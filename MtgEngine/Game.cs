@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
@@ -26,6 +27,10 @@ namespace MtgEngine
         {
             await Task.Run(() =>
             {
+                // TODO: Determine Turn Order
+
+                ShufflePlayers();
+
                 _players.ForEach(player => player.ShuffleLibrary());
                 _players.ForEach(player => player.Draw(7));
 
@@ -75,8 +80,44 @@ namespace MtgEngine
                     break;
             }
         }
+        
+        /// <summary>
+        /// This method shuffles the Players collection by having the players Roll for Initiative, similarly to how we play in Paper MTG, except they roll d100 instead of 2d6
+        /// </summary>
+        private void ShufflePlayers()
+        {
+            var temp = new Queue<Player>(_players.Count);
+            foreach (var player in _players)
+                temp.Enqueue(player);
+            _players.Clear();
 
-        internal void BeginningPhase()
+            Dictionary<int, Player> initiative = new Dictionary<int, Player>(temp.Count);
+            while(temp.Count > 0)
+            {
+                var player = temp.Dequeue();
+                int i = player.RollInitiative();
+
+                if(initiative.ContainsKey(i))
+                {
+                    temp.Enqueue(initiative[i]);
+                    temp.Enqueue(player);
+
+                    initiative.Remove(i);
+                }
+                else
+                {
+                    initiative.Add(i, player);
+                }
+            }
+
+            foreach (var pair in initiative.ToList().OrderBy(c => c.Key))
+            {
+                _players.Add(pair.Value);
+            }
+            initiative.Clear();
+        }
+
+        private void BeginningPhase()
         {
             UntapStep();
 
@@ -85,24 +126,24 @@ namespace MtgEngine
             DrawStep();
         }
 
-        internal void UntapStep()
+        private void UntapStep()
         {
             _activePlayer.Battlefield.ForEach(c => c.Untap());
         }
 
-        internal void UpkeepStep()
+        private void UpkeepStep()
         {
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
         }
 
-        internal void DrawStep()
+        private void DrawStep()
         {
             // TODO: Add Beginning of Draw Step Triggers to the Stack
 
             _activePlayer.Draw(1);
         }
 
-        internal void MainPhase(bool beforeCombat)
+        private void MainPhase(bool beforeCombat)
         {
             // TODO: Add Beginning of Main Phase Triggers to the stack
 
@@ -118,7 +159,7 @@ namespace MtgEngine
             // TODO: Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
         }
 
-        internal void CombatPhase()
+        private void CombatPhase()
         {
             BeginningOfCombatStep();
 
@@ -131,28 +172,28 @@ namespace MtgEngine
             EndOfCombatStep();
         }
 
-        internal void BeginningOfCombatStep()
+        private void BeginningOfCombatStep()
         {
             // TODO: Add Beginning of Combat Triggers to the Stack
 
             // TODO: Cycle Priority, do NOT give the Active Player the ability to cast Sorcery Speed spells
         }
 
-        internal void DeclareAttackersStep()
+        private void DeclareAttackersStep()
         {
             // TODO: Ask the Active Player to declare attackers
 
             // TODO: Cycle Priority in ApNap order
         }
 
-        internal void DeclareBlockersStep()
+        private void DeclareBlockersStep()
         {
             // TODO: Ask the Defending Players, in ApNap order, to declare Blockers
 
             // TODO: Cycle Priority in ApNap order
         }
 
-        internal void DamageStep()
+        private void DamageStep()
         {
             // TODO: Deal First Strike Damage
 
@@ -165,24 +206,24 @@ namespace MtgEngine
             // TODO: Check State-Based Actions
         }
 
-        internal void EndOfCombatStep()
+        private void EndOfCombatStep()
         {
             // TODO: Cycle Priority in ApNap order
         }
 
-        internal void EndingPhase()
+        private void EndingPhase()
         {
             EndStep();
 
             CleanupStep();
         }
 
-        internal void EndStep()
+        private void EndStep()
         {
             // TODO: Add EndStep Triggers to the Stack in ApNap Order
         }
 
-        internal void CleanupStep()
+        private void CleanupStep()
         {
             // TODO: Discard down to Maximum Hand Size
 
@@ -192,7 +233,7 @@ namespace MtgEngine
             // Example: Madness is a triggered ability that happens when a player discards a card with Madness. This can potentially be put on the stack from the First part of the Cleanup step
         }
 
-        internal void ApNapLoop(Player startingPlayer, bool startingPlayerCanCastSorceries)
+        private void ApNapLoop(Player startingPlayer, bool startingPlayerCanCastSorceries)
         {
             // Idea: This might need to be put in a separate class, a Stack Resolver
 

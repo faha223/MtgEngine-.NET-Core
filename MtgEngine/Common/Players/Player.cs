@@ -27,6 +27,12 @@ namespace MtgEngine
         public Dictionary<string, int> Counters { get; }
         public List<Card> CommandZone { get; } = new List<Card>();
 
+        public int RollInitiative()
+        {
+            Random rand = new Random();
+            return 1 + (rand.Next() % 100);
+        }
+
         public void ShuffleLibrary()
         {
             Common.Utilities.LibraryShuffler.ShuffleLibrary(Library);
