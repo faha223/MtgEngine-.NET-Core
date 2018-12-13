@@ -35,6 +35,8 @@ namespace MtgEngine.Common.Cards
         private bool _isLegendary { get; }
         public virtual bool IsLegendary { get { return _isLegendary; } }
 
+        public bool IsTapped { get; protected set; }
+
         public Player Controller { get; set; }
 
         public Player Owner { get; }
@@ -61,6 +63,7 @@ namespace MtgEngine.Common.Cards
 
         public virtual void OnResolve(Game game)
         {
+
         }
 
         /// <summary>
@@ -68,5 +71,17 @@ namespace MtgEngine.Common.Cards
         /// </summary>
         /// <param name="game"></param>
         public abstract void AfterResolve(Game game);
+
+        public void Untap()
+        {
+            if (IsTapped)
+                IsTapped = false;
+        }
+
+        public void Tap()
+        {
+            if (!IsTapped)
+                IsTapped = true;
+        }
     }
 }
