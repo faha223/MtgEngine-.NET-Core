@@ -3,8 +3,7 @@
     public enum ActionType
     {
         PassPriority,
-        PlayLand,
-        CastSpell,
+        PlayCard,
         ActivateAbility
     }
 }

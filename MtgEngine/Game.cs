@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Utilities;
 
 namespace MtgEngine
@@ -19,7 +21,7 @@ namespace MtgEngine
             get
             {
                 int i = _players.IndexOf(_activePlayer) + 1;
-                return _players[(i + 1) % _players.Count];
+                return _players[i % _players.Count];
             }
         }
 
@@ -51,6 +53,8 @@ namespace MtgEngine
 
                 do
                 {
+                    _players.ForEach(player => ResetLandsPlayed(player));
+
                     BeginningPhase();
 
                     MainPhase(true);
@@ -60,6 +64,8 @@ namespace MtgEngine
                     MainPhase(false);
 
                     EndingPhase();
+
+                    _activePlayer = _nextPlayer;
                 } while (true);
             });
         }
@@ -177,12 +183,18 @@ namespace MtgEngine
         {
             BeginningOfCombatStep();
 
+            // If the active player controls no creatures without summoning sickness, is this really necessary?
             DeclareAttackersStep();
 
-            DeclareBlockersStep();
+            // If Attackers were declared
+            if (true)
+            {
+                DeclareBlockersStep();
 
-            DamageStep();
+                DamageStep();
+            }
 
+            // TODO : If there are no attackers, is this really necessary?
             EndOfCombatStep();
         }
 
@@ -209,15 +221,21 @@ namespace MtgEngine
 
         private void DamageStep()
         {
-            // TODO: Deal First Strike Damage
+            // If any attackers have firststrike or doublestrike
+            if(false)
+            {
+                // TODO: Deal First Strike Damage
 
-            // TODO: Check State-Based Actions
+                CheckStateBasedActions();
+            }
 
-            // TODO: Deal Regular Damage
+            // If any remaining attackers have doublestrike or don't have firststrike
+            if (false)
+            {
+                // TODO: Deal Regular Damage
 
-            // TODO: Check State-Based Actions
-
-            // TODO: Check State-Based Actions
+                CheckStateBasedActions();
+            }
         }
 
         private void EndOfCombatStep()
@@ -265,21 +283,65 @@ namespace MtgEngine
                 _priorityPlayer = player;
                 var chosenAction = player.GivePriority(_activePlayer, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
 
-                switch(chosenAction.ActionType)
+                bool playerHasPassedPriority = false;
+                while (!playerHasPassedPriority)
                 {
-                    case Common.Players.Actions.ActionType.PassPriority:
-                        continue;
-                    case Common.Players.Actions.ActionType.PlayLand:
-                        // TODO
-                        break;
-                    case Common.Players.Actions.ActionType.CastSpell:
-                        // TODO
-                        break;
-                    case Common.Players.Actions.ActionType.ActivateAbility:
-                        // TODO
-                        break;
+                    switch (chosenAction.ActionType)
+                    {
+                        case ActionType.PassPriority:
+                            playerHasPassedPriority = true;
+                            continue;
+                        case ActionType.PlayCard:
+                            {
+                                var action = chosenAction as PlayCardAction;
+                                if (action.Card is LandCard)
+                                {
+                                    if (player == startingPlayer && startingPlayerCanCastSorceries && player.LandsPlayedThisTurn < player.MaxLandsPlayedThisTurn)
+                                    {
+                                        PlayLand(action.Card as LandCard);
+                                        player.LandsPlayedThisTurn++;
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO : Make player pay the cost of the Card
+                                    // TODO : Put the Card onto the stack
+                                    ApNapLoop(_players[_players.IndexOf(player) + 1 % _players.Count], false);
+                                }
+                            }
+                            break;
+                        case ActionType.ActivateAbility:
+                            {
+                                var action = chosenAction as ActivateAbilityAction;
+                                var ability = action.Ability as ActivatedAbility;
+                                // TODO : Make player pay the cost of the Ability
+                                if (action.Ability is ManaAbility)
+                                {
+                                    (action.Ability as ManaAbility).OnResolve(this);
+                                }
+                                else
+                                {
+                                    // TODO : Put the Ability onto the stack
+                                }
+
+
+                                ApNapLoop(_players[_players.IndexOf(player) + 1 % _players.Count], false);
+                            }
+                            break;
+                    }
                 }
             }
+        }
+
+        private void CheckStateBasedActions()
+        {
+            // TODO: Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
+
+            // TODO: Any players with 0 life total lose the game
+
+            // TODO: If an effect has caused a player to win the game, all other players lose
+
+            // TODO: If a player has lost the game, remove them from the _players list. If they were the active player, go to the start of the next player's turn
         }
 
         /// <summary>
@@ -334,6 +396,16 @@ namespace MtgEngine
                 player.Draw(Math.Max(0, 6 - player.MulligansTaken));
                 player.MulligansTaken++;
             }                
+        }
+
+        /// <summary>
+        /// Resets the Player's lands played per turn and max lands played per turn
+        /// </summary>
+        /// <param name="player"></param>
+        private void ResetLandsPlayed(Player player)
+        {
+            player.LandsPlayedThisTurn = 0;
+            player.MaxLandsPlayedThisTurn = (player == _activePlayer ? 1 : 0);
         }
 
         #endregion Utility Methods

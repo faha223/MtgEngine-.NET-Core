@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace MtgEngine.Common.Mana
@@ -17,6 +18,14 @@ namespace MtgEngine.Common.Mana
             this[ManaColor.Red] = 0;
             this[ManaColor.Green] = 0;
             this[ManaColor.Colorless] = 0;
+        }
+
+        public void Add(ManaAmount manaAmount)
+        {
+            if (manaAmount.Color == ManaColor.Generic)
+                throw new ArgumentException("ManaAmount.Color: Invalid Value. Generic Mana can only be payed. Generic Mana cannot be generated.");
+
+            this[manaAmount.Color] += manaAmount.Amount;
         }
     }
 }

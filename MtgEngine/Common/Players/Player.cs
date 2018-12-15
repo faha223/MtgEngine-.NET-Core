@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players.Actions;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,11 @@ namespace MtgEngine
 
         private int _startingLifeTotal { get; } = 20;
         public int LifeTotal { get; set; } = 20;
+
+        public int LandsPlayedThisTurn = 0;
+        public int MaxLandsPlayedThisTurn = 1;
+
+        public ManaPool ManaPool { get; } = new ManaPool();
 
         public Dictionary<string, int> Counters { get; }
         public List<Card> CommandZone { get; } = new List<Card>();

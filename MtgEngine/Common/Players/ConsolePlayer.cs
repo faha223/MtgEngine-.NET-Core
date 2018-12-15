@@ -13,7 +13,7 @@ namespace MtgEngine.Common.Players
         public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
         {
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
-            Console.WriteLine($"You Have Priority (Active Player: {activePlayer.Name}");
+            Console.WriteLine($"You Have Priority (Active Player: {activePlayer.Name})");
             return new PassPriorityAction();
         }
 
