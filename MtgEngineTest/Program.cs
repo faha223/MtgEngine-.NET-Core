@@ -9,8 +9,8 @@ namespace MtgEngineTest
         static void Main(string[] args)
         {
             var game = new Game();
-            game.AddPlayer(new ConsolePlayer("Specialfred453", 20));
-            game.AddPlayer(new PassPriorityPlayer("Al", 20));
+            game.AddPlayer(new ConsolePlayer("Specialfred453", 20, "60x Forest"));
+            game.AddPlayer(new PassPriorityPlayer("Al", 20, "60x Forest"));
             game.Start().Wait();
         }
     }

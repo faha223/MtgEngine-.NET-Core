@@ -6,7 +6,7 @@ namespace MtgEngine.Common.Cards
     {
         ManaColor _color;
 
-        public BasicLandCard(Player owner, ManaColor color, string name, string image, string cardId, CardType[] types, string[] subtypes) : 
+        protected BasicLandCard(Player owner, ManaColor color, string name, string image, string cardId, CardType[] types, string[] subtypes) : 
             base(owner, name, image, cardId, types, subtypes, true, false)
         {
             _color = color;

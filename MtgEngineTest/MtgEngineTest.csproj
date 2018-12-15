@@ -6,7 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MtgEngine.TestSet\MtgEngine.TestSet.csproj" />
     <ProjectReference Include="..\MtgEngine\MtgEngine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="PlayerDeck.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

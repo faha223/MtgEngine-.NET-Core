@@ -37,11 +37,11 @@ namespace MtgEngine.Common.Cards
 
         public bool IsTapped { get; protected set; }
 
-        public Player Controller { get; set; }
+        public Player Controller { get; private set; }
 
         public Player Owner { get; }
 
-        public Card(Player owner, string name, string image, string cardId, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary)
+        protected Card(Player owner, string name, string image, string cardId, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary)
         {
             Owner = owner;
             Controller = owner;
@@ -63,7 +63,6 @@ namespace MtgEngine.Common.Cards
 
         public virtual void OnResolve(Game game)
         {
-
         }
 
         /// <summary>
@@ -82,6 +81,11 @@ namespace MtgEngine.Common.Cards
         {
             if (!IsTapped)
                 IsTapped = true;
+        }
+
+        public void GiveControl(Player player)
+        {
+            Controller = player;
         }
     }
 }

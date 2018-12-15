@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Utilities;
 
 namespace MtgEngine
 {
@@ -13,13 +14,24 @@ namespace MtgEngine
 
         private Player _activePlayer { get; set; }
 
+        private Player _nextPlayer
+        {
+            get
+            {
+                int i = _players.IndexOf(_activePlayer) + 1;
+                return _players[(i + 1) % _players.Count];
+            }
+        }
+
+        private Queue<Player> _extraTurns { get; } = new Queue<Player>();
+
         private Player _priorityPlayer { get; set; }
 
         private Stack<Card> Stack { get; } = new Stack<Card>();
 
         public void AddPlayer(Player player)
         {
-            if (_players.Contains(player))
+            if (!_players.Contains(player))
                 _players.Add(player);
         }
 
@@ -30,6 +42,7 @@ namespace MtgEngine
                 // TODO: Determine Turn Order
 
                 ShufflePlayers();
+                _activePlayer = _players.First();
 
                 _players.ForEach(player => player.ShuffleLibrary());
                 _players.ForEach(player => player.Draw(7));
@@ -51,7 +64,7 @@ namespace MtgEngine
             });
         }
 
-        internal void ChangeZone(Card card, Zone newZone)
+        public void ChangeZone(Card card, Zone newZone)
         {
             card.Controller.Hand.RemoveAll(c => c == card);
             card.Controller.Battlefield.RemoveAll(c => c == card);
@@ -157,6 +170,7 @@ namespace MtgEngine
             }
 
             // TODO: Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
+            ApNapLoop(_activePlayer, true);
         }
 
         private void CombatPhase()
@@ -245,6 +259,83 @@ namespace MtgEngine
             // If the player responds with an illegal action then inform the user of why the action is illegal, and ask again
 
             // This function returns when the stack is empty and all players have Passed Priority since the last spell resolved
+            foreach(var player in _players.StartAt(startingPlayer))
+            {
+                // TODO: Give Priority
+                _priorityPlayer = player;
+                var chosenAction = player.GivePriority(_activePlayer, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
+
+                switch(chosenAction.ActionType)
+                {
+                    case Common.Players.Actions.ActionType.PassPriority:
+                        continue;
+                    case Common.Players.Actions.ActionType.PlayLand:
+                        // TODO
+                        break;
+                    case Common.Players.Actions.ActionType.CastSpell:
+                        // TODO
+                        break;
+                    case Common.Players.Actions.ActionType.ActivateAbility:
+                        // TODO
+                        break;
+                }
+            }
         }
+
+        /// <summary>
+        /// Play the specified Land card
+        /// </summary>
+        /// <param name="card"></param>
+        private void PlayLand(LandCard card)
+        {
+            // Remove the card from the player's hand and place it on the battlefield
+            card.Controller.Hand.Remove(card);
+            card.Controller.Battlefield.Add(card);
+
+            // Add any ETB triggers to the stack
+            ChangeZone(card, Zone.Battlefield);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="card"></param>
+        private void CastSpell(Card card)
+        {
+            // Can't do anything if we can't pay the cost
+            if (card.Cost.CanPay())
+            {
+                card.Cost.Pay();
+                card.Controller.Hand.Remove(card);
+                Stack.Push(card);
+            }
+        }
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Vancouver mulligan works by having the player return their hand to their library and 
+        /// drawing 1 fewer cards. In Multiplayer, the player gets a free first mulligan.
+        /// </summary>
+        /// <param name="player">The player that is taking a mulligan</param>
+        private void VancouverMulligan(Player player)
+        {
+            player.Library.AddRange(player.Hand);
+            player.Hand.Clear();
+            player.ShuffleLibrary();
+
+            if (_players.Count > 2) // Free first mulligan if multiplayer
+            {
+                player.Draw(Math.Max(0, 7 - player.MulligansTaken));
+                player.MulligansTaken++;
+            }
+            else
+            {
+                player.Draw(Math.Max(0, 6 - player.MulligansTaken));
+                player.MulligansTaken++;
+            }                
+        }
+
+        #endregion Utility Methods
     }
 }

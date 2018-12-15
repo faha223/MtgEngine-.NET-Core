@@ -17,7 +17,7 @@ namespace MtgEngine.Common.Cards
             get { return _baseToughness; }
         }
 
-        public CreatureCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary) : 
+        protected CreatureCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary) : 
             base(owner, name, image, cardId, true, cost, types, subtypes, false, isLegendary)
         {
             _basePower = basePower;

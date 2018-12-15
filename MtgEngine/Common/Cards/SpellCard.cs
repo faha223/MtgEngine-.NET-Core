@@ -5,7 +5,7 @@ namespace MtgEngine.Common.Cards
 {
     public abstract class SpellCard : Card
     {
-        public SpellCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, bool isLegendary) :
+        protected SpellCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, bool isLegendary) :
             base(owner, name, image, cardId, true, cost, types, subtypes, false, isLegendary)
         {
         }

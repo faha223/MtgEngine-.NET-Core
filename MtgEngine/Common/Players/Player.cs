@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Players.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ namespace MtgEngine
 {
     public abstract class Player
     {
+        public int MulligansTaken { get; set; } = 0;
+
         public string Name { get; }
 
         public Guid Id { get; } = Guid.NewGuid();
@@ -33,6 +36,13 @@ namespace MtgEngine
             return 1 + (rand.Next() % 100);
         }
 
+        /// <summary>
+        /// This method sends a request to the Player to request a target.
+        /// </summary>
+        /// <param name="targetSelector"></param>
+        /// <returns></returns>
+        public abstract Card SelectTarget(string message, Func<Card, bool> targetSelector);
+
         public void ShuffleLibrary()
         {
             Common.Utilities.LibraryShuffler.ShuffleLibrary(Library);
@@ -45,12 +55,15 @@ namespace MtgEngine
             Hand.AddRange(cardsDrawn);
         }
 
-        public Player(string name, int startingLifeTotal)
+        public Player(string name, int startingLifeTotal, string deckList)
         {
             Name = name;
 
             _startingLifeTotal = startingLifeTotal;
             LifeTotal = _startingLifeTotal;
+            Library = new Deck(this, deckList);
         }
+
+        public abstract ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells);
     }
 }
