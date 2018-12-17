@@ -3,7 +3,7 @@ using MtgEngine.Common.Enums;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract class CreatureCard : Card
+    public abstract class CreatureCard : PermanentCard
     {
         private int _basePower { get; }
         public virtual int BasePower
@@ -16,6 +16,12 @@ namespace MtgEngine.Common.Cards
         {
             get { return _baseToughness; }
         }
+
+        public Player DefendingPlayer { get; set; } = null;
+
+        public bool IsAttacking { get { return DefendingPlayer != null; } }
+
+        public Card Blocking { get; set; } = null;
 
         protected CreatureCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary) : 
             base(owner, name, image, cardId, true, cost, types, subtypes, false, isLegendary)
