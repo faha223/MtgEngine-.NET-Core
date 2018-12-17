@@ -3,22 +3,27 @@ using System.Text;
 
 namespace MtgEngine.Common.Costs
 {
+    // TODO: Make constructors private, add a static method that parses mana cost
     public class ManaCost : Cost
     {
         private ManaAmount[] _manaAmounts;
 
-        public ManaCost(IResolvable source, params ManaAmount[] manaAmounts) : base(source)
+        private ManaCost(IResolvable source, params ManaAmount[] manaAmounts) : base(source)
         {
             _manaAmounts = manaAmounts;
         }
 
-        public ManaCost(IResolvable source, string manaCost) : base(source)
+        public static Cost Parse(IResolvable source, string manaCost)
         {
-            _manaAmounts = ManaParser.Parse(manaCost);
+            var manaAmounts = ManaParser.Parse(manaCost);
+            if (manaAmounts == null)
+                return new NoCost(source);
+            return new ManaCost(source, manaAmounts);
         }
 
         public override bool CanPay()
         {
+            // TODO
             return false;
         }
 

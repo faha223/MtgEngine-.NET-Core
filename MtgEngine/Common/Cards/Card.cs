@@ -20,8 +20,8 @@ namespace MtgEngine.Common.Cards
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
-        private Cost _cost { get; }
-        public virtual Cost Cost { get { return _cost; } }
+        private Cost _cost { get; set; }
+        public virtual Cost Cost { get { return _cost; } protected set { _cost = value; } }
 
         private CardType[] _types { get; }
         public virtual CardType[] Types { get { return _types; } }

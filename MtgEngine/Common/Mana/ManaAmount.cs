@@ -11,36 +11,18 @@ namespace MtgEngine.Common.Mana
         {
             if (Amount == 0)
                 return "{0}";
-            string colorStr = null;
-            switch(Color)
+            
+            if(Color == ManaColor.Generic)
+                return $"{{{Amount}}}";
+            else
             {
-                case ManaColor.White:
-                    colorStr = "{W}";
-                    break;
-                case ManaColor.Blue:
-                    colorStr = "{U}";
-                    break;
-                case ManaColor.Black:
-                    colorStr = "{B}";
-                    break;
-                case ManaColor.Red:
-                    colorStr = "{R}";
-                    break;
-                case ManaColor.Green:
-                    colorStr = "{G}";
-                    break;
-                case ManaColor.Colorless:
-                    colorStr = "{C}";
-                    break;
-                default:
-                    return $"{{{Amount}}}";
+                var attrib = ManaAttribute.GetManaAttribute(Color);
+                var sb = new StringBuilder();
+                for (int i = 0; i < Amount; i++)
+                    sb.Append(attrib.AsString);
+
+                return sb.ToString();
             }
-
-            var sb = new StringBuilder();
-            for(int i = 0; i < Amount; i++)
-                sb.Append(colorStr);
-
-            return sb.ToString();
         }
     }
 }
