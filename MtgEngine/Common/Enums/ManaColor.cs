@@ -30,6 +30,9 @@ namespace MtgEngine.Common.Enums
         // Generic gets no attribute because it appears differently in Mana Costs depending on the amount
         Generic,        // May be paid with any mana source, cannot be explicitly generated
 
+        [Mana("{X}")]
+        GenericX,       // Same as Generic, but the amount is determined at the time the mana cost is to be paid. Cannot be explicitly generated
+
         // Phyrexian Mana Types
 
         [Mana("{W/P}")]
