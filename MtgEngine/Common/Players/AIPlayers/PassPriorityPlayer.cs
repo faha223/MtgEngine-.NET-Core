@@ -21,5 +21,13 @@ namespace MtgEngine.Common.Players.AIPlayers
         {
             return null;
         }
+
+        public override void Discard()
+        {
+            Thread.Sleep(500);
+            var rand = new Random();
+            var index = Math.Abs(rand.Next()) % Hand.Count;
+            Discard(Hand[index]);
+        }
     }
 }

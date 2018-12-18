@@ -31,6 +31,9 @@ namespace MtgEngine
         public int LandsPlayedThisTurn = 0;
         public int MaxLandsPlayedThisTurn = 1;
 
+        protected int _maxHandSize = 7;
+        public int MaxHandSize { get { return _maxHandSize; } }
+
         public ManaPool ManaPool { get; } = new ManaPool();
 
         public Dictionary<string, int> Counters { get; }
@@ -71,5 +74,24 @@ namespace MtgEngine
         }
 
         public abstract ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells);
+
+        public virtual void DiscardToHandSize()
+        {
+            while (Hand.Count > MaxHandSize)
+            {
+                Discard();
+            }
+        }
+
+        public abstract void Discard();
+
+        public virtual void Discard(Card card)
+        {
+            if (!Hand.Contains(card))
+                return;
+
+            Hand.Remove(card);
+            Graveyard.Add(card);
+        }
     }
 }

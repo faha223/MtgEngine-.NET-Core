@@ -258,6 +258,7 @@ namespace MtgEngine
         private void CleanupStep()
         {
             // TODO: Discard down to Maximum Hand Size
+            _activePlayer.DiscardToHandSize();
 
             // TODO: Remove Marked Damage from Permanents, and "Until End of Turn" and "This Turn" effects go away
 
