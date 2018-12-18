@@ -5,14 +5,9 @@ namespace MtgEngine.Common.Cards
 {
     public abstract class SpellCard : Card
     {
-        protected SpellCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, bool isLegendary) :
-            base(owner, name, image, cardId, true, cost, types, subtypes, false, isLegendary)
+        protected SpellCard(Player owner, Cost cost, CardType[] types, string[] subtypes, bool isLegendary) :
+            base(owner, true, cost, types, subtypes, false, isLegendary, false)
         {
-        }
-
-        public override void AfterResolve(Game game)
-        {
-            game.ChangeZone(this, Zone.Graveyard);
         }
     }
 }

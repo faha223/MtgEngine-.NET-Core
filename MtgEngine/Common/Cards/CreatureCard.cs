@@ -23,8 +23,8 @@ namespace MtgEngine.Common.Cards
 
         public Card Blocking { get; set; } = null;
 
-        protected CreatureCard(Player owner, string name, string image, string cardId, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary) : 
-            base(owner, name, image, cardId, true, cost, types, subtypes, false, isLegendary)
+        protected CreatureCard(Player owner, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary, bool isSnow) : 
+            base(owner, true, cost, types, subtypes, false, isLegendary, isSnow)
         {
             _basePower = basePower;
             _baseToughness = baseToughness;

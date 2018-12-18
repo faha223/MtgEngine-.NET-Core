@@ -1,19 +1,13 @@
 ﻿using MtgEngine.Common.Cards;
-using MtgEngine.Common.Enums;
 
 namespace MtgEngine.TestSet
 { 
-    [MtgCard("Forest", "TestSet")]
-    public class Forest : BasicLandCard
+    [MtgCard("Forest", "TestSet", "", "")]
+    public class Forest : Common.Cards.BasicLands.Forest
     {
-        public Forest(Player owner) : base(owner, ManaColor.Green, "Forest", "", "", new[] { CardType.Land }, new[] { "Forest" })
+        public Forest(Player owner) : base(owner)
         {
 
-        }
-
-        public override void AfterResolve(Game game)
-        {
-            game.ChangeZone(this, Zone.Battlefield);
         }
     }
 }

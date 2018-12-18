@@ -9,14 +9,37 @@ namespace MtgEngine.Common.Cards
     /// </summary>
     public abstract class Card : IResolvable
     {
-        private string _name { get; }
-        public virtual string Name { get { return _name; } }
-
         public bool UsesStack { get; }
 
-        public string Image { get; }
+        public string CardId
+        {
+            get => AllCards.GetCardId(GetType());
+        }
 
-        public string CardId { get; }
+        public string Name
+        {
+            get => AllCards.GetCardName(GetType());
+        }
+
+        public string Set
+        {
+            get => AllCards.GetSet(GetType());
+        }
+
+        public string ImageUri
+        {
+            get => AllCards.GetImageUri(GetType());
+        }
+
+        public string Text
+        {
+            get => AllCards.GetText(GetType());
+        }
+
+        public string FlavorText
+        {
+            get => AllCards.GetFlavorText(GetType());
+        }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
@@ -35,25 +58,26 @@ namespace MtgEngine.Common.Cards
         private bool _isLegendary { get; }
         public virtual bool IsLegendary { get { return _isLegendary; } }
 
+        private bool _isSnow { get; }
+        public virtual bool IsSnow { get { return _isSnow; } }
+
         public bool IsTapped { get; protected set; }
 
         public Player Controller { get; private set; }
 
         public Player Owner { get; }
 
-        protected Card(Player owner, string name, string image, string cardId, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary)
+        protected Card(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow)
         {
             Owner = owner;
             Controller = owner;
-            Image = image;
-            CardId = cardId;
             UsesStack = usesStack;
-            _name = name;
             _cost = Cost;
             _types = types;
             _subtypes = subtypes;
             _isBasic = isBasic;
             _isLegendary = isLegendary;
+            _isSnow = isSnow;
         }
 
         public virtual void OnCast(Game game)
@@ -61,15 +85,13 @@ namespace MtgEngine.Common.Cards
 
         }
 
+        /// <summary>
+        /// The method that is called as the spell resolves. If a spell is exiled after it resolves, exile it in this method
+        /// </summary>
+        /// <param name="game"></param>
         public virtual void OnResolve(Game game)
         {
         }
-
-        /// <summary>
-        /// Permanents are added to the Battlefield, Spells go to their owner's graveyard unless specified otherwise
-        /// </summary>
-        /// <param name="game"></param>
-        public abstract void AfterResolve(Game game);
 
         public void Untap()
         {

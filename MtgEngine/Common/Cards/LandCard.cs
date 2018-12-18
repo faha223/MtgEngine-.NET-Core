@@ -5,8 +5,8 @@ namespace MtgEngine.Common.Cards
 {
     public abstract class LandCard : PermanentCard
     {
-        protected LandCard(Player owner, string name, string image, string cardId, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary) : 
-            base(owner, name, image, cardId, false, null, types, subtypes, isBasic, isLegendary)
+        protected LandCard(Player owner, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) : 
+            base(owner, false, null, types, subtypes, isBasic, isLegendary, isSnow)
         {
             Cost = new NoCost(this);
         }

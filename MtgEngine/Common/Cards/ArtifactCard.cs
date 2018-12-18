@@ -5,8 +5,8 @@ namespace MtgEngine.Common.Cards
 {
     public abstract class ArtifactCard : PermanentCard
     {
-        public ArtifactCard(Player owner, string name, string image, string cardId, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isLegendary) : 
-            base(owner, name, image, cardId, usesStack, cost, types, subtypes, false, isLegendary)
+        public ArtifactCard(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isLegendary, bool isSnow) : 
+            base(owner, usesStack, cost, types, subtypes, false, isLegendary, isSnow)
         {
         }
     }
