@@ -1,6 +1,8 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common;
+using MtgEngine.Common.Cards;
 using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players.Actions;
+using MtgEngine.Common.Players.Gameplay;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +17,15 @@ namespace MtgEngine
 
         public Guid Id { get; } = Guid.NewGuid();
 
-        public List<Card> Hand { get; } = new List<Card>();
+        public Zone Hand { get; } = new Zone();
 
         public List<Card> Library { get; } = new List<Card>();
 
-        public List<Card> Battlefield { get; } = new List<Card>();
+        public Zone Battlefield { get; } = new Zone();
 
-        public List<Card> Graveyard { get; } = new List<Card>();
+        public Zone Graveyard { get; } = new Zone();
 
-        public List<Card> Exile { get; } = new List<Card>();
+        public Zone Exile { get; } = new Zone();
 
         private int _startingLifeTotal { get; } = 20;
         public int LifeTotal { get; set; } = 20;
@@ -37,7 +39,7 @@ namespace MtgEngine
         public ManaPool ManaPool { get; } = new ManaPool();
 
         public Dictionary<string, int> Counters { get; }
-        public List<Card> CommandZone { get; } = new List<Card>();
+        public Zone CommandZone { get; } = new Zone();
 
         public int RollInitiative()
         {
@@ -57,9 +59,18 @@ namespace MtgEngine
             Common.Utilities.LibraryShuffler.ShuffleLibrary(Library);
         }
 
-        public void Draw(int howMany)
+        public void DrawHand(int handSize)
         {
-            IEnumerable<Card> cardsDrawn = Library.Take(howMany);
+            var cardsDrawn = Library.Take(handSize);
+            Library.RemoveRange(0, handSize);
+            Hand.AddRange(cardsDrawn);
+        }
+
+        public abstract bool OfferMulligan();
+
+        public virtual void Draw(int howMany)
+        {
+            var cardsDrawn = Library.Take(howMany);
             Library.RemoveRange(0, howMany);
             Hand.AddRange(cardsDrawn);
         }
@@ -74,6 +85,10 @@ namespace MtgEngine
         }
 
         public abstract ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells);
+
+        public abstract List<AttackerDeclaration> DeclareAttackers();
+
+        public abstract List<BlockerDeclaration> DeclareBlockers(IEnumerable<CreatureCard> AttackingCreatures);
 
         public virtual void DiscardToHandSize()
         {
@@ -93,5 +108,13 @@ namespace MtgEngine
             Hand.Remove(card);
             Graveyard.Add(card);
         }
+
+        /// <summary>
+        /// Show the player the top N cards of their library. They choose which ones that would like to put back on top of their library, and which ones they'd like to go on the bottom, and the order of each.
+        /// </summary>
+        /// <param name="scryedCards">The top N cards of their library</param>
+        /// <param name="cardsOnTop">The cards the player wishes to put on the top of their library, in the order in which they wish to draw them</param>
+        /// <param name="cardsOnBottom">The cards the player wishes to put on the bottom of their library, in the order they wish to draw them</param>
+        public abstract void ScryChoice(List<Card> scryedCards, out IEnumerable<Card> cardsOnTop, out IEnumerable<Card> cardsOnBottom);
     }
 }

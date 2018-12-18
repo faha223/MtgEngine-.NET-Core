@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MtgEngine.Common.Utilities
 {
@@ -18,6 +19,16 @@ namespace MtgEngine.Common.Utilities
             }
 
             return ordered;
+        }
+
+        public static List<T> OrderByIndexList<T>(this List<T> self, IEnumerable<int> indexList)
+        {
+            var temp = new List<T>(indexList.Count());
+            foreach(var i in indexList)
+            {
+                temp.Add(self[i]);
+            }
+            return temp;
         }
     }
 }

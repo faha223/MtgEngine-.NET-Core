@@ -41,16 +41,18 @@ namespace MtgEngine
         {
             await Task.Run(() =>
             {
-                // TODO: Determine Turn Order
-
+                // Determine Turn Order
                 ShufflePlayers();
                 _activePlayer = _players.First();
 
+                // Deal Opening Hands
                 _players.ForEach(player => player.ShuffleLibrary());
                 _players.ForEach(player => player.Draw(7));
 
-                // TODO: Mulligans
+                // Offer Players the option of mulliganing
+                OfferMulligans();
 
+                // Go to Player 1 Turn 1
                 do
                 {
                     _players.ForEach(player => ResetLandsPlayed(player));
@@ -136,6 +138,45 @@ namespace MtgEngine
             initiative.Clear();
         }
 
+        /// <summary>
+        /// This method offers all players mulligans in Turn order, then gives them each a mulligan. The process repeats until no player has opted to take their hand
+        /// </summary>
+        private void OfferMulligans()
+        {
+            List<Player> playersTakingMulligan = new List<Player>(_players);
+            do
+            {
+                // Offer each player a mulligan, note which ones chose to keep their current hand
+                List<Player> playersKeeping = new List<Player>(playersTakingMulligan.Count);
+                foreach (var player in playersTakingMulligan)
+                {
+                    if (!player.OfferMulligan())
+                        playersKeeping.Add(player);
+                }
+
+                // Remove players who chose to keep their hand from the players taking mulligan
+                playersTakingMulligan.RemoveAll(player => playersKeeping.Contains(player));
+
+                // Apply the Vancouver Mulligan strategy to all players who elected to take a mulligan
+                playersTakingMulligan.ForEach(player => VancouverMulligan(player));
+
+            } while (playersTakingMulligan.Count > 0);
+
+            // Players who are starting with a hand of less than 7 scry 1
+            foreach(var player in _players)
+            {
+                if (player.Hand.Count < 7)
+                {
+                    var scryedCards = player.Library.Take(1).ToList();
+                    player.Library.RemoveRange(0, 1);
+                    player.ScryChoice(scryedCards, out var cardsOnTop, out var cardsOnBottom);
+                    player.Library.AddRange(cardsOnBottom);
+                    foreach (var card in cardsOnTop.Reverse())
+                        player.Library.Insert(0, card);
+                }
+            }
+        }
+
         private void BeginningPhase()
         {
             UntapStep();
@@ -153,6 +194,7 @@ namespace MtgEngine
         private void UpkeepStep()
         {
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
+            ApNapLoop(_activePlayer, false);
         }
 
         private void DrawStep()
@@ -187,7 +229,7 @@ namespace MtgEngine
             DeclareAttackersStep();
 
             // If Attackers were declared
-            if (true)
+            if (_activePlayer.Battlefield.Any(card => card is CreatureCard && (card as CreatureCard).IsAttacking))
             {
                 DeclareBlockersStep();
 
@@ -202,21 +244,35 @@ namespace MtgEngine
         {
             // TODO: Add Beginning of Combat Triggers to the Stack
 
-            // TODO: Cycle Priority, do NOT give the Active Player the ability to cast Sorcery Speed spells
+            ApNapLoop(_activePlayer, false);
         }
 
         private void DeclareAttackersStep()
         {
             // TODO: Ask the Active Player to declare attackers
+            var attackers = _activePlayer.DeclareAttackers();
+            foreach(var declaration in attackers)
+            {
+                declaration.AttackingCreature.DefendingPlayer = declaration.DefendingPlayer;
+            }
 
-            // TODO: Cycle Priority in ApNap order
+            // TODO: Any "When this creature attacks" triggers get put onto the stack
+
+            ApNapLoop(_activePlayer, false);
         }
 
         private void DeclareBlockersStep()
         {
             // TODO: Ask the Defending Players, in ApNap order, to declare Blockers
+            var defendingPlayers = _players.StartAt(_activePlayer)
+                .Where(p => _activePlayer.Battlefield.Creatures.Any(c => c.DefendingPlayer == p));
+            // Iterate over the defending players in turn order
+            foreach(var player in defendingPlayers)
+            {
+                player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player));
+            }
 
-            // TODO: Cycle Priority in ApNap order
+            ApNapLoop(_activePlayer, false);
         }
 
         private void DamageStep()
@@ -230,7 +286,7 @@ namespace MtgEngine
             }
 
             // If any remaining attackers have doublestrike or don't have firststrike
-            if (false)
+            if (_activePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
             {
                 // TODO: Deal Regular Damage
 
@@ -240,7 +296,14 @@ namespace MtgEngine
 
         private void EndOfCombatStep()
         {
-            // TODO: Cycle Priority in ApNap order
+            // Give Priority to Players
+            ApNapLoop(_activePlayer, false);
+
+            // TODO: Add any "End of Combat" triggers to the stack
+
+            // Remove all creatures from combat
+            foreach (var creature in _activePlayer.Battlefield.Creatures)
+                creature.DefendingPlayer = null;
         }
 
         private void EndingPhase()
@@ -253,6 +316,7 @@ namespace MtgEngine
         private void EndStep()
         {
             // TODO: Add EndStep Triggers to the Stack in ApNap Order
+            ApNapLoop(_activePlayer, false);
         }
 
         private void CleanupStep()
@@ -383,10 +447,12 @@ namespace MtgEngine
         /// <param name="player">The player that is taking a mulligan</param>
         private void VancouverMulligan(Player player)
         {
+            // The player Shuffles their current Hand into their library
             player.Library.AddRange(player.Hand);
             player.Hand.Clear();
             player.ShuffleLibrary();
 
+            // Then draws a new hand, the number of cards is determined by how many mulligans the player has taken already
             if (_players.Count > 2) // Free first mulligan if multiplayer
             {
                 player.Draw(Math.Max(0, 7 - player.MulligansTaken));
