@@ -31,10 +31,22 @@ namespace MtgEngine
 
         private Stack<Card> Stack { get; } = new Stack<Card>();
 
+        delegate void CardEvent(Card card);
+        private event CardEvent CardHasEnteredStack;
+        private event CardEvent CardHasEnteredBattlefield;
+
+        delegate void GameStepEvent(string step);
+        private event GameStepEvent CurrentStepHasChanged;
+
         public void AddPlayer(Player player)
         {
             if (!_players.Contains(player))
+            {
+                CurrentStepHasChanged += player.GameStepChanged;
+                CardHasEnteredBattlefield += player.CardHasEnteredBattlefield;
+                CardHasEnteredStack += player.CardHasEnteredStack;
                 _players.Add(player);
+            }
         }
 
         public async Task Start()
@@ -188,17 +200,21 @@ namespace MtgEngine
 
         private void UntapStep()
         {
+            CurrentStepHasChanged("Untap Step");
             _activePlayer.Battlefield.ForEach(c => c.Untap());
         }
 
         private void UpkeepStep()
         {
+            CurrentStepHasChanged("Upkeep Step");
+
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
             ApNapLoop(_activePlayer, false);
         }
 
         private void DrawStep()
         {
+            CurrentStepHasChanged("Draw Step");
             // TODO: Add Beginning of Draw Step Triggers to the Stack
 
             _activePlayer.Draw(1);
@@ -206,6 +222,8 @@ namespace MtgEngine
 
         private void MainPhase(bool beforeCombat)
         {
+            CurrentStepHasChanged($"{(beforeCombat ? "Precombat" : "Postcombat")} Main Phase");
+
             // TODO: Add Beginning of Main Phase Triggers to the stack
 
             if (beforeCombat)
@@ -242,6 +260,7 @@ namespace MtgEngine
 
         private void BeginningOfCombatStep()
         {
+            CurrentStepHasChanged("Beginning of Combat");
             // TODO: Add Beginning of Combat Triggers to the Stack
 
             ApNapLoop(_activePlayer, false);
@@ -249,11 +268,15 @@ namespace MtgEngine
 
         private void DeclareAttackersStep()
         {
+            CurrentStepHasChanged("Declare Attackers Step");
             // TODO: Ask the Active Player to declare attackers
             var attackers = _activePlayer.DeclareAttackers();
-            foreach(var declaration in attackers)
+            if (attackers != null)
             {
-                declaration.AttackingCreature.DefendingPlayer = declaration.DefendingPlayer;
+                foreach (var declaration in attackers)
+                {
+                    declaration.AttackingCreature.DefendingPlayer = declaration.DefendingPlayer;
+                }
             }
 
             // TODO: Any "When this creature attacks" triggers get put onto the stack
@@ -263,13 +286,22 @@ namespace MtgEngine
 
         private void DeclareBlockersStep()
         {
+            CurrentStepHasChanged("Declare Blockers Step");
+
             // TODO: Ask the Defending Players, in ApNap order, to declare Blockers
             var defendingPlayers = _players.StartAt(_activePlayer)
                 .Where(p => _activePlayer.Battlefield.Creatures.Any(c => c.DefendingPlayer == p));
             // Iterate over the defending players in turn order
             foreach(var player in defendingPlayers)
             {
-                player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player));
+                var blockers = player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player));
+                if(blockers != null)
+                {
+                    foreach(var blocker in blockers)
+                    {
+                        blocker.Blocker.Blocking = blocker.Attacker;
+                    }
+                }
             }
 
             ApNapLoop(_activePlayer, false);
@@ -277,8 +309,10 @@ namespace MtgEngine
 
         private void DamageStep()
         {
+            CurrentStepHasChanged("Damage Step");
+
             // If any attackers have firststrike or doublestrike
-            if(false)
+            if (false)
             {
                 // TODO: Deal First Strike Damage
 
@@ -296,6 +330,8 @@ namespace MtgEngine
 
         private void EndOfCombatStep()
         {
+            CurrentStepHasChanged("End of Combat Step");
+
             // Give Priority to Players
             ApNapLoop(_activePlayer, false);
 
@@ -315,12 +351,14 @@ namespace MtgEngine
 
         private void EndStep()
         {
+            CurrentStepHasChanged("End Step");
             // TODO: Add EndStep Triggers to the Stack in ApNap Order
             ApNapLoop(_activePlayer, false);
         }
 
         private void CleanupStep()
         {
+            CurrentStepHasChanged("Cleanup Step");
             // TODO: Discard down to Maximum Hand Size
             _activePlayer.DiscardToHandSize();
 
@@ -346,11 +384,12 @@ namespace MtgEngine
             {
                 // TODO: Give Priority
                 _priorityPlayer = player;
-                var chosenAction = player.GivePriority(_activePlayer, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
 
                 bool playerHasPassedPriority = false;
-                while (!playerHasPassedPriority)
+                do
                 {
+                    var chosenAction = player.GivePriority(_activePlayer, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
+
                     switch (chosenAction.ActionType)
                     {
                         case ActionType.PassPriority:
@@ -365,6 +404,10 @@ namespace MtgEngine
                                     {
                                         PlayLand(action.Card as LandCard);
                                         player.LandsPlayedThisTurn++;
+                                        CardHasEnteredBattlefield?.Invoke(action.Card);
+                                    }
+                                    else
+                                    {
                                     }
                                 }
                                 else
@@ -394,7 +437,7 @@ namespace MtgEngine
                             }
                             break;
                     }
-                }
+                } while (!playerHasPassedPriority);
             }
         }
 

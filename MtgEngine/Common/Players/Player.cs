@@ -109,6 +109,22 @@ namespace MtgEngine
             Graveyard.Add(card);
         }
 
+        #region Game Event Handlers
+
+        public virtual void CardHasEnteredStack(Card card)
+        {
+        }
+
+        public virtual void CardHasEnteredBattlefield(Card card)
+        {
+        }
+
+        public virtual void GameStepChanged(string currentStep)
+        {
+        }
+
+        #endregion Game Event Handlers
+
         /// <summary>
         /// Show the player the top N cards of their library. They choose which ones that would like to put back on top of their library, and which ones they'd like to go on the bottom, and the order of each.
         /// </summary>

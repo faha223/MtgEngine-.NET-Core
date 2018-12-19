@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MtgEngine.Common.Cards;
+using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using MtgEngine.Common.Utilities;
@@ -20,7 +21,44 @@ namespace MtgEngine.Common.Players
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
             PrintHand();
             Console.WriteLine($"You Have Priority (Active Player: {activePlayer.Name})");
-            return new PassPriorityAction();
+            int i = 1;
+            foreach(var card in Hand)
+            {
+                if (canPlayCardThisTurn(card, canPlaySorcerySpeedSpells))
+                    Console.WriteLine($"{i++}: Play {card.Name}");
+            }
+            Console.WriteLine($"{i}: Pass Priority");
+
+            int selection = -1;
+            do
+            {
+                Console.Write("What do you want to do? ");
+                var parsed = ParseChoice(Console.ReadLine(), 1, 1, 1, i, true);
+                if (parsed == null || parsed.Count != 1)
+                {
+                    Console.WriteLine("I don't understand your selection. Try Again.");
+                    Console.WriteLine();
+                }
+                else
+                    selection = parsed[0];
+            } while (selection == -1);
+
+            if (selection == i)
+                return new PassPriorityAction();
+            else
+            {
+                var card = Hand.Where(c => canPlayCardThisTurn(c, canPlaySorcerySpeedSpells)).Skip(selection - 1).First();
+                return new PlayCardAction(card);
+            }
+        }
+
+        public bool canPlayCardThisTurn(Card card, bool canPlaySorcerySpeedSpells)
+        {
+            bool canPlayCard = card.Cost.CanPay();
+            canPlayCard &= (canPlaySorcerySpeedSpells || card.Types.Contains(CardType.Instant));
+            canPlayCard &= (!card.Types.Contains(CardType.Land) || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
+
+            return canPlayCard;
         }
 
         private void PrintHand()
@@ -72,10 +110,10 @@ namespace MtgEngine.Common.Players
             {
                 Console.WriteLine();
                 Console.Write("Do you wish to take a mulligan? (Y/N)");
-                char choice = Convert.ToChar(Console.Read());
-                if (choice == 'y')
+                string choice = Console.ReadLine();
+                if (choice.ToLower().StartsWith("y"))
                     return true;
-                else if (choice == 'n')
+                if (choice.ToLower().StartsWith("n"))
                     return false;
             }
         }
@@ -144,6 +182,28 @@ namespace MtgEngine.Common.Players
             Console.WriteLine("TODO: Declare Blockers");
             return null;
         }
+
+        public override void GameStepChanged(string currentStep)
+        {
+            Console.WriteLine();
+            Console.WriteLine($"CurrentStep: {currentStep}");
+            Console.WriteLine();
+        }
+
+        public override void CardHasEnteredBattlefield(Card card)
+        {
+            Console.WriteLine($"{card.Name} has entered the battlefield under the control of {card.Controller.Name}.");
+        }
+
+        public override void CardHasEnteredStack(Card card)
+        {
+            Console.WriteLine($"{card.Name} is now on the stack.");
+        }
+
+        //public override void PlayerHasGainedControlOfCard(Card card)
+        //{
+        //    Console.WriteLine($"{card.Controller.Name} has gained control of {card.Name}.");
+        //}
 
         private List<int> ParseChoice(string userText, int minResponseCount, int maxResponseCount, int minResponseValue, int maxResponseValue, bool noDuplicates)
         {
