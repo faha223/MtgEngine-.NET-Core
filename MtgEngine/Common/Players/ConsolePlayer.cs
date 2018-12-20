@@ -138,13 +138,13 @@ namespace MtgEngine.Common.Players
             
             while (true)
             {
-                Console.WriteLine();
-                Console.Write("Do you wish to take a mulligan? (Y/N)");
+                Console.Write("Do you wish to take a mulligan (Y/N)? ");
                 string choice = Console.ReadLine();
                 if (choice.ToLower().StartsWith("y"))
                     return true;
                 if (choice.ToLower().StartsWith("n"))
                     return false;
+                Console.WriteLine();
             }
         }
 

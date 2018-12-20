@@ -1,10 +1,12 @@
-﻿namespace MtgEngine.Common.Players.Actions
+﻿using MtgEngine.Common.Abilities;
+
+namespace MtgEngine.Common.Players.Actions
 {
     public class ActivateAbilityAction : ActionBase
     {
-        public Ability Ability { get; private set; }
+        public ActivatedAbility Ability { get; private set; }
 
-        public ActivateAbilityAction(Ability ability) : base(ActionType.ActivateAbility)
+        public ActivateAbilityAction(ActivatedAbility ability) : base(ActionType.ActivateAbility)
         {
             Ability = ability;
         }

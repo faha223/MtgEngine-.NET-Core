@@ -202,6 +202,8 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("Untap Step");
             _activePlayer.Battlefield.ForEach(c => c.Untap());
+
+            DrainManaPools();
         }
 
         private void UpkeepStep()
@@ -210,6 +212,9 @@ namespace MtgEngine
 
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
             ApNapLoop(_activePlayer, false);
+
+            // Drain each player's mana pool
+            DrainManaPools();
         }
 
         private void DrawStep()
@@ -218,6 +223,8 @@ namespace MtgEngine
             // TODO: Add Beginning of Draw Step Triggers to the Stack
 
             _activePlayer.Draw(1);
+
+            DrainManaPools();
         }
 
         private void MainPhase(bool beforeCombat)
@@ -237,6 +244,8 @@ namespace MtgEngine
 
             // TODO: Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
             ApNapLoop(_activePlayer, true);
+
+            DrainManaPools();
         }
 
         private void CombatPhase()
@@ -264,6 +273,8 @@ namespace MtgEngine
             // TODO: Add Beginning of Combat Triggers to the Stack
 
             ApNapLoop(_activePlayer, false);
+
+            DrainManaPools();
         }
 
         private void DeclareAttackersStep()
@@ -282,6 +293,8 @@ namespace MtgEngine
             // TODO: Any "When this creature attacks" triggers get put onto the stack
 
             ApNapLoop(_activePlayer, false);
+
+            DrainManaPools();
         }
 
         private void DeclareBlockersStep()
@@ -305,6 +318,8 @@ namespace MtgEngine
             }
 
             ApNapLoop(_activePlayer, false);
+
+            DrainManaPools();
         }
 
         private void DamageStep()
@@ -326,6 +341,8 @@ namespace MtgEngine
 
                 CheckStateBasedActions();
             }
+
+            DrainManaPools();
         }
 
         private void EndOfCombatStep()
@@ -340,6 +357,8 @@ namespace MtgEngine
             // Remove all creatures from combat
             foreach (var creature in _activePlayer.Battlefield.Creatures)
                 creature.DefendingPlayer = null;
+
+            DrainManaPools();
         }
 
         private void EndingPhase()
@@ -354,6 +373,8 @@ namespace MtgEngine
             CurrentStepHasChanged("End Step");
             // TODO: Add EndStep Triggers to the Stack in ApNap Order
             ApNapLoop(_activePlayer, false);
+
+            DrainManaPools();
         }
 
         private void CleanupStep()
@@ -366,6 +387,8 @@ namespace MtgEngine
 
             // TODO: If there are triggered abilities on the stack then players may receive priority, in ApNap order, to react to them before the stack resolves.
             // Example: Madness is a triggered ability that happens when a player discards a card with Madness. This can potentially be put on the stack from the First part of the Cleanup step
+
+            DrainManaPools();
         }
 
         private void ApNapLoop(Player startingPlayer, bool startingPlayerCanCastSorceries)
@@ -398,6 +421,8 @@ namespace MtgEngine
                         case ActionType.PlayCard:
                             {
                                 var action = chosenAction as PlayCardAction;
+
+                                // If it's a land card, it bypasses the stack
                                 if (action.Card is LandCard)
                                 {
                                     if (player == startingPlayer && startingPlayerCanCastSorceries && player.LandsPlayedThisTurn < player.MaxLandsPlayedThisTurn)
@@ -424,7 +449,7 @@ namespace MtgEngine
                                 var action = chosenAction as ActivateAbilityAction;
                                 var ability = action.Ability as ActivatedAbility;
 
-                                // TODO : Make player pay the cost of the Ability
+                                // If it's a mana ability, it bypasses the stack
                                 if (action.Ability is ManaAbility)
                                 {
                                     var manaAbility = action.Ability as ManaAbility;
@@ -437,10 +462,8 @@ namespace MtgEngine
                                 else
                                 {
                                     // TODO : Put the Ability onto the stack
+                                    ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
                                 }
-
-
-                                ApNapLoop(_players[_players.IndexOf(player) + 1 % _players.Count], false);
                             }
                             break;
                     }
@@ -523,6 +546,14 @@ namespace MtgEngine
         {
             player.LandsPlayedThisTurn = 0;
             player.MaxLandsPlayedThisTurn = (player == _activePlayer ? 1 : 0);
+        }
+
+        /// <summary>
+        /// Resets each player's mana pool to zero
+        /// </summary>
+        private void DrainManaPools()
+        {
+            _players.ForEach(c => c.ManaPool.Clear());
         }
 
         #endregion Utility Methods

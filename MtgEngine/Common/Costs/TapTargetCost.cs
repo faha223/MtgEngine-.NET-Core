@@ -1,4 +1,5 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Abilities;
+using MtgEngine.Common.Cards;
 using System;
 using System.Linq;
 
@@ -20,7 +21,7 @@ namespace MtgEngine.Common.Costs
         public override bool CanPay()
         {
             // Get the controller of the source. The source has to have a controller, or else there's no way to select targets
-            Player controller = (_source is Card) ? (_source as Card).Controller : (_source as Ability)?.Controller;
+            Player controller = (_source is Card) ? (_source as Card).Controller : (_source as ActivatedAbility)?.Controller;
 
             if(controller != null)
             {
