@@ -1,5 +1,4 @@
-﻿using MtgEngine.Common;
-using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Cards;
 using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
@@ -7,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MtgEngine
+namespace MtgEngine.Common.Players
 {
     public abstract class Player
     {

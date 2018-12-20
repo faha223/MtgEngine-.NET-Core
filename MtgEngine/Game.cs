@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Utilities;
 

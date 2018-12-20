@@ -1,5 +1,6 @@
 ﻿using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Players;
 using System;
 
 namespace MtgEngine.Common.Cards

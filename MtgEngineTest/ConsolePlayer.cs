@@ -5,11 +5,12 @@ using System.Text.RegularExpressions;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using MtgEngine.Common.Utilities;
 
-namespace MtgEngine.Common.Players
+namespace MtgEngineTest
 {
     public class ConsolePlayer : Player
     {

@@ -1,4 +1,6 @@
-﻿namespace MtgEngine.Common.Abilities
+﻿using MtgEngine.Common.Players;
+
+namespace MtgEngine.Common.Abilities
 {
     public abstract class Ability : IResolvable
     {

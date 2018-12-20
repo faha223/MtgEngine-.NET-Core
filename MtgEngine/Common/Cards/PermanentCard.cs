@@ -1,6 +1,7 @@
 ﻿using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Players;
 using System.Collections.Generic;
 
 namespace MtgEngine.Common.Cards

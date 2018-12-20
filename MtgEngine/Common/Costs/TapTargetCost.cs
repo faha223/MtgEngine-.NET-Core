@@ -1,5 +1,6 @@
 ﻿using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
+using MtgEngine.Common.Players;
 using System;
 using System.Linq;
 
