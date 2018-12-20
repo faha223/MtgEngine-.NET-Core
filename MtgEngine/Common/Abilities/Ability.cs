@@ -4,9 +4,12 @@
     {
         public Player Controller { get; private set; }
 
-        protected Ability(Player controller)
+        public string Text { get; private set; }
+
+        protected Ability(Player controller, string text)
         {
             Controller = controller;
+            Text = text;
         }
 
         public abstract void OnResolve(Game game);

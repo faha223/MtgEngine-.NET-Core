@@ -7,7 +7,7 @@ namespace MtgEngine.Common.Abilities
     {
         public Cost Cost { get; private set; }
 
-        protected ActivatedAbility(Card source, Cost cost) : base(source.Controller)
+        protected ActivatedAbility(Card source, Cost cost, string text) : base(source.Controller, text)
         {
             Cost = cost;
         }

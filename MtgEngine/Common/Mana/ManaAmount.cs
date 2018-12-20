@@ -7,6 +7,13 @@ namespace MtgEngine.Common.Mana
     {
         public int Amount { get; private set; }
         public ManaColor Color { get; private set; }
+
+        public ManaAmount(int amount, ManaColor color)
+        {
+            Amount = amount;
+            Color = color;
+        }
+
         public override string ToString()
         {
             if (Amount == 0)

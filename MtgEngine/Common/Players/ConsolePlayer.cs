@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players.Actions;
@@ -19,16 +20,37 @@ namespace MtgEngine.Common.Players
         public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
         {
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
+            PrintManaPool();
             PrintHand();
             Console.WriteLine($"You Have Priority (Active Player: {activePlayer.Name})");
             int i = 1;
-            foreach(var card in Hand)
+            var potentialActions = new List<ActionBase>();
+
+            foreach (var card in Hand)
             {
                 if (canPlayCardThisTurn(card, canPlaySorcerySpeedSpells))
+                {
                     Console.WriteLine($"{i++}: Play {card.Name}");
+                    potentialActions.Add(new PlayCardAction(card));
+                }
+            }
+
+            // Add each ability the player can activate to the 
+            foreach(PermanentCard card in Battlefield)
+            {
+                foreach(ActivatedAbility ability in card.Abilities)
+                {
+                    if(ability.Cost.CanPay())
+                    {
+                        Console.WriteLine($"{i++}: {card.Name}: {ability.Text}");
+                        potentialActions.Add(new ActivateAbilityAction(ability));
+                    }
+                }
             }
             Console.WriteLine($"{i}: Pass Priority");
+            potentialActions.Add(new PassPriorityAction());
 
+            // Ask the user for their choice of action
             int selection = -1;
             do
             {
@@ -43,13 +65,8 @@ namespace MtgEngine.Common.Players
                     selection = parsed[0];
             } while (selection == -1);
 
-            if (selection == i)
-                return new PassPriorityAction();
-            else
-            {
-                var card = Hand.Where(c => canPlayCardThisTurn(c, canPlaySorcerySpeedSpells)).Skip(selection - 1).First();
-                return new PlayCardAction(card);
-            }
+            // Return the action the user chose
+            return potentialActions[selection - 1];
         }
 
         public bool canPlayCardThisTurn(Card card, bool canPlaySorcerySpeedSpells)
@@ -61,10 +78,23 @@ namespace MtgEngine.Common.Players
             return canPlayCard;
         }
 
+        private void PrintManaPool()
+        {
+            Console.WriteLine("Mana Pool:");
+            Console.WriteLine($"White: {ManaPool[ManaColor.White]}");
+            Console.WriteLine($"Blue: {ManaPool[ManaColor.Blue]}");
+            Console.WriteLine($"Black: {ManaPool[ManaColor.Black]}");
+            Console.WriteLine($"Red: {ManaPool[ManaColor.Red]}");
+            Console.WriteLine($"Green: {ManaPool[ManaColor.Green]}");
+            Console.WriteLine($"Colorless: {ManaPool[ManaColor.Colorless]}");
+            Console.WriteLine();
+        }
+
         private void PrintHand()
         {
             Console.WriteLine("Your Hand:");
             Hand.ForEach(card => Console.WriteLine(card.Name));
+            Console.WriteLine();
         }
 
         public override void Draw(int howMany)

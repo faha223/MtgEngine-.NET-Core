@@ -1,4 +1,6 @@
-﻿namespace MtgEngine.Common.Costs
+﻿using System.Linq;
+
+namespace MtgEngine.Common.Costs
 {
     /// <summary>
     /// This class is used when multiple types of costs are required.
@@ -25,6 +27,11 @@
         public AggregateCost(IResolvable source, params Cost[] costs) : base(source)
         {
             innerCosts = costs;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(", ", innerCosts.Select(c => c.ToString()));
         }
     }
 }

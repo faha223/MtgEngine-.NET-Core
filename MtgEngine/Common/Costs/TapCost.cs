@@ -1,7 +1,4 @@
 ﻿using MtgEngine.Common.Cards;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MtgEngine.Common.Costs
 {
@@ -20,6 +17,11 @@ namespace MtgEngine.Common.Costs
         public override void Pay()
         {
             ((Card)_source).Tap();
+        }
+
+        public override string ToString()
+        {
+            return "{T}";
         }
     }
 }

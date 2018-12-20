@@ -1,8 +1,6 @@
 ﻿using MtgEngine.Common.Cards;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MtgEngine.Common.Costs
 {
@@ -10,11 +8,13 @@ namespace MtgEngine.Common.Costs
     {
         private string _targetSelectionMessage;
         private Func<Card, bool> _targetSelector;
+        private readonly string _text;
 
-        public TapTargetCost(IResolvable source, string targetSelectionMessage, Func<Card, bool> targetSelector) : base(source)
+        public TapTargetCost(IResolvable source, string targetSelectionMessage, Func<Card, bool> targetSelector, string text) : base(source)
         {
             _targetSelectionMessage = targetSelectionMessage;
             _targetSelector = targetSelector;
+            _text = text;
         }
 
         public override bool CanPay()
@@ -36,6 +36,11 @@ namespace MtgEngine.Common.Costs
             {
                 var target = (_source as Card).Controller.SelectTarget(_targetSelectionMessage, _targetSelector);
             }
+        }
+
+        public override string ToString()
+        {
+            return _text;
         }
     }
 }

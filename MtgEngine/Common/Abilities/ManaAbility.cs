@@ -4,11 +4,12 @@ using MtgEngine.Common.Mana;
 
 namespace MtgEngine.Common.Abilities
 {
+    // Mana Abilities don't use the stack
     public class ManaAbility : ActivatedAbility
     {
         public ManaAmount ManaGenerated { get; private set; }
 
-        public ManaAbility(Card source, Cost cost, ManaAmount manaGenerated) : base(source, cost)
+        public ManaAbility(Card source, Cost cost, ManaAmount manaGenerated, string text) : base(source, cost, text)
         {
             ManaGenerated = manaGenerated;
         }

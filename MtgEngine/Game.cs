@@ -408,6 +408,7 @@ namespace MtgEngine
                                     }
                                     else
                                     {
+                                        // Player can't play a land right now
                                     }
                                 }
                                 else
@@ -422,10 +423,16 @@ namespace MtgEngine
                             {
                                 var action = chosenAction as ActivateAbilityAction;
                                 var ability = action.Ability as ActivatedAbility;
+
                                 // TODO : Make player pay the cost of the Ability
                                 if (action.Ability is ManaAbility)
                                 {
-                                    (action.Ability as ManaAbility).OnResolve(this);
+                                    var manaAbility = action.Ability as ManaAbility;
+                                    if (manaAbility.Cost.CanPay())
+                                    {
+                                        manaAbility.Cost.Pay();
+                                        manaAbility.OnResolve(this);
+                                    }
                                 }
                                 else
                                 {
