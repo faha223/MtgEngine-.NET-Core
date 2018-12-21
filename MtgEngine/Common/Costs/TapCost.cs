@@ -14,9 +14,10 @@ namespace MtgEngine.Common.Costs
             return !((Card)_source).IsTapped;
         }
 
-        public override void Pay()
+        public override bool Pay()
         {
             ((Card)_source).Tap();
+            return true;
         }
 
         public override string ToString()

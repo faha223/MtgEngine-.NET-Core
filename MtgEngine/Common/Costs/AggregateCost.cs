@@ -18,10 +18,12 @@ namespace MtgEngine.Common.Costs
             return true;
         }
 
-        public override void Pay()
+        public override bool Pay()
         {
             foreach (var cost in innerCosts)
-                cost.Pay();
+                if (!cost.Pay())
+                    return false;
+            return true;
         }
 
         public AggregateCost(IResolvable source, params Cost[] costs) : base(source)

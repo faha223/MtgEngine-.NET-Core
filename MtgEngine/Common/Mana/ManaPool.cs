@@ -36,7 +36,7 @@ namespace MtgEngine.Common.Mana
             }
             set
             {
-                switch(color)
+                switch (color)
                 {
                     case ManaColor.White:
                     case ManaColor.Blue:
@@ -58,6 +58,16 @@ namespace MtgEngine.Common.Mana
                 throw new ArgumentException("ManaAmount.Color: Invalid Value. Generic Mana can only be payed. Generic Mana cannot be generated.");
 
             _pool[manaAmount.Color] += manaAmount.Amount;
+        }
+
+        public ManaPool Clone()
+        {
+            var pool = new ManaPool();
+
+            foreach (var color in new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green, ManaColor.Colorless })
+                pool[color] = this[color];
+
+            return pool;
         }
 
         // Override the Clear behavior of the Dictionary 

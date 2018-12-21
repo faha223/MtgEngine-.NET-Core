@@ -1,5 +1,6 @@
-﻿12x Plains
-12x Island
-12x Swamp
-12x Mountain
-12x Forest
+﻿0x Plains
+0x Island
+0x Swamp
+0x Mountain
+20x Forest
+40x Grizzly Bears

@@ -441,7 +441,29 @@ namespace MtgEngine
                                 {
                                     // TODO : Make player pay the cost of the Card
                                     // TODO : Put the Card onto the stack
-                                    ApNapLoop(_players[_players.IndexOf(player) + 1 % _players.Count], false);
+                                    if (action.Card.Cost.Pay())
+                                    {
+                                        player.Hand.Remove(action.Card);
+                                        Stack.Push(action.Card);
+                                        CardHasEnteredStack?.Invoke(action.Card);
+                                        ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
+
+                                        // If we made it back with no responses, resolve the spell
+                                        if (Stack.Count > 0)
+                                        {
+                                            var card = Stack.Pop();
+                                            if(card is PermanentCard)
+                                            {
+                                                card.OnResolve(this);
+                                                card.Controller.Battlefield.Add(card);
+                                                CardHasEnteredBattlefield?.Invoke(card);
+                                            }
+                                            else if(card is SpellCard)
+                                            {
+                                                card.OnResolve(this);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             break;

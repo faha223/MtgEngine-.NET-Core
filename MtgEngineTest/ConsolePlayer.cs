@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
@@ -266,6 +267,38 @@ namespace MtgEngineTest
         //{
         //    Console.WriteLine($"{card.Controller.Name} has gained control of {card.Name}.");
         //}
+
+        public override ManaColor? PayManaCost(string cost)
+        {
+            do
+            {
+                Console.WriteLine($"Pay {cost}");
+                int i = 1;
+                List<ManaColor> colorOptions = new List<ManaColor>(6);
+                foreach (var color in new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green, ManaColor.Colorless })
+                {
+                    if (ManaPool[color] > 0)
+                    {
+                        colorOptions.Add(color);
+                        Console.WriteLine($"{i++}: Pay {color}");
+                    }
+                }
+                Console.WriteLine($"{i}: Cancel");
+
+                var selections = ParseChoice(Console.ReadLine(), 1, 1, 1, i, true);
+                if (selections != null && selections.Count == 1)
+                {
+                    int selection = selections.First();
+                    if (selection == i)
+                        return null;
+
+                    var color = colorOptions[selection - 1];
+                    ManaPool[color]--;
+                    return color;
+                }
+                Console.WriteLine();
+            } while (true);
+        }
 
         private List<int> ParseChoice(string userText, int minResponseCount, int maxResponseCount, int minResponseValue, int maxResponseValue, bool noDuplicates)
         {

@@ -32,12 +32,14 @@ namespace MtgEngine.Common.Costs
             return false;
         }
 
-        public override void Pay()
+        public override bool Pay()
         {
             if(_source is Card)
             {
                 var target = (_source as Card).Controller.SelectTarget(_targetSelectionMessage, _targetSelector);
+                return true;
             }
+            return false;
         }
 
         public override string ToString()

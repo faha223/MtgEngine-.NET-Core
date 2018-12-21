@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Enums;
 using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
@@ -57,6 +58,8 @@ namespace MtgEngine.Common.Players
         {
             Common.Utilities.LibraryShuffler.ShuffleLibrary(Library);
         }
+
+        public abstract ManaColor? PayManaCost(string cost);
 
         public void DrawHand(int handSize)
         {

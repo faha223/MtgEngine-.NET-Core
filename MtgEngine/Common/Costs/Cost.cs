@@ -4,7 +4,7 @@
     {
         protected readonly IResolvable _source;
 
-        public abstract void Pay();
+        public abstract bool Pay();
 
         public abstract bool CanPay();
 

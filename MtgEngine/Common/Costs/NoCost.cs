@@ -11,8 +11,9 @@
             return true;
         }
 
-        public override void Pay()
+        public override bool Pay()
         {
+            return true;
         }
     }
 }

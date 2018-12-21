@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using System;
@@ -48,6 +49,11 @@ namespace MtgEngine.Common.Players.AIPlayers
         public override List<AttackerDeclaration> DeclareAttackers()
         {
             // Never Attack
+            return null;
+        }
+
+        public override ManaColor? PayManaCost(string cost)
+        {
             return null;
         }
 
