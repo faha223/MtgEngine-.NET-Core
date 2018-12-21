@@ -1,1 +1,5 @@
-﻿60x Forest
+﻿12x Plains
+12x Island
+12x Swamp
+12x Mountain
+12x Forest

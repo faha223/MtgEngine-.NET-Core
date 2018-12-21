@@ -1,6 +1,7 @@
 ﻿using MtgEngine;
-using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.AIPlayers;
+using System.IO;
+using System.Reflection;
 
 namespace MtgEngineTest
 {
@@ -8,9 +9,11 @@ namespace MtgEngineTest
     {
         static void Main(string[] args)
         {
+            var deckFileLocation = Path.Combine(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName, "PlayerDeck.txt");
+
             var game = new Game();
-            game.AddPlayer(new ConsolePlayer("Specialfred453", 20, "60x Forest"));
-            game.AddPlayer(new PassPriorityPlayer("Al", 20, "60x Forest"));
+            game.AddPlayer(new ConsolePlayer("Specialfred453", 20, File.ReadAllText(deckFileLocation)));
+            game.AddPlayer(new PassPriorityPlayer("Al", 20, File.ReadAllText(deckFileLocation)));
             game.Start().Wait();
         }
     }

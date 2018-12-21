@@ -14,12 +14,25 @@ namespace MtgEngineTest
 {
     public class ConsolePlayer : Player
     {
+        private bool passTurn = false;
+        private bool passToYourTurn = false;
+        private string currentStep = null;
+
         public ConsolePlayer(string name, int startingLifeTotal, string deckList) : base(name, startingLifeTotal, deckList)
         {
         }
 
         public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
         {
+            if (passTurn)
+                return new PassPriorityAction();
+
+            if (activePlayer == this)
+                passToYourTurn = false;
+
+            if (passToYourTurn && activePlayer != this)
+                return new PassPriorityAction();
+
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
             PrintManaPool();
             PrintHand();
@@ -48,8 +61,11 @@ namespace MtgEngineTest
                     }
                 }
             }
-            Console.WriteLine($"{i}: Pass Priority");
+
+            Console.WriteLine($"{i++}: Pass Priority");
             potentialActions.Add(new PassPriorityAction());
+            Console.WriteLine($"{i++}: Next Turn");
+            Console.WriteLine($"{i++}: To Your Turn");
 
             // Ask the user for their choice of action
             int selection = -1;
@@ -67,7 +83,19 @@ namespace MtgEngineTest
             } while (selection == -1);
 
             // Return the action the user chose
-            return potentialActions[selection - 1];
+            if (selection <= potentialActions.Count)
+                return potentialActions[selection - 1];
+            else
+            {
+                if (selection - potentialActions.Count == 1)
+                    passTurn = true;
+                else
+                {
+                    passTurn = true;
+                    passToYourTurn = true;
+                }
+                return new PassPriorityAction();
+            }
         }
 
         public bool canPlayCardThisTurn(Card card, bool canPlaySorcerySpeedSpells)
@@ -216,6 +244,9 @@ namespace MtgEngineTest
 
         public override void GameStepChanged(string currentStep)
         {
+            if (currentStep == "Untap Step")
+                passTurn = false;
+
             Console.WriteLine();
             Console.WriteLine($"CurrentStep: {currentStep}");
             Console.WriteLine();
