@@ -10,13 +10,16 @@ namespace MtgEngine.Common.Players.AIPlayers
 {
     public class PassPriorityPlayer : Player
     {
+        // How long to wait, simulating a real player
+        private readonly TimeSpan timeToThink = TimeSpan.FromMilliseconds(100);
+
         public PassPriorityPlayer(string name, int startingLifeTotal, string deckList) : base(name, startingLifeTotal, deckList)
         {
         }
 
         public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
         {
-            Thread.Sleep(500);
+            Thread.Sleep(timeToThink);
             return new PassPriorityAction();
         }
 
@@ -33,7 +36,7 @@ namespace MtgEngine.Common.Players.AIPlayers
 
         public override void Discard()
         {
-            Thread.Sleep(500);
+            Thread.Sleep(timeToThink);
             var rand = new Random();
             var index = Math.Abs(rand.Next()) % Hand.Count;
             Discard(Hand[index]);
