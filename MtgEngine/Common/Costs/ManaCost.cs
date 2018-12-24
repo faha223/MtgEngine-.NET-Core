@@ -14,6 +14,9 @@ namespace MtgEngine.Common.Costs
     {
         private ManaAmount[] _manaAmounts;
 
+        public delegate void IntegerEvent(int X);
+        public event IntegerEvent ValueforXChosen;
+
         private Player _controller
         {
             get
@@ -36,6 +39,8 @@ namespace MtgEngine.Common.Costs
         {
             if (manaCost == "{1}{G}")
                 return new ManaCost(source, new ManaAmount(1, ManaColor.Generic), new ManaAmount(1, ManaColor.Green));
+            else if (manaCost == "{X}{X}{X}")
+                return new ManaCost(source, new ManaAmount(3, ManaColor.GenericX));
 
             var manaAmounts = ManaParser.Parse(manaCost);
             if (manaAmounts == null)
@@ -56,6 +61,23 @@ namespace MtgEngine.Common.Costs
                 return false;
 
             var temp = new List<ManaAmount>(_manaAmounts.Select(c => new ManaAmount(c.Amount, c.Color)));
+            if(temp.Any(c => c.Color == ManaColor.GenericX))
+            {
+                int x = controller.GetValueForX(stringify(temp));
+                ValueforXChosen?.Invoke(x);
+                var amt = temp.Where(c => c.Color == ManaColor.GenericX).Sum(c => c.Amount);
+                temp.RemoveAll(c => c.Color == ManaColor.GenericX);
+                if(temp.Any(c => c.Color == ManaColor.Generic))
+                {
+                    var generic = temp.First(c => c.Color == ManaColor.Generic);
+                    temp.Remove(generic);
+                    temp.Add(new ManaAmount(generic.Amount + (amt * x), ManaColor.Generic));
+                }
+                else
+                {
+                    temp.Add(new ManaAmount(amt * x, ManaColor.Generic));
+                }
+            }
             while(temp.Count > 0)
             {
                 var colorPaid = controller.PayManaCost(stringify(temp));

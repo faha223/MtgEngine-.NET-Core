@@ -49,10 +49,16 @@ namespace MtgEngine.Common.Players.AIPlayers
             cardsOnTop = scryedCards;
         }
 
-        public override List<AttackerDeclaration> DeclareAttackers()
+        public override List<AttackerDeclaration> DeclareAttackers(List<Player> opponents)
         {
             // Never Attack
             return null;
+        }
+
+        public override IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers)
+        {
+            // Never Block
+            return blockers;
         }
 
         public override ManaColor? PayManaCost(string cost)
@@ -60,7 +66,12 @@ namespace MtgEngine.Common.Players.AIPlayers
             return null;
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(IEnumerable<CreatureCard> attackingCreatures)
+        public override int GetValueForX(string cost)
+        {
+            return 0;
+        }
+
+        public override List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> attackingCreatures)
         {
             return null;
         }

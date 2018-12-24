@@ -73,14 +73,14 @@ namespace MtgEngineTest
             do
             {
                 Console.Write("What do you want to do? ");
-                var parsed = ParseChoice(Console.ReadLine(), 1, 1, 1, i, true);
-                if (parsed == null || parsed.Count != 1)
+                var parsed = ParseChoice(Console.ReadLine(), 1, i);
+                if (!parsed.HasValue)
                 {
                     Console.WriteLine("I don't understand your selection. Try Again.");
                     Console.WriteLine();
                 }
                 else
-                    selection = parsed[0];
+                    selection = parsed.Value;
             } while (selection == -1);
 
             // Return the action the user chose
@@ -230,18 +230,179 @@ namespace MtgEngineTest
                 cardsOnTop = scryedCards;
         }
 
-        public override List<AttackerDeclaration> DeclareAttackers()
+        #region Combat
+
+        public override List<AttackerDeclaration> DeclareAttackers(List<Player> opponents)
         {
-            Console.WriteLine("TODO: Declare Attackers");
-            return null;
+            var attackers = new List<AttackerDeclaration>(Battlefield.Count);
+            var creatures = Battlefield.Creatures.Where(c => !c.HasSummoningSickness).ToList();
+            if (creatures.Count > 0)
+            {
+                bool done = false;
+                while (!done)
+                {
+                    int i = 1;
+
+                    Console.WriteLine("Declare Attackers");
+                    foreach (var creature in creatures)
+                    {
+                        if (creature.IsAttacking)
+                        {
+                            Console.WriteLine($"{i++}: Withdraw {creature.Name} from combat");
+                        }
+                        else
+                            Console.WriteLine($"{i++}: Declare {creature.Name} as attacker");
+                    }
+                    Console.WriteLine($"{i}: Pass Priority");
+
+                    var selection = ParseChoice(Console.ReadLine(), 1, i);
+                    if (selection.HasValue)
+                    {
+                        if (selection.Value <= creatures.Count)
+                        {
+                            var creature = creatures[selection.Value - 1];
+                            if (creature.IsAttacking)
+                                attackers.RemoveAll(c => c.AttackingCreature == creature);
+                            else
+                            {
+                                if (opponents.Count == 1)
+                                {
+                                    creature.DefendingPlayer = opponents[0];
+                                    attackers.Add(new AttackerDeclaration() { AttackingCreature = creature, DefendingPlayer = opponents[0] });
+                                }
+                                else
+                                {
+                                    selection = -1;
+                                    do
+                                    {
+                                        Console.WriteLine("Choose Opponent:");
+                                        i = 1;
+                                        foreach (var opponent in opponents)
+                                            Console.WriteLine($"{i++}: {opponent.Name}");
+                                        Console.WriteLine($"{i}: Cancel");
+
+                                        Console.Write("What is your selection? ");
+                                        selection = ParseChoice(Console.ReadLine(), 1, i);
+                                        Console.WriteLine();
+                                        if (selection.HasValue)
+                                        {
+                                            creature.DefendingPlayer = opponents[selection.Value - 1];
+                                            attackers.Add(new AttackerDeclaration() { AttackingCreature = creature, DefendingPlayer = creature.DefendingPlayer });
+                                        }
+                                    } while (selection == -1);
+                                }
+                            }
+                        }
+                        else if (selection == i)
+                            done = true;
+                    }
+                    else
+                        Console.WriteLine();
+                }
+            }
+            return attackers;
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(IEnumerable<CreatureCard> attackingCreatures)
+        public override List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> attackingCreatures)
         {
-            // TODO: Let the player chose which of their creatures will block which of the attacker's creatures
-            Console.WriteLine("TODO: Declare Blockers");
-            return null;
+            var availableBlockers = Battlefield.Creatures.Where(c => !c.IsTapped).ToList();
+            var blockers = new List<BlockerDeclaration>(availableBlockers.Count);
+
+            Console.WriteLine("You are being attacked");
+            while (true)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Declare Blockers");
+
+                int i = 1;
+                foreach (var creature in attackingCreatures)
+                {
+                    Console.WriteLine($"{i++}: Block {creature.Name}");
+                }
+                foreach (var creature in Battlefield.Creatures.Where(c => c.Blocking != null))
+                {
+                    Console.WriteLine($"{i++}: Withdraw {creature.Name} from combat");
+                }
+                Console.WriteLine($"{i}: Pass Priority");
+
+                Console.Write("What do you choose? ");
+                var selection = ParseChoice(Console.ReadLine(), 1, i);
+                if (selection.HasValue)
+                {
+                    if (selection.Value <= attackingCreatures.Count)
+                    {
+                        var attacker = attackingCreatures[selection.Value - 1];
+                        var _availBlockers = availableBlockers.Where(c => c.Blocking == null).ToList();
+
+                        // declare blocker
+                        while (true)
+                        {
+                            Console.WriteLine("Choose a blocker:");
+                            i = 1;
+                            foreach (var creature in _availBlockers)
+                            {
+                                Console.WriteLine($"{i++}: {creature.Name}");
+                            }
+                            Console.WriteLine($"{i}: Cancel");
+                            Console.Write("Which do you choose? ");
+                            selection = ParseChoice(Console.ReadLine(), 1, i);
+                            if (selection.HasValue)
+                            {
+                                if (selection.Value == i)
+                                    break;
+                                else
+                                {
+                                    var blocker = _availBlockers[selection.Value - 1];
+                                    blocker.Blocking = attacker;
+                                    blockers.Add(new BlockerDeclaration()
+                                    {
+                                        Attacker = attacker,
+                                        Blocker = blocker
+                                    });
+                                    break;
+                                }
+                            }
+                            else
+                                Console.WriteLine();
+                        }
+                    }
+                    else if (selection == i)
+                        break;
+                    else
+                    {
+                        // remove from combat
+                        var blockingCreatures = Battlefield.Creatures.Where(c => c.Blocking != null).ToList();
+                        var blocker = blockingCreatures[selection.Value - attackingCreatures.Count];
+                        blockers.RemoveAll(c => c.Blocker == blocker);
+                        blocker.Blocking = null;
+                    }
+                }
+            }
+
+            return blockers;
         }
+
+        public override IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers)
+        {
+            if (blockers.Count() == 1)
+                return blockers;
+
+            while(true)
+            {
+                Console.WriteLine($"{attacker.Name} is being blocked by {blockers.Count()} creatures");
+                for(int i = 0; i < blockers.Count(); i++)
+                    Console.WriteLine($"{i}: {blockers.ElementAt(i).Name}");
+                Console.Write($"In what order would you like {attacker.Name} to deal damage to blockers?");
+                var response = ParseChoice(Console.ReadLine(), blockers.Count(), blockers.Count(), 1, blockers.Count(), true);
+                if (response != null && response.Count == blockers.Count())
+                    return blockers.ToList().OrderByIndexList(response);
+                Console.WriteLine();
+            }
+        }
+
+        #endregion Combat
+
+        #region Game State Updates
 
         public override void GameStepChanged(string currentStep)
         {
@@ -268,6 +429,29 @@ namespace MtgEngineTest
         //    Console.WriteLine($"{card.Controller.Name} has gained control of {card.Name}.");
         //}
 
+        public override void PlayerTookDamage(Player player, int damageDealt)
+        {
+            Console.WriteLine($"{player.Name} took {damageDealt} damage.");
+            Console.WriteLine($"{player.Name}'s life total is now {player.LifeTotal}");
+            Console.WriteLine();
+        }
+
+        #endregion Game State Updates
+
+        public override int GetValueForX(string cost)
+        {
+            do
+            {
+                Console.WriteLine($"Pay {cost}");
+                Console.Write("What value would you like for X? ");
+                var selection = ParseChoice(Console.ReadLine(), 0, int.MaxValue);
+                if (selection.HasValue)
+                    return selection.Value;
+                else
+                    Console.WriteLine();
+            } while (true);
+        }
+
         public override ManaColor? PayManaCost(string cost)
         {
             do
@@ -285,19 +469,26 @@ namespace MtgEngineTest
                 }
                 Console.WriteLine($"{i}: Cancel");
 
-                var selections = ParseChoice(Console.ReadLine(), 1, 1, 1, i, true);
-                if (selections != null && selections.Count == 1)
+                var selection = ParseChoice(Console.ReadLine(), 1, i);
+                if (selection.HasValue)
                 {
-                    int selection = selections.First();
-                    if (selection == i)
+                    if (selection.Value == i)
                         return null;
 
-                    var color = colorOptions[selection - 1];
+                    var color = colorOptions[selection.Value - 1];
                     ManaPool[color]--;
                     return color;
                 }
                 Console.WriteLine();
             } while (true);
+        }
+
+        private int? ParseChoice(string userText, int minResponseValue, int maxResponseValue)
+        {
+            var selections = ParseChoice(userText, 1, 1, minResponseValue, maxResponseValue, false);
+            if (selections != null && selections.Count == 1)
+                return selections[0];
+            return null;
         }
 
         private List<int> ParseChoice(string userText, int minResponseCount, int maxResponseCount, int minResponseValue, int maxResponseValue, bool noDuplicates)

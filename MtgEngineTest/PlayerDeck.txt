@@ -1,6 +1,3 @@
-﻿0x Plains
-0x Island
-0x Swamp
-0x Mountain
-20x Forest
-40x Grizzly Bears
+﻿25x Forest
+10x Grizzly Bears
+15x Astral Cornucopia

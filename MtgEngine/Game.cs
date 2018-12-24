@@ -39,6 +39,9 @@ namespace MtgEngine
         delegate void GameStepEvent(string step);
         private event GameStepEvent CurrentStepHasChanged;
 
+        delegate void PlayerTookDamageEvent(Player player, int damageDealt);
+        private event PlayerTookDamageEvent PlayerTookDamage;
+
         public void AddPlayer(Player player)
         {
             if (!_players.Contains(player))
@@ -46,6 +49,7 @@ namespace MtgEngine
                 CurrentStepHasChanged += player.GameStepChanged;
                 CardHasEnteredBattlefield += player.CardHasEnteredBattlefield;
                 CardHasEnteredStack += player.CardHasEnteredStack;
+                PlayerTookDamage += player.PlayerTookDamage;
                 _players.Add(player);
             }
         }
@@ -202,6 +206,7 @@ namespace MtgEngine
         private void UntapStep()
         {
             CurrentStepHasChanged("Untap Step");
+            _activePlayer.Battlefield.Creatures.ForEach(c => c.HasSummoningSickness = false);
             _activePlayer.Battlefield.ForEach(c => c.Untap());
 
             DrainManaPools();
@@ -282,7 +287,7 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("Declare Attackers Step");
             // TODO: Ask the Active Player to declare attackers
-            var attackers = _activePlayer.DeclareAttackers();
+            var attackers = _activePlayer.DeclareAttackers(_players.Except(new[] { _activePlayer }).ToList());
             if (attackers != null)
             {
                 foreach (var declaration in attackers)
@@ -308,7 +313,7 @@ namespace MtgEngine
             // Iterate over the defending players in turn order
             foreach(var player in defendingPlayers)
             {
-                var blockers = player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player));
+                var blockers = player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player).ToList());
                 if(blockers != null)
                 {
                     foreach(var blocker in blockers)
@@ -338,7 +343,32 @@ namespace MtgEngine
             // If any remaining attackers have doublestrike or don't have firststrike
             if (_activePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
             {
-                // TODO: Deal Regular Damage
+                foreach(CreatureCard attacker in _activePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
+                {
+                    // If the defending player blocked
+                    if (attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker))
+                    {
+                        // Deal damage to the defending player's creatures
+                        var damageOutput = attacker.BasePower;
+                        var blockers = attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker);
+
+                        foreach (var blocker in _activePlayer.SortBlockers(attacker, blockers))
+                        {
+                            if (damageOutput > 0)
+                            {
+                                int damageDealt = Math.Min(blocker.BaseToughness, damageOutput);
+                                blocker.DamageAccumulated += damageDealt;
+                                damageOutput -= damageDealt;
+                            }
+                            attacker.DamageAccumulated += blocker.BasePower;
+                        }
+                    }
+                    else
+                    {
+                        attacker.DefendingPlayer.LifeTotal -= attacker.BasePower;
+                        PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.BasePower);
+                    }
+                }
 
                 CheckStateBasedActions();
             }
@@ -456,6 +486,8 @@ namespace MtgEngine
                                             {
                                                 card.OnResolve(this);
                                                 card.Controller.Battlefield.Add(card);
+                                                if(card is CreatureCard)
+                                                    (card as CreatureCard).HasSummoningSickness = true;
                                                 CardHasEnteredBattlefield?.Invoke(card);
                                             }
                                             else if(card is SpellCard)

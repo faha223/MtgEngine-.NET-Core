@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MtgEngine.Common.Utilities
@@ -29,6 +30,12 @@ namespace MtgEngine.Common.Utilities
                 temp.Add(self[i]);
             }
             return temp;
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> self, Action<T> action)
+        {
+            foreach (var x in self)
+                action(x);
         }
     }
 }

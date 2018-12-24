@@ -61,6 +61,8 @@ namespace MtgEngine.Common.Players
 
         public abstract ManaColor? PayManaCost(string cost);
 
+        public abstract int GetValueForX(string cost);
+
         public void DrawHand(int handSize)
         {
             var cardsDrawn = Library.Take(handSize);
@@ -88,9 +90,9 @@ namespace MtgEngine.Common.Players
 
         public abstract ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells);
 
-        public abstract List<AttackerDeclaration> DeclareAttackers();
+        public abstract List<AttackerDeclaration> DeclareAttackers(List<Player> opponents);
 
-        public abstract List<BlockerDeclaration> DeclareBlockers(IEnumerable<CreatureCard> AttackingCreatures);
+        public abstract List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> AttackingCreatures);
 
         public virtual void DiscardToHandSize()
         {
@@ -101,6 +103,8 @@ namespace MtgEngine.Common.Players
         }
 
         public abstract void Discard();
+
+        public abstract IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers);
 
         public virtual void Discard(Card card)
         {
@@ -122,6 +126,10 @@ namespace MtgEngine.Common.Players
         }
 
         public virtual void GameStepChanged(string currentStep)
+        {
+        }
+
+        public virtual void PlayerTookDamage(Player player, int damageDealt)
         {
         }
 

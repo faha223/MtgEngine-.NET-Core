@@ -20,9 +20,13 @@ namespace MtgEngine.Common.Cards
 
         public Player DefendingPlayer { get; set; } = null;
 
+        public bool HasSummoningSickness { get; set; } = false;
+
         public bool IsAttacking { get { return DefendingPlayer != null; } }
 
         public Card Blocking { get; set; } = null;
+
+        public int DamageAccumulated { get; set; } = 0;
 
         protected CreatureCard(Player owner, Cost cost, CardType[] types, string[] subtypes, int basePower, int baseToughness, bool isLegendary, bool isSnow) : 
             base(owner, true, cost, types, subtypes, false, isLegendary, isSnow)
