@@ -84,5 +84,17 @@ namespace MtgEngineTest.UnitTests
         {
             testParseChoices(null, 1, 1, 4, 5, false, null);
         }
+
+        [TestMethod]
+        public void testParseChoices_1_2_buckle_my_shoe_3_4_lock_the_door_1()
+        {
+            testParseChoices("1, 2, buckle my shoe, 3, 4, lock the door", 1, 1, 1, 5, false, null);
+        }
+
+        [TestMethod]
+        public void testParseChoices_1_2_buckle_my_shoe_3_4_lock_the_door_2()
+        {
+            testParseChoices("1, 2, buckle my shoe, 3, 4, lock the door", 1, 4, 1, 5, false, null);
+        }
     }
 }
