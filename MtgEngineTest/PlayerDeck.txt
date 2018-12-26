@@ -1,3 +1,5 @@
-﻿25x Forest
+﻿12x Forest
+13x Island
 10x Grizzly Bears
-15x Astral Cornucopia
+4x Astral Cornucopia
+11x Counterspell

@@ -35,12 +35,23 @@ namespace MtgEngine.Common.Costs
             _manaAmounts = manaAmounts;
         }
 
+        /// <summary>
+        /// Returns the Converted mana cost
+        /// </summary>
+        /// <returns></returns>
+        public int Convert()
+        {
+            return _manaAmounts.Sum(c => c.Convert());
+        }
+
         public static Cost Parse(IResolvable source, string manaCost)
         {
             if (manaCost == "{1}{G}")
                 return new ManaCost(source, new ManaAmount(1, ManaColor.Generic), new ManaAmount(1, ManaColor.Green));
             else if (manaCost == "{X}{X}{X}")
                 return new ManaCost(source, new ManaAmount(3, ManaColor.GenericX));
+            else if (manaCost == "{U}{U}")
+                return new ManaCost(source, new ManaAmount(2, ManaColor.Blue));
 
             var manaAmounts = ManaParser.Parse(manaCost);
             if (manaAmounts == null)

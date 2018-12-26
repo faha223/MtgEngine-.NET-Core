@@ -9,9 +9,12 @@ namespace MtgEngine.Common.Mana
     {
         public string AsString { get; }
 
-        public ManaAttribute(string asString)
+        public int CMC { get; }
+
+        public ManaAttribute(string asString, int cmc = 1)
         {
             AsString = asString;
+            CMC = cmc;
         }
 
         public static ManaAttribute GetManaAttribute(ManaColor color)

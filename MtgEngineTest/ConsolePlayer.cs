@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MtgEngine;
+using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
@@ -23,27 +25,27 @@ namespace MtgEngineTest
         {
         }
 
-        public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
+        public override ActionBase GivePriority(Game game, bool canPlaySorcerySpeedSpells)
         {
             if (passTurn)
                 return new PassPriorityAction();
 
-            if (activePlayer == this)
+            if (game.ActivePlayer == this)
                 passToYourTurn = false;
 
-            if (passToYourTurn && activePlayer != this)
+            if (passToYourTurn && game.ActivePlayer != this)
                 return new PassPriorityAction();
 
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
             PrintManaPool();
             PrintHand();
-            Console.WriteLine($"You Have Priority (Active Player: {activePlayer.Name})");
+            Console.WriteLine($"You Have Priority (Active Player: {game.ActivePlayer.Name})");
             int i = 1;
             var potentialActions = new List<ActionBase>();
 
             foreach (var card in Hand)
             {
-                if (canPlayCardThisTurn(card, canPlaySorcerySpeedSpells))
+                if (canPlayCardThisTurn(card, game, canPlaySorcerySpeedSpells))
                 {
                     Console.WriteLine($"{i++}: Play {card.Name}");
                     potentialActions.Add(new PlayCardAction(card));
@@ -99,9 +101,9 @@ namespace MtgEngineTest
             }
         }
 
-        public bool canPlayCardThisTurn(Card card, bool canPlaySorcerySpeedSpells)
+        public bool canPlayCardThisTurn(Card card, Game game, bool canPlaySorcerySpeedSpells)
         {
-            bool canPlayCard = card.Cost.CanPay();
+            bool canPlayCard = card.CanCast(game);
             canPlayCard &= (canPlaySorcerySpeedSpells || card.Types.Contains(CardType.Instant));
             canPlayCard &= (!card.Types.Contains(CardType.Land) || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
 
@@ -228,6 +230,15 @@ namespace MtgEngineTest
             }
             else
                 cardsOnTop = scryedCards;
+        }
+
+        public override Card ChooseTarget(IResolvable source, List<Card> possibleTargets)
+        {
+            if (possibleTargets.Count == 1)
+                return possibleTargets[0];
+
+            // TODO: Print the possibilities and have the player choose
+            return possibleTargets.Last();
         }
 
         #region Combat
@@ -491,7 +502,7 @@ namespace MtgEngineTest
             return null;
         }
 
-        private List<int> ParseChoice(string userText, int minResponseCount, int maxResponseCount, int minResponseValue, int maxResponseValue, bool noDuplicates)
+        public static List<int> ParseChoice(string userText, int minResponseCount, int maxResponseCount, int minResponseValue, int maxResponseValue, bool noDuplicates)
         {
             if (string.IsNullOrWhiteSpace(userText))
             {

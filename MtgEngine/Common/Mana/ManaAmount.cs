@@ -14,6 +14,18 @@ namespace MtgEngine.Common.Mana
             Color = color;
         }
 
+        /// <summary>
+        /// Returns the CMC Contribution of this thing
+        /// </summary>
+        /// <returns></returns>
+        public int Convert()
+        {
+            var attrib = ManaAttribute.GetManaAttribute(Color);
+            if (attrib == null)
+                return Amount;
+            return attrib.CMC * Amount;
+        }
+
         public override string ToString()
         {
             if (Amount == 0)

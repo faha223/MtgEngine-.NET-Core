@@ -88,11 +88,13 @@ namespace MtgEngine.Common.Players
             Library = new Deck(this, deckList);
         }
 
-        public abstract ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells);
+        public abstract ActionBase GivePriority(Game game, bool canPlaySorcerySpeedSpells);
 
         public abstract List<AttackerDeclaration> DeclareAttackers(List<Player> opponents);
 
         public abstract List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> AttackingCreatures);
+
+        public abstract Card ChooseTarget(IResolvable source, List<Card> possibleTargets);
 
         public virtual void DiscardToHandSize()
         {

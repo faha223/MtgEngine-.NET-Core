@@ -4,6 +4,7 @@ using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace MtgEngine.Common.Players.AIPlayers
@@ -17,7 +18,7 @@ namespace MtgEngine.Common.Players.AIPlayers
         {
         }
 
-        public override ActionBase GivePriority(Player activePlayer, bool canPlaySorcerySpeedSpells)
+        public override ActionBase GivePriority(Game game, bool canPlaySorcerySpeedSpells)
         {
             Thread.Sleep(timeToThink);
             return new PassPriorityAction();
@@ -59,6 +60,11 @@ namespace MtgEngine.Common.Players.AIPlayers
         {
             // Never Block
             return blockers;
+        }
+
+        public override Card ChooseTarget(IResolvable source, List<Card> possibleTargets)
+        {
+            return possibleTargets.Last();
         }
 
         public override ManaColor? PayManaCost(string cost)

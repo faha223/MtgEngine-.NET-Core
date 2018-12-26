@@ -15,13 +15,13 @@ namespace MtgEngine
     {
         private List<Player> _players { get; } = new List<Player>();
 
-        private Player _activePlayer { get; set; }
+        public Player ActivePlayer { get; private set; }
 
         private Player _nextPlayer
         {
             get
             {
-                int i = _players.IndexOf(_activePlayer) + 1;
+                int i = _players.IndexOf(ActivePlayer) + 1;
                 return _players[i % _players.Count];
             }
         }
@@ -31,6 +31,39 @@ namespace MtgEngine
         private Player _priorityPlayer { get; set; }
 
         private Stack<Card> Stack { get; } = new Stack<Card>();
+
+        public List<Card> CardsOnStack()
+        {
+            return Stack.ToList();
+        }
+
+        /// <summary>
+        /// This method removes a spell from the stack and puts it in its owner's graveyard. If the given spell is not on the stack, then this effect does nothing.
+        /// </summary>
+        /// <param name="card">This spell is the spell that is to be countered.</param>
+        public void CounterSpell(Card card)
+        {
+            if(Stack.Contains(card))
+            {
+                Stack<Card> temp = new Stack<Card>(Stack.Count);
+                Card topmost = null;
+                do
+                {
+                    topmost = Stack.Pop();
+                    if (topmost == card)
+                        break;
+                    temp.Push(topmost);
+                    topmost = null;
+                } while (Stack.Count > 0);
+
+                while (temp.Count > 0)
+                    Stack.Push(temp.Pop());
+
+                if(topmost != null)
+                    topmost.Owner.Graveyard.Add(topmost);
+            }
+            CheckStateBasedActions();
+        }
 
         delegate void CardEvent(Card card);
         private event CardEvent CardHasEnteredStack;
@@ -60,7 +93,7 @@ namespace MtgEngine
             {
                 // Determine Turn Order
                 ShufflePlayers();
-                _activePlayer = _players.First();
+                ActivePlayer = _players.First();
 
                 // Deal Opening Hands
                 _players.ForEach(player => player.ShuffleLibrary());
@@ -84,7 +117,7 @@ namespace MtgEngine
 
                     EndingPhase();
 
-                    _activePlayer = _nextPlayer;
+                    ActivePlayer = _nextPlayer;
                 } while (true);
             });
         }
@@ -206,8 +239,8 @@ namespace MtgEngine
         private void UntapStep()
         {
             CurrentStepHasChanged("Untap Step");
-            _activePlayer.Battlefield.Creatures.ForEach(c => c.HasSummoningSickness = false);
-            _activePlayer.Battlefield.ForEach(c => c.Untap());
+            ActivePlayer.Battlefield.Creatures.ForEach(c => c.HasSummoningSickness = false);
+            ActivePlayer.Battlefield.ForEach(c => c.Untap());
 
             DrainManaPools();
         }
@@ -217,7 +250,7 @@ namespace MtgEngine
             CurrentStepHasChanged("Upkeep Step");
 
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             // Drain each player's mana pool
             DrainManaPools();
@@ -228,7 +261,7 @@ namespace MtgEngine
             CurrentStepHasChanged("Draw Step");
             // TODO: Add Beginning of Draw Step Triggers to the Stack
 
-            _activePlayer.Draw(1);
+            ActivePlayer.Draw(1);
 
             DrainManaPools();
         }
@@ -249,7 +282,7 @@ namespace MtgEngine
             }
 
             // TODO: Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
-            ApNapLoop(_activePlayer, true);
+            ApNapLoop(ActivePlayer, true);
 
             DrainManaPools();
         }
@@ -262,7 +295,7 @@ namespace MtgEngine
             DeclareAttackersStep();
 
             // If Attackers were declared
-            if (_activePlayer.Battlefield.Any(card => card is CreatureCard && (card as CreatureCard).IsAttacking))
+            if (ActivePlayer.Battlefield.Any(card => card is CreatureCard && (card as CreatureCard).IsAttacking))
             {
                 DeclareBlockersStep();
 
@@ -278,7 +311,7 @@ namespace MtgEngine
             CurrentStepHasChanged("Beginning of Combat");
             // TODO: Add Beginning of Combat Triggers to the Stack
 
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             DrainManaPools();
         }
@@ -287,7 +320,7 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("Declare Attackers Step");
             // TODO: Ask the Active Player to declare attackers
-            var attackers = _activePlayer.DeclareAttackers(_players.Except(new[] { _activePlayer }).ToList());
+            var attackers = ActivePlayer.DeclareAttackers(_players.Except(new[] { ActivePlayer }).ToList());
             if (attackers != null)
             {
                 foreach (var declaration in attackers)
@@ -298,7 +331,7 @@ namespace MtgEngine
 
             // TODO: Any "When this creature attacks" triggers get put onto the stack
 
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             DrainManaPools();
         }
@@ -308,12 +341,12 @@ namespace MtgEngine
             CurrentStepHasChanged("Declare Blockers Step");
 
             // TODO: Ask the Defending Players, in ApNap order, to declare Blockers
-            var defendingPlayers = _players.StartAt(_activePlayer)
-                .Where(p => _activePlayer.Battlefield.Creatures.Any(c => c.DefendingPlayer == p));
+            var defendingPlayers = _players.StartAt(ActivePlayer)
+                .Where(p => ActivePlayer.Battlefield.Creatures.Any(c => c.DefendingPlayer == p));
             // Iterate over the defending players in turn order
             foreach(var player in defendingPlayers)
             {
-                var blockers = player.DeclareBlockers(_activePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player).ToList());
+                var blockers = player.DeclareBlockers(ActivePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player).ToList());
                 if(blockers != null)
                 {
                     foreach(var blocker in blockers)
@@ -323,7 +356,7 @@ namespace MtgEngine
                 }
             }
 
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             DrainManaPools();
         }
@@ -341,9 +374,9 @@ namespace MtgEngine
             }
 
             // If any remaining attackers have doublestrike or don't have firststrike
-            if (_activePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
+            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
             {
-                foreach(CreatureCard attacker in _activePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
+                foreach(CreatureCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
                 {
                     // If the defending player blocked
                     if (attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker))
@@ -352,7 +385,7 @@ namespace MtgEngine
                         var damageOutput = attacker.BasePower;
                         var blockers = attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker);
 
-                        foreach (var blocker in _activePlayer.SortBlockers(attacker, blockers))
+                        foreach (var blocker in ActivePlayer.SortBlockers(attacker, blockers))
                         {
                             if (damageOutput > 0)
                             {
@@ -381,12 +414,12 @@ namespace MtgEngine
             CurrentStepHasChanged("End of Combat Step");
 
             // Give Priority to Players
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             // TODO: Add any "End of Combat" triggers to the stack
 
             // Remove all creatures from combat
-            foreach (var creature in _activePlayer.Battlefield.Creatures)
+            foreach (var creature in ActivePlayer.Battlefield.Creatures)
                 creature.DefendingPlayer = null;
 
             DrainManaPools();
@@ -403,7 +436,7 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("End Step");
             // TODO: Add EndStep Triggers to the Stack in ApNap Order
-            ApNapLoop(_activePlayer, false);
+            ApNapLoop(ActivePlayer, false);
 
             DrainManaPools();
         }
@@ -412,7 +445,7 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("Cleanup Step");
             // TODO: Discard down to Maximum Hand Size
-            _activePlayer.DiscardToHandSize();
+            ActivePlayer.DiscardToHandSize();
 
             // TODO: Remove Marked Damage from Permanents, and "Until End of Turn" and "This Turn" effects go away
 
@@ -442,7 +475,7 @@ namespace MtgEngine
                 bool playerHasPassedPriority = false;
                 do
                 {
-                    var chosenAction = player.GivePriority(_activePlayer, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
+                    var chosenAction = player.GivePriority(this, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
 
                     switch (chosenAction.ActionType)
                     {
@@ -600,7 +633,7 @@ namespace MtgEngine
         private void ResetLandsPlayed(Player player)
         {
             player.LandsPlayedThisTurn = 0;
-            player.MaxLandsPlayedThisTurn = (player == _activePlayer ? 1 : 0);
+            player.MaxLandsPlayedThisTurn = (player == ActivePlayer ? 1 : 0);
         }
 
         /// <summary>

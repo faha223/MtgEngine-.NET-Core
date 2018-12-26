@@ -30,7 +30,7 @@ namespace MtgEngine.Common.Enums
         // Generic gets no attribute because it appears differently in Mana Costs depending on the amount
         Generic,        // May be paid with any mana source, cannot be explicitly generated
 
-        [Mana("{X}")]
+        [Mana("{X}", 0)]
         GenericX,       // Same as Generic, but the amount is determined at the time the mana cost is to be paid. Cannot be explicitly generated
 
         // Phyrexian Mana Types
@@ -84,19 +84,19 @@ namespace MtgEngine.Common.Enums
 
         // 1 Color Hybrid Mana Types
 
-        [Mana("{2/W}")]
+        [Mana("{2/W}", 2)]
         TwoOrWhite,     // May be paid with White mana sources or 2 mana sources of any other color, cannot be explicitly generated
 
-        [Mana("{2/U}")]
+        [Mana("{2/U}", 2)]
         TwoOrBlue,      // May be paid with Blue mana sources or 2 mana sources of any other color, cannot be explicitly generated
 
-        [Mana("{2/B}")]
+        [Mana("{2/B}", 2)]
         TwoOrBlack,     // May be paid with Black mana sources or 2 mana sources of any other color, cannot be explicitly generated
 
-        [Mana("{2/R}")]
+        [Mana("{2/R}", 2)]
         TwoOrRed,       // May be paid with Red mana sources or 2 mana sources of any other color, cannot be explicitly generated
 
-        [Mana("{2/G}")]
+        [Mana("{2/G}", 2)]
         TwoOrGreen      // May be paid with Green mana sources or 2 mana sources of any other color, cannot be explicitly generated
     }
 }

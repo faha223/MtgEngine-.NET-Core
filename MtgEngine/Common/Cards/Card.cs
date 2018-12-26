@@ -81,6 +81,11 @@ namespace MtgEngine.Common.Cards
             _isSnow = isSnow;
         }
 
+        public virtual bool CanCast(Game game)
+        {
+            return true;
+        }
+
         public virtual void OnCast(Game game)
         {
 
