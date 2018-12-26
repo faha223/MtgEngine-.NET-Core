@@ -27,14 +27,19 @@ namespace MtgEngineTest
 
         public override ActionBase GivePriority(Game game, bool canPlaySorcerySpeedSpells)
         {
-            if (passTurn)
-                return new PassPriorityAction();
+            // Don't skip priority if there's something on the stack
+            var stack = game.CardsOnStack();
+            if (stack.Count == 0)
+            {
+                if (passTurn)
+                    return new PassPriorityAction();
 
-            if (game.ActivePlayer == this)
-                passToYourTurn = false;
+                if (game.ActivePlayer == this)
+                    passToYourTurn = false;
 
-            if (passToYourTurn && game.ActivePlayer != this)
-                return new PassPriorityAction();
+                if (passToYourTurn && game.ActivePlayer != this)
+                    return new PassPriorityAction();
+            }
 
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
             PrintManaPool();

@@ -506,6 +506,7 @@ namespace MtgEngine
                                     // TODO : Put the Card onto the stack
                                     if (action.Card.Cost.Pay())
                                     {
+                                        action.Card.OnCast(this);
                                         player.Hand.Remove(action.Card);
                                         Stack.Push(action.Card);
                                         CardHasEnteredStack?.Invoke(action.Card);
