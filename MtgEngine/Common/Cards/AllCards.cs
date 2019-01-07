@@ -27,46 +27,10 @@ namespace MtgEngine.Common.Cards
         {
             foreach (var cardType in Cards)
             {
-                if (name == GetCardName(cardType))
+                if (name == MtgCardAttribute.GetAttribute(cardType)?.Name)
                     return cardType;
             }
             return null;
-        }
-
-        private static MtgCardAttribute getMtgCardAttribute(Type cardType)
-        {
-            var attributes = cardType.GetCustomAttributes(typeof(MtgCardAttribute), true);
-            return attributes.FirstOrDefault() as MtgCardAttribute;
-        }
-
-        public static string GetCardName(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.Name;
-        }
-
-        public static string GetSet(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.SetName;
-        }
-
-        public static string GetCardId(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.CardId;
-        }
-
-        public static string GetImageUri(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.ImageUri;
-        }
-
-        public static string GetText(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.Text;
-        }
-
-        public static string GetFlavorText(Type cardType)
-        {
-            return getMtgCardAttribute(cardType)?.FlavorText;
         }
     }
 }

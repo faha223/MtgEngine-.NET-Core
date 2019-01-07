@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MtgEngine.Common.Players
 {
-    public abstract class Player
+    public abstract class Player : ITarget, IAttackable
     {
         public int MulligansTaken { get; set; } = 0;
 
@@ -95,6 +95,8 @@ namespace MtgEngine.Common.Players
         public abstract List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> AttackingCreatures);
 
         public abstract Card ChooseTarget(IResolvable source, List<Card> possibleTargets);
+
+        public abstract ManaColor ChooseColor();
 
         public virtual void DiscardToHandSize()
         {

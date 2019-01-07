@@ -9,7 +9,7 @@ namespace MtgEngine.Common.Abilities
     {
         public ManaAmount ManaGenerated { get; private set; }
 
-        public ManaAbility(Card source, Cost cost, ManaAmount manaGenerated, string text) : base(source, cost, text)
+        public ManaAbility(PermanentCard source, Cost cost, ManaAmount manaGenerated, string text) : base(source, cost, text)
         {
             ManaGenerated = manaGenerated;
         }

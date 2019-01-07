@@ -499,6 +499,24 @@ namespace MtgEngineTest
             } while (true);
         }
 
+        public override ManaColor ChooseColor()
+        {
+            var options = new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green };
+            while(true)
+            {
+                Console.WriteLine("Choose a Color:");
+                for(int i = 0; i < options.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {options[i]}");
+                }
+                Console.Write("Which Color do you choose? ");
+                var choice = ParseChoice(Console.ReadLine(), 1, options.Length);
+                if (choice.HasValue)
+                    return options[choice.Value - 1];
+                Console.WriteLine();
+            }
+        }
+
         private int? ParseChoice(string userText, int minResponseValue, int maxResponseValue)
         {
             var selections = ParseChoice(userText, 1, 1, minResponseValue, maxResponseValue, false);

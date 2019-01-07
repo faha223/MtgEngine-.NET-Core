@@ -77,6 +77,14 @@ namespace MtgEngine.Common.Players.AIPlayers
             return 0;
         }
 
+        public override ManaColor ChooseColor()
+        {
+            var rand = new Random();
+            var options = new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green };
+
+            return options[Math.Abs(rand.Next()) % options.Length];
+        }
+
         public override List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> attackingCreatures)
         {
             return null;

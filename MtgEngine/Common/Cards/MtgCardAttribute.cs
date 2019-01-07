@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
@@ -19,6 +20,12 @@ namespace MtgEngine.Common.Cards
             this.CardId = CardId;
             this.Text = Text;
             this.FlavorText = FlavorText;
+        }
+
+        public static MtgCardAttribute GetAttribute(Type cardType)
+        {
+            var attributes = cardType.GetCustomAttributes(typeof(MtgCardAttribute), true);
+            return attributes.FirstOrDefault(c => c is MtgCardAttribute) as MtgCardAttribute;
         }
     }
 }

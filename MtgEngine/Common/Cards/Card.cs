@@ -8,38 +8,38 @@ namespace MtgEngine.Common.Cards
     /// <summary>
     /// Cards can, generally, be put on the stack. The exception to this rule is Land cards
     /// </summary>
-    public abstract class Card : IResolvable
+    public abstract class Card : ITarget, IResolvable
     {
         public bool UsesStack { get; }
 
         public string CardId
         {
-            get => AllCards.GetCardId(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.CardId;
         }
 
         public string Name
         {
-            get => AllCards.GetCardName(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.Name;
         }
 
         public string Set
         {
-            get => AllCards.GetSet(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.SetName;
         }
 
         public string ImageUri
         {
-            get => AllCards.GetImageUri(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.ImageUri;
         }
 
         public string Text
         {
-            get => AllCards.GetText(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.Text;
         }
 
         public string FlavorText
         {
-            get => AllCards.GetFlavorText(GetType());
+            get => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
         }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
