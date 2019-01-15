@@ -1,5 +1,10 @@
-﻿12x Forest
-13x Island
-10x Grizzly Bears
+﻿6x Plains
+6x Island
+6x Swamp
+6x Mountain
+6x Forest
+4x Fusion Elemental
+4x Gigantosaurus
+4x Grizzly Bears
 4x Astral Cornucopia
-11x Counterspell
+4x Counterspell

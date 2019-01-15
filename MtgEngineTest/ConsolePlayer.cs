@@ -278,7 +278,10 @@ namespace MtgEngineTest
                         {
                             var creature = creatures[selection.Value - 1];
                             if (creature.IsAttacking)
+                            {
                                 attackers.RemoveAll(c => c.AttackingCreature == creature);
+                                creature.DefendingPlayer = null;
+                            }
                             else
                             {
                                 if (opponents.Count == 1)
