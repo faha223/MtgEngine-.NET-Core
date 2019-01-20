@@ -319,13 +319,18 @@ namespace MtgEngine
         private void DeclareAttackersStep()
         {
             CurrentStepHasChanged("Declare Attackers Step");
-            // TODO: Ask the Active Player to declare attackers
+
+            // Ask the Active Player to declare attackers
             var attackers = ActivePlayer.DeclareAttackers(_players.Except(new[] { ActivePlayer }).ToList());
             if (attackers != null)
             {
                 foreach (var declaration in attackers)
                 {
                     declaration.AttackingCreature.DefendingPlayer = declaration.DefendingPlayer;
+
+                    // Tap all attacking creatures that don't have vigilance
+                    if (!declaration.AttackingCreature.StaticAbilities.Contains(StaticAbility.Vigilance))
+                        declaration.AttackingCreature.Tap();
                 }
             }
 
@@ -365,10 +370,20 @@ namespace MtgEngine
         {
             CurrentStepHasChanged("Damage Step");
 
+            // These creatures have been blocked
+            var blockedCreatures = ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && c.DefendingPlayer.Battlefield.Creatures.Any(d => d.Blocking == c)).ToList();
+
             // If any attackers have firststrike or doublestrike
-            if (false)
+            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c)))
             {
                 // TODO: Deal First Strike Damage
+                foreach(var attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c)))
+                {
+                    // Deal combat damage to, and take combat damage from, blockers
+                    CombatDamage(attacker, 
+                        blockedCreatures.Contains(attacker), 
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker && doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c)));
+                }
 
                 CheckStateBasedActions();
             }
@@ -376,37 +391,74 @@ namespace MtgEngine
             // If any remaining attackers have doublestrike or don't have firststrike
             if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
             {
-                foreach(PermanentCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
+                foreach(PermanentCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesNormalDamage(c)))
                 {
-                    // If the defending player blocked
-                    if (attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker))
-                    {
-                        // Deal damage to the defending player's creatures
-                        var damageOutput = attacker.BasePower;
-                        var blockers = attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker);
-
-                        foreach (var blocker in ActivePlayer.SortBlockers(attacker, blockers))
-                        {
-                            if (damageOutput > 0)
-                            {
-                                int damageDealt = Math.Min(blocker.BaseToughness, damageOutput);
-                                blocker.DamageAccumulated += damageDealt;
-                                damageOutput -= damageDealt;
-                            }
-                            attacker.DamageAccumulated += blocker.BasePower;
-                        }
-                    }
-                    else
-                    {
-                        attacker.DefendingPlayer.LifeTotal -= attacker.BasePower;
-                        PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.BasePower);
-                    }
+                    // Deal combat damage to, and take combat damage from, blockers
+                    CombatDamage(attacker, 
+                        blockedCreatures.Contains(attacker), 
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker && doesNormalDamage(attacker) || doesNormalDamage(c)));
                 }
 
                 CheckStateBasedActions();
             }
 
             DrainManaPools();
+        }
+
+        private void CombatDamage(PermanentCard attacker, bool blocked, IEnumerable<PermanentCard> blockers)
+        {
+            // If the defending player didn't block (we might not have blockers right now)
+            if (!blocked)
+            {
+                attacker.DefendingPlayer.LifeTotal -= attacker.BasePower;
+                PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.BasePower);
+            }
+            else if(blockers != null)
+            {
+                // Deal damage to the defending player's creatures
+                var damageOutput = attacker.BasePower;
+
+                foreach (var blocker in ActivePlayer.SortBlockers(attacker, blockers))
+                {
+                    if (damageOutput > 0)
+                    {
+                        int damageDealt = Math.Min(blocker.BaseToughness, damageOutput);
+                        blocker.DamageAccumulated += damageDealt;
+                        damageOutput -= damageDealt;
+                    }
+                    attacker.DamageAccumulated += blocker.BasePower;
+                }
+            }
+        }
+
+        // Do first strike damage only if the creature has first strike or double strike
+        private bool doesFirstStrikeDamage(PermanentCard creature)
+        {
+            if (creature.StaticAbilities.Contains(StaticAbility.FirstStrike) || creature.StaticAbilities.Contains(StaticAbility.DoubleStrike))
+                return true;
+            return false;
+        }
+
+        // Take first strike damage if any blocking creatures do first strike damage
+        private bool takesFirstStrikeDamage(PermanentCard attacker)
+        {
+            return attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker && doesFirstStrikeDamage(c));
+        }
+
+        // Do normal damage unless the creature has first strike and NOT double strike
+        private bool doesNormalDamage(PermanentCard creature)
+        {
+            if (creature.StaticAbilities.Contains(StaticAbility.DoubleStrike))
+                return true;
+            if (creature.StaticAbilities.Contains(StaticAbility.FirstStrike))
+                return false;
+            return true;
+        }
+
+        // Take normal damage if any blocking creatures do normal damage
+        private bool takesNormalDamage(PermanentCard attacker)
+        {
+            return attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker && doesNormalDamage(c));
         }
 
         private void EndOfCombatStep()
@@ -563,9 +615,18 @@ namespace MtgEngine
         private void CheckStateBasedActions()
         {
             // TODO: Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
+            foreach(var player in _players)
+            {
+                var deadCreatures = player.Battlefield.Creatures.Where(c => (c.DamageAccumulated >= c.BasePower && !c.StaticAbilities.Contains(StaticAbility.Indestructible)) || c.BasePower == 0);
+                foreach(var creature in deadCreatures)
+                {
+                    creature.Controller.Battlefield.Remove(creature);
+                    creature.Owner.Graveyard.Add(creature);
+                }
+            }
 
             // TODO: Any players with 0 life total lose the game
-
+            
             // TODO: If an effect has caused a player to win the game, all other players lose
 
             // TODO: If a player has lost the game, remove them from the _players list. If they were the active player, go to the start of the next player's turn

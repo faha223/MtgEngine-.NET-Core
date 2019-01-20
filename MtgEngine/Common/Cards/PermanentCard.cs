@@ -4,7 +4,6 @@ using MtgEngine.Common.Counters;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
@@ -47,7 +46,15 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                return IsACreature && (StaticAbilities.Contains(StaticAbility.Haste) || !HasSummoningSickness);
+                if (!IsACreature)
+                    return false;
+                if (IsTapped)
+                    return false;
+                if (StaticAbilities.Contains(StaticAbility.Defender))
+                    return false;
+                if (StaticAbilities.Contains(StaticAbility.Haste))
+                    return true;
+                return !(HasSummoningSickness || IsTapped);
             }
         }
 
