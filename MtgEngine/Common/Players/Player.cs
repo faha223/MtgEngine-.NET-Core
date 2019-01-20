@@ -92,7 +92,7 @@ namespace MtgEngine.Common.Players
 
         public abstract List<AttackerDeclaration> DeclareAttackers(List<Player> opponents);
 
-        public abstract List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> AttackingCreatures);
+        public abstract List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> AttackingCreatures);
 
         public abstract Card ChooseTarget(IResolvable source, List<Card> possibleTargets);
 
@@ -108,7 +108,7 @@ namespace MtgEngine.Common.Players
 
         public abstract void Discard();
 
-        public abstract IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers);
+        public abstract IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers);
 
         public virtual void Discard(Card card)
         {

@@ -2,6 +2,7 @@
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
+using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
@@ -49,6 +50,22 @@ namespace MtgEngine.Common.Cards
 
         private CardType[] _types { get; }
         public virtual CardType[] Types { get { return _types; } }
+
+        public bool IsACreature { get { return Types.Contains(CardType.Creature); } }
+
+        public bool IsAnArtifact { get { return Types.Contains(CardType.Artifact); } }
+
+        public bool IsALand { get { return Types.Contains(CardType.Land); } }
+
+        public bool IsAnEnchantment { get { return Types.Contains(CardType.Enchantment); } }
+
+        public bool IsAnInstant { get { return Types.Contains(CardType.Instant); } }
+
+        public bool IsASorcery { get { return Types.Contains(CardType.Instant); } }
+
+        public bool IsAPlaneswalker { get { return Types.Contains(CardType.Planeswalker); } }
+
+        public bool IsATribal { get { return Types.Contains(CardType.Tribal); } }
 
         private string[] _subtypes { get; }
         public virtual string[] Subtypes { get { return _subtypes; } }

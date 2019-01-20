@@ -52,6 +52,8 @@ namespace MtgEngine.Common.Costs
                 return new ManaCost(source, new ManaAmount(3, ManaColor.GenericX));
             else if (manaCost == "{U}{U}")
                 return new ManaCost(source, new ManaAmount(2, ManaColor.Blue));
+            else if (manaCost == "{W}{U}{B}{R}{G}")
+                return new ManaCost(source, new ManaAmount(1, ManaColor.White), new ManaAmount(1, ManaColor.Blue), new ManaAmount(1, ManaColor.Black), new ManaAmount(1, ManaColor.Red), new ManaAmount(1, ManaColor.Green));
 
             var manaAmounts = ManaParser.Parse(manaCost);
             if (manaAmounts == null)
@@ -89,11 +91,22 @@ namespace MtgEngine.Common.Costs
                     temp.Add(new ManaAmount(amt * x, ManaColor.Generic));
                 }
             }
+            List<ManaColor> manaPaid = new List<ManaColor>();
             while(temp.Count > 0)
             {
                 var colorPaid = controller.PayManaCost(stringify(temp));
-                if (colorPaid == null)
+                if (!colorPaid.HasValue)
+                {
+                    // If the player cancelled, return the paid mana to their mana pool
+                    foreach(var mana in manaPaid)
+                    {
+                        controller.ManaPool.Add(new ManaAmount(1, mana));
+                    }
                     return false;
+                }
+
+                manaPaid.Add(colorPaid.Value);
+
                 switch(colorPaid)
                 {
                     case ManaColor.White:

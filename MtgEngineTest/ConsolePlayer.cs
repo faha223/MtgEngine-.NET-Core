@@ -7,7 +7,6 @@ using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
-using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
@@ -109,8 +108,8 @@ namespace MtgEngineTest
         public bool canPlayCardThisTurn(Card card, Game game, bool canPlaySorcerySpeedSpells)
         {
             bool canPlayCard = card.CanCast(game);
-            canPlayCard &= (canPlaySorcerySpeedSpells || card.Types.Contains(CardType.Instant));
-            canPlayCard &= (!card.Types.Contains(CardType.Land) || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
+            canPlayCard &= (canPlaySorcerySpeedSpells || card.IsAnInstant);
+            canPlayCard &= (!card.IsALand || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
 
             return canPlayCard;
         }
@@ -322,7 +321,7 @@ namespace MtgEngineTest
             return attackers;
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> attackingCreatures)
+        public override List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> attackingCreatures)
         {
             var availableBlockers = Battlefield.Creatures.Where(c => !c.IsTapped).ToList();
             var blockers = new List<BlockerDeclaration>(availableBlockers.Count);
@@ -401,7 +400,7 @@ namespace MtgEngineTest
             return blockers;
         }
 
-        public override IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers)
+        public override IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers)
         {
             if (blockers.Count() == 1)
                 return blockers;

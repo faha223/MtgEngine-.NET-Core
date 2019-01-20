@@ -56,7 +56,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return null;
         }
 
-        public override IEnumerable<CreatureCard> SortBlockers(CreatureCard attacker, IEnumerable<CreatureCard> blockers)
+        public override IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers)
         {
             // Never Block
             return blockers;
@@ -85,7 +85,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return options[Math.Abs(rand.Next()) % options.Length];
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(List<CreatureCard> attackingCreatures)
+        public override List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> attackingCreatures)
         {
             return null;
         }

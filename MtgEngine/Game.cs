@@ -295,7 +295,7 @@ namespace MtgEngine
             DeclareAttackersStep();
 
             // If Attackers were declared
-            if (ActivePlayer.Battlefield.Any(card => card is CreatureCard && (card as CreatureCard).IsAttacking))
+            if (ActivePlayer.Battlefield.Creatures.Any(card => card.IsAttacking))
             {
                 DeclareBlockersStep();
 
@@ -376,7 +376,7 @@ namespace MtgEngine
             // If any remaining attackers have doublestrike or don't have firststrike
             if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
             {
-                foreach(CreatureCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
+                foreach(PermanentCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking))
                 {
                     // If the defending player blocked
                     if (attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker))
@@ -520,8 +520,8 @@ namespace MtgEngine
                                             {
                                                 card.OnResolve(this);
                                                 card.Controller.Battlefield.Add(card);
-                                                if(card is CreatureCard)
-                                                    (card as CreatureCard).HasSummoningSickness = true;
+                                                if(card.IsACreature)
+                                                    (card as PermanentCard).HasSummoningSickness = true;
                                                 CardHasEnteredBattlefield?.Invoke(card);
                                             }
                                             else if(card is SpellCard)
