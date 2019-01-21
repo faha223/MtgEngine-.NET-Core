@@ -374,15 +374,15 @@ namespace MtgEngine
             var blockedCreatures = ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && c.DefendingPlayer.Battlefield.Creatures.Any(d => d.Blocking == c)).ToList();
 
             // If any attackers have firststrike or doublestrike
-            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c)))
+            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && (doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c))))
             {
                 // TODO: Deal First Strike Damage
-                foreach(var attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c)))
+                foreach(var attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && (doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c))))
                 {
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker, 
                         blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker && doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c)));
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c))));
                 }
 
                 CheckStateBasedActions();
@@ -396,7 +396,7 @@ namespace MtgEngine
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker, 
                         blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker && doesNormalDamage(attacker) || doesNormalDamage(c)));
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesNormalDamage(attacker) || doesNormalDamage(c))));
                 }
 
                 CheckStateBasedActions();
