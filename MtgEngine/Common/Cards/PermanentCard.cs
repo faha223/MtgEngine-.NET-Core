@@ -47,8 +47,6 @@ namespace MtgEngine.Common.Cards
 
         public List<Ability> Abilities { get; } = new List<Ability>();
 
-        public List<StaticAbility> StaticAbilities { get; } = new List<StaticAbility>();
-
         // This isn't protected because we don't want inheriting classes modifying how counters are added or removed
         private List<CounterType> counters { get; } = new List<CounterType>();
 
@@ -132,13 +130,58 @@ namespace MtgEngine.Common.Cards
 
         public bool CanBlock(PermanentCard permanent)
         {
-            // This permanent can't block if it is not a creature
+            // This permanent can't block if it is not a creature (Vehicles can only attack/block if they're creatures)
             if (!IsACreature)
                 return false;
 
-            // Can't block non-creatures (this is for Vehicles)
+            // Can't block non-creatures (Vehicles can only attack/block if they're creatures)
             if (!permanent.IsACreature)
                 return false;
+
+            #region Evasion Abilities
+
+            #region Unblockable
+
+            // Can't block unblockables. Seems pretty straightforward
+            if (permanent.StaticAbilities.Contains(StaticAbility.Unblockable))
+                return false;
+
+            #endregion Unblockable
+
+            #region Fear
+
+            // Creatures with Fear can only be blocked by artifacts and black creatures
+            if(permanent.StaticAbilities.Contains(StaticAbility.Fear))
+            {
+                if (!IsAnArtifact || ColorIdentity == null || ColorIdentity.Contains(ManaColor.Black))
+                    return false;
+            }
+
+            #endregion Fear
+
+            #region Shadow
+
+            // Only creatures with shadow can block attackers with shadow
+            if (permanent.StaticAbilities.Contains(StaticAbility.Shadow))
+            {
+                if (!StaticAbilities.Contains(StaticAbility.Shadow))
+                    return false;
+            }
+
+            #endregion Shadow
+
+            #region Horsemanship
+
+            // Only creatures with horsemanship can block attackers with horsemanship
+            if(permanent.StaticAbilities.Contains(StaticAbility.Horsemanship))
+            {
+                if (!StaticAbilities.Contains(StaticAbility.Horsemanship))
+                    return false;
+            }
+
+            #endregion Horsemanship
+
+            #region Flying
 
             // Only creatures with Flying or Reach can block creatures with flying
             if (permanent.StaticAbilities.Contains(StaticAbility.Flying))
@@ -147,7 +190,50 @@ namespace MtgEngine.Common.Cards
                     return false;
             }
 
-            // This creature can block that creature as long as it's a creature
+            #endregion Flying
+
+            #region Land-walk
+
+            // Creatures with Plainswalk can't be blocked if we control a Plains
+            if(permanent.StaticAbilities.Contains(StaticAbility.Plainswalk))
+            {
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Plains")))
+                    return false;
+            }
+
+            // Creatures with Islandwalk can't be blocked if we control a Island
+            if (permanent.StaticAbilities.Contains(StaticAbility.Islandwalk))
+            {
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Island")))
+                    return false;
+            }
+
+            // Creatures with Swampwalk can't be blocked if we control a Swamp
+            if (permanent.StaticAbilities.Contains(StaticAbility.Swampwalk))
+            {
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Swamp")))
+                    return false;
+            }
+
+            // Creatures with Mountainwalk can't be blocked if we control a Mountain
+            if (permanent.StaticAbilities.Contains(StaticAbility.Mountainwalk))
+            {
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Mountain")))
+                    return false;
+            }
+
+            // Creatures with Forestwalk can't be blocked if we control a Forest
+            if (permanent.StaticAbilities.Contains(StaticAbility.Forestwalk))
+            {
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Forest")))
+                    return false;
+            }
+
+            #endregion Land-walk
+
+            #endregion Evasion Abilities
+
+            // This creature can block that creature. It passed all the tests
             return true;
         }
 

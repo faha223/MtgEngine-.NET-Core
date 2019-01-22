@@ -2,6 +2,7 @@
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MtgEngine.Common.Cards
@@ -43,6 +44,8 @@ namespace MtgEngine.Common.Cards
             get => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
         }
 
+        public List<StaticAbility> StaticAbilities { get; } = new List<StaticAbility>();
+
         public Guid InstanceId { get; } = Guid.NewGuid();
 
         private Cost _cost { get; set; }
@@ -66,6 +69,20 @@ namespace MtgEngine.Common.Cards
         public bool IsAPlaneswalker { get { return Types.Contains(CardType.Planeswalker); } }
 
         public bool IsATribal { get { return Types.Contains(CardType.Tribal); } }
+
+        public ManaColor[] ColorIdentity {
+            get
+            {
+                if (StaticAbilities.Contains(StaticAbility.Devoid))
+                    return null;
+
+                // TODO: Parse Mana Symbols from Text, and combine with mana symbols in ManaCost, then 
+                // distill down to single mana colors (no hybrids), then distinct, sort, return as array;
+
+                // Requires: ManaParser
+                return null;
+            }
+        }
 
         private string[] _subtypes { get; }
         public virtual string[] Subtypes { get { return _subtypes; } }

@@ -10,6 +10,16 @@
         Fear,
         FirstStrike,
         DoubleStrike,
-        Vigilance
+        Vigilance,
+        Unblockable,
+        Devoid,
+        Shadow,
+        Horsemanship,
+        Plainswalk,
+        Islandwalk,
+        Swampwalk,
+        Mountainwalk,
+        Forestwalk,
+        Flash
     }
 }
