@@ -4,15 +4,27 @@ using MtgEngine.Common.Counters;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract class PermanentCard : Card
+    public abstract class PermanentCard : Card, IDamageable
     {
         protected int _basePower { get; }
         public virtual int BasePower
         {
             get { return _basePower; }
+        }
+
+        public int Power
+        {
+            get
+            {
+                return BasePower
+                    + Counters.Count(c => c == CounterType.Plus1Plus1)
+                    - Counters.Count(c => c == CounterType.Minus1Minus1);
+            }
         }
 
         protected int _baseToughness { get; }
@@ -21,13 +33,61 @@ namespace MtgEngine.Common.Cards
             get { return _baseToughness; }
         }
 
+        public int Toughness
+        {
+            get
+            {
+                return BaseToughness
+                    + Counters.Count(c => c == CounterType.Plus1Plus1)
+                    - Counters.Count(c => c == CounterType.Minus1Minus1);
+            }
+        }
+
         public bool HasSummoningSickness { get; set; } = false;
 
         public List<Ability> Abilities { get; } = new List<Ability>();
 
         public List<StaticAbility> StaticAbilities { get; } = new List<StaticAbility>();
 
-        public List<Counter> Counters { get; } = new List<Counter>();
+        // This isn't protected because we don't want inheriting classes modifying how counters are added or removed
+        private List<CounterType> counters { get; } = new List<CounterType>();
+
+        // This returns a copy so that this can't be used to modify the counters
+        public ReadOnlyCollection<CounterType> Counters { get { return new ReadOnlyCollection<CounterType>(counters); } }
+
+        public void AddCounters(int count, CounterType counter)
+        {
+            for(int i = 0; i < count; i++)
+            {
+                switch(counter)
+                {
+                    case CounterType.Plus1Plus1:
+                        if (counters.Contains(CounterType.Minus1Minus1))
+                            counters.Remove(CounterType.Minus1Minus1);
+                        else
+                            counters.Add(CounterType.Plus1Plus1);
+                        break;
+                    case CounterType.Minus1Minus1:
+                        if (counters.Contains(CounterType.Plus1Plus1))
+                            counters.Remove(CounterType.Plus1Plus1);
+                        else
+                            counters.Add(CounterType.Minus1Minus1);
+                        break;
+                    default:
+                        counters.Add(counter);
+                        break;
+                }
+            }
+        }
+
+        public void RemoveCounters(int amount, CounterType counter)
+        {
+            for(int i = 0; i < amount; i++)
+            {
+                if (counters.Contains(counter))
+                    counters.Remove(counter);
+            }
+        }
 
         /// <summary>
         /// This stuff is here instead of on the Permanent class because enchantments and artifacts and lands can become creatures
@@ -40,7 +100,19 @@ namespace MtgEngine.Common.Cards
 
         public Card Blocking { get; set; } = null;
 
-        public int DamageAccumulated { get; set; } = 0;
+        public int DamageAccumulated { get; private set; } = 0;
+
+        public virtual void TakeDamage(int amount, Card source)
+        {
+            DamageAccumulated += amount;
+        }
+
+        public virtual bool IsDead => DamageAccumulated >= Toughness;
+
+        public void ResetDamage()
+        {
+            DamageAccumulated = 0;
+        }
 
         public bool CanAttack
         {

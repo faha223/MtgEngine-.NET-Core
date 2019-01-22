@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MtgEngine.Common.Players
 {
-    public abstract class Player : ITarget, IAttackable
+    public abstract class Player : ITarget, IDamageable
     {
         public int MulligansTaken { get; set; } = 0;
 
@@ -29,6 +29,18 @@ namespace MtgEngine.Common.Players
 
         private int _startingLifeTotal { get; } = 20;
         public int LifeTotal { get; set; } = 20;
+
+        public void LoseLife(int amount)
+        {
+            LifeTotal -= amount;
+        }
+
+        public void TakeDamage(int amount, Card source)
+        {
+            LoseLife(amount);
+        }
+
+        public bool IsDead => LifeTotal <= 0;
 
         public int LandsPlayedThisTurn = 0;
         public int MaxLandsPlayedThisTurn = 1;

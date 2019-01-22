@@ -382,21 +382,23 @@ namespace MtgEngine
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker, 
                         blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c))));
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c))),
+                        true);
                 }
 
                 CheckStateBasedActions();
             }
 
             // If any remaining attackers have doublestrike or don't have firststrike
-            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking))
+            if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && (doesNormalDamage(c) || takesNormalDamage(c))))
             {
                 foreach(PermanentCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesNormalDamage(c)))
                 {
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker, 
                         blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesNormalDamage(attacker) || doesNormalDamage(c))));
+                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesNormalDamage(attacker) || doesNormalDamage(c))),
+                        false);
                 }
 
                 CheckStateBasedActions();
@@ -405,29 +407,38 @@ namespace MtgEngine
             DrainManaPools();
         }
 
-        private void CombatDamage(PermanentCard attacker, bool blocked, IEnumerable<PermanentCard> blockers)
+        private void CombatDamage(PermanentCard attacker, bool blocked, IEnumerable<PermanentCard> blockers, bool firstStrike)
         {
             // If the defending player didn't block (we might not have blockers right now)
             if (!blocked)
             {
-                attacker.DefendingPlayer.LifeTotal -= attacker.BasePower;
-                PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.BasePower);
+                attacker.DefendingPlayer.LifeTotal -= attacker.Power;
+                PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.Power);
             }
             else if(blockers != null)
             {
                 // Deal damage to the defending player's creatures
-                var damageOutput = attacker.BasePower;
+                var damageOutput = attacker.Power;
 
                 foreach (var blocker in ActivePlayer.SortBlockers(attacker, blockers))
                 {
-                    if (damageOutput > 0)
+                    // The attacker hits
+                    if ((firstStrike && doesFirstStrikeDamage(attacker)) || (!firstStrike && doesNormalDamage(attacker)))
                     {
-                        int damageDealt = Math.Min(blocker.BaseToughness, damageOutput);
-                        blocker.DamageAccumulated += damageDealt;
-                        damageOutput -= damageDealt;
+                        if (damageOutput > 0)
+                        {
+                            int damageDealt = Math.Min(blocker.Toughness, damageOutput);
+                            blocker.TakeDamage(damageDealt, attacker);
+                            damageOutput -= damageDealt;
+                        }
                     }
-                    attacker.DamageAccumulated += blocker.BasePower;
+
+                    // The blocker hits back
+                    if((firstStrike && doesFirstStrikeDamage(blocker)) || (!firstStrike && doesNormalDamage(blocker)))
+                        attacker.TakeDamage(blocker.Power, blocker);
                 }
+
+                // TODO: Trample Damage to defending player
             }
         }
 
@@ -473,6 +484,11 @@ namespace MtgEngine
             // Remove all creatures from combat
             foreach (var creature in ActivePlayer.Battlefield.Creatures)
                 creature.DefendingPlayer = null;
+            foreach(var player in _players)
+            {
+                foreach (var creature in player.Battlefield.Creatures)
+                    creature.Blocking = null;
+            }
 
             DrainManaPools();
         }
@@ -500,6 +516,9 @@ namespace MtgEngine
             ActivePlayer.DiscardToHandSize();
 
             // TODO: Remove Marked Damage from Permanents, and "Until End of Turn" and "This Turn" effects go away
+            foreach (var player in _players)
+                foreach (var creature in player.Battlefield.Creatures)
+                    creature.ResetDamage();
 
             // TODO: If there are triggered abilities on the stack then players may receive priority, in ApNap order, to react to them before the stack resolves.
             // Example: Madness is a triggered ability that happens when a player discards a card with Madness. This can potentially be put on the stack from the First part of the Cleanup step
@@ -511,15 +530,12 @@ namespace MtgEngine
         {
             // Idea: This might need to be put in a separate class, a Stack Resolver
 
-            // TODO: Loop through all players, starting with startingPlayer, and ask them if they would like to take an action.
-            // If the player responds PassPriority, then go to the next player.
-            // If the player responds with a legal action that doesn't go on the stack (playing a land during main phase) then perform the action and ask again.
-            // If the player responds with a legal action that does go on the stack (activating an ability of a permanent, or casting a spell), then put it on 
-            //   the stack and begin another ApNap loop starting with the next player in turn order
             // If the player responds with an illegal action then inform the user of why the action is illegal, and ask again
 
             // This function returns when the stack is empty and all players have Passed Priority since the last spell resolved
-            foreach(var player in _players.StartAt(startingPlayer))
+
+            // Loop through all players, starting with startingPlayer, and ask them if they would like to take an action.
+            foreach (var player in _players.StartAt(startingPlayer))
             {
                 // TODO: Give Priority
                 _priorityPlayer = player;
@@ -532,6 +548,7 @@ namespace MtgEngine
                     switch (chosenAction.ActionType)
                     {
                         case ActionType.PassPriority:
+                            // If the player responds PassPriority, then go to the next player.
                             playerHasPassedPriority = true;
                             continue;
                         case ActionType.PlayCard:
@@ -554,10 +571,10 @@ namespace MtgEngine
                                 }
                                 else
                                 {
-                                    // TODO : Make player pay the cost of the Card
-                                    // TODO : Put the Card onto the stack
+                                    // Make player pay the cost of the Card
                                     if (action.Card.Cost.Pay())
                                     {
+                                        // Put the Card onto the stack
                                         action.Card.OnCast(this);
                                         player.Hand.Remove(action.Card);
                                         Stack.Push(action.Card);
@@ -617,11 +634,18 @@ namespace MtgEngine
             // TODO: Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
             foreach(var player in _players)
             {
-                var deadCreatures = player.Battlefield.Creatures.Where(c => (c.DamageAccumulated >= c.BasePower && !c.StaticAbilities.Contains(StaticAbility.Indestructible)) || c.BasePower == 0);
+                var deadCreatures = player.Battlefield.Creatures.Where(c => c.IsDead).ToList();
                 foreach(var creature in deadCreatures)
                 {
                     creature.Controller.Battlefield.Remove(creature);
                     creature.Owner.Graveyard.Add(creature);
+                }
+
+                var deadPlaneswalkers = player.Battlefield.Planeswalkers.Where(c => c.IsDead).ToList();
+                foreach(var planeswalker in deadPlaneswalkers)
+                {
+                    planeswalker.Controller.Battlefield.Remove(planeswalker);
+                    planeswalker.Owner.Graveyard.Add(planeswalker);
                 }
             }
 

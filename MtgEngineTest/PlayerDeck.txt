@@ -1,10 +1,8 @@
-﻿6x Plains
-6x Island
-6x Swamp
-6x Mountain
-6x Forest
-4x Fusion Elemental
-4x Gigantosaurus
-4x Grizzly Bears
-4x Astral Cornucopia
-4x Counterspell
+﻿8x Plains
+16x Forest
+4x Savannah
+5x Rustwing Falcon
+5x Darksteel Myr
+5x Fencing Ace
+5x Giant Spider
+5x Grizzly Bears

@@ -350,7 +350,9 @@ namespace MtgEngineTest
                     if (selection.Value <= attackingCreatures.Count)
                     {
                         var attacker = attackingCreatures[selection.Value - 1];
-                        var _availBlockers = availableBlockers.Where(c => c.Blocking == null).ToList();
+
+                        // Available blockers are creatures that are not currently blocking anything, and which can block the selected attacker
+                        var _availBlockers = availableBlockers.Where(c => c.Blocking == null && c.CanBlock(attacker)).ToList();
 
                         // declare blocker
                         while (true)
@@ -485,6 +487,18 @@ namespace MtgEngineTest
                         Console.WriteLine($"{i++}: Pay {color}");
                     }
                 }
+                List<ManaAbility> manaAbilities = new List<ManaAbility>();
+                foreach(var land in Battlefield.Lands.Where(c => !c.IsTapped))
+                {
+                    foreach(var manaAbility in land.Abilities.Where(a => a is ManaAbility).Select(c => c as ManaAbility))
+                    {
+                        if (manaAbility.Cost.CanPay())
+                        {
+                            Console.WriteLine($"{i++}: {land.Name}: {manaAbility.Text}");
+                            manaAbilities.Add(manaAbility);
+                        }
+                    }
+                }
                 Console.WriteLine($"{i}: Cancel");
 
                 var selection = ParseChoice(Console.ReadLine(), 1, i);
@@ -492,10 +506,19 @@ namespace MtgEngineTest
                 {
                     if (selection.Value == i)
                         return null;
-
-                    var color = colorOptions[selection.Value - 1];
-                    ManaPool[color]--;
-                    return color;
+                    else if (selection.Value <= colorOptions.Count)
+                    {
+                        var color = colorOptions[selection.Value - 1];
+                        ManaPool[color]--;
+                        return color;
+                    }
+                    else
+                    {
+                        var manaAbility = manaAbilities[selection.Value - colorOptions.Count - 1];
+                        manaAbility.Cost.Pay();
+                        ManaPool.Add(manaAbility.ManaGenerated);
+                        continue;
+                    }
                 }
                 Console.WriteLine();
             } while (true);

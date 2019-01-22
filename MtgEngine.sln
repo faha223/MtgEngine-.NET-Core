@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtgEngine.TestSet", "MtgEng
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtgEngine.UnitTests", "MtgEngine.UnitTests\MtgEngine.UnitTests.csproj", "{ACC0965C-B11D-4BE4-9263-FA0F127D9894}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtgEngineTest.UnitTests", "MtgEngineTest.UnitTests\MtgEngineTest.UnitTests.csproj", "{F87BBC07-5073-4B04-A9B7-8C868B84ADC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MtgEngineTest.UnitTests", "MtgEngineTest.UnitTests\MtgEngineTest.UnitTests.csproj", "{F87BBC07-5073-4B04-A9B7-8C868B84ADC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtgEngine.Alpha", "MtgEngine.Alpha\MtgEngine.Alpha.csproj", "{D20F7391-EF2B-4749-96B2-9FB0A944010B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F87BBC07-5073-4B04-A9B7-8C868B84ADC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F87BBC07-5073-4B04-A9B7-8C868B84ADC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F87BBC07-5073-4B04-A9B7-8C868B84ADC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D20F7391-EF2B-4749-96B2-9FB0A944010B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D20F7391-EF2B-4749-96B2-9FB0A944010B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D20F7391-EF2B-4749-96B2-9FB0A944010B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D20F7391-EF2B-4749-96B2-9FB0A944010B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

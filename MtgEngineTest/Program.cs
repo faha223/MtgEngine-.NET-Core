@@ -13,7 +13,8 @@ namespace MtgEngineTest
 
             var game = new Game();
             game.AddPlayer(new ConsolePlayer("Specialfred453", 20, File.ReadAllText(deckFileLocation)));
-            game.AddPlayer(new PassPriorityPlayer("Al", 20, File.ReadAllText(deckFileLocation)));
+            game.AddPlayer(new ConsolePlayer("Not Fred", 20, File.ReadAllText(deckFileLocation)));
+            //game.AddPlayer(new PassPriorityPlayer("Al", 20, File.ReadAllText(deckFileLocation)));
             game.Start().Wait();
         }
     }

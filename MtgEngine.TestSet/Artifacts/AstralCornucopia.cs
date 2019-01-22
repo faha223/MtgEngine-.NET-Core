@@ -27,8 +27,7 @@ namespace MtgEngine.TestSet
 
         public override void OnResolve(Game game)
         {
-            for (int i = 0; i < _x; i++)
-                Counters.Add(new ChargeCounter());
+            AddCounters(_x, CounterType.Charge);
         }
 
         private class AstralCornucopiaManaAbility : ManaAbility
@@ -41,7 +40,7 @@ namespace MtgEngine.TestSet
             {
                 var options = new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green };
                 var selection = Controller.ChooseColor();
-                Controller.ManaPool.Add(new ManaAmount(Source.Counters.Count(c => c is ChargeCounter), selection));
+                Controller.ManaPool.Add(new ManaAmount(Source.Counters.Count(c => c == CounterType.Charge), selection));
             }
         }
     }
