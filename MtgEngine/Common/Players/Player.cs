@@ -167,5 +167,18 @@ namespace MtgEngine.Common.Players
         /// <param name="cardsOnTop">The cards the player wishes to put on the top of their library, in the order in which they wish to draw them</param>
         /// <param name="cardsOnBottom">The cards the player wishes to put on the bottom of their library, in the order they wish to draw them</param>
         public abstract void ScryChoice(List<Card> scryedCards, out IEnumerable<Card> cardsOnTop, out IEnumerable<Card> cardsOnBottom);
+
+        #region Helper Methods
+
+        protected bool canPlayCardThisTurn(Card card, Game game, bool canPlaySorcerySpeedSpells)
+        {
+            bool canPlayCard = card.CanCast(game);
+            canPlayCard &= (canPlaySorcerySpeedSpells || card.IsAnInstant || card.StaticAbilities.Contains(StaticAbility.Flash));
+            canPlayCard &= (!card.IsALand || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
+
+            return canPlayCard;
+        }
+
+        #endregion Helper Methods
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
@@ -30,9 +31,19 @@ namespace MtgEngine
 
         private Player _priorityPlayer { get; set; }
 
-        private Stack<Card> Stack { get; } = new Stack<Card>();
+        private Stack<IResolvable> Stack { get; } = new Stack<IResolvable>();
 
         public List<Card> CardsOnStack()
+        {
+            return Stack.Where(c => c is Card).Select(c => c as Card).ToList();
+        }
+
+        public List<Ability> AbilitiesOnStack()
+        {
+            return Stack.Where(c => c is Ability).Select(c => c as Ability).ToList();
+        }
+
+        public List<IResolvable> ObjectsOnStack()
         {
             return Stack.ToList();
         }
@@ -46,16 +57,16 @@ namespace MtgEngine
         /// This method removes a spell from the stack and puts it in its owner's graveyard. If the given spell is not on the stack, then this effect does nothing.
         /// </summary>
         /// <param name="card">This spell is the spell that is to be countered.</param>
-        public void CounterSpell(Card card)
+        public void Counter(IResolvable obj)
         {
-            if(Stack.Contains(card))
+            if(Stack.Contains(obj))
             {
-                Stack<Card> temp = new Stack<Card>(Stack.Count);
-                Card topmost = null;
+                Stack<IResolvable> temp = new Stack<IResolvable>(Stack.Count);
+                IResolvable topmost = null;
                 do
                 {
                     topmost = Stack.Pop();
-                    if (topmost == card)
+                    if (topmost == obj)
                         break;
                     temp.Push(topmost);
                     topmost = null;
@@ -64,8 +75,11 @@ namespace MtgEngine
                 while (temp.Count > 0)
                     Stack.Push(temp.Pop());
 
-                if(topmost != null)
-                    topmost.Owner.Graveyard.Add(topmost);
+                if (topmost != null)
+                {
+                    if(topmost is Card)
+                    (topmost as Card).Owner.Graveyard.Add(topmost as Card);
+                }
             }
             CheckStateBasedActions();
         }
@@ -578,18 +592,29 @@ namespace MtgEngine
                                         // If we made it back with no responses, resolve the spell
                                         if (Stack.Count > 0)
                                         {
-                                            var card = Stack.Pop();
-                                            if(card is PermanentCard)
+                                            var obj = Stack.Pop();
+                                            if (obj is Card)
                                             {
-                                                card.OnResolve(this);
-                                                card.Controller.Battlefield.Add(card);
-                                                if(card.IsACreature)
-                                                    (card as PermanentCard).HasSummoningSickness = true;
-                                                CardHasEnteredBattlefield?.Invoke(card);
+                                                var card = obj as Card;
+                                                if (card is PermanentCard)
+                                                {
+                                                    var permanent = card as PermanentCard;
+                                                    permanent.OnResolve(this);
+                                                    permanent.Controller.Battlefield.Add(permanent);
+                                                    if (permanent.IsACreature)
+                                                        (card as PermanentCard).HasSummoningSickness = true;
+                                                    CardHasEnteredBattlefield?.Invoke(permanent);
+                                                }
+                                                else if (card is SpellCard)
+                                                {
+                                                    card.OnResolve(this);
+                                                    card.Owner.Graveyard.Add(card);
+                                                }
                                             }
-                                            else if(card is SpellCard)
+                                            else if(obj is Ability)
                                             {
-                                                card.OnResolve(this);
+                                                var ability = obj as Ability;
+                                                ability.OnResolve(this);
                                             }
                                         }
                                     }
@@ -615,8 +640,16 @@ namespace MtgEngine
                                 }
                                 else
                                 {
-                                    // TODO : Put the Ability onto the stack
-                                    ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
+                                    var activatedAbility = action.Ability as ActivatedAbility;
+                                    if (activatedAbility.Cost.CanPay())
+                                    {
+                                        if(activatedAbility.Cost.Pay())
+                                        {
+                                            Stack.Push(activatedAbility);
+                                            ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
+                                        }
+                                        
+                                    }
                                 }
                             }
                             break;

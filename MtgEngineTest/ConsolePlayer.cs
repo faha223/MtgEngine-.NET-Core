@@ -105,15 +105,6 @@ namespace MtgEngineTest
             }
         }
 
-        public bool canPlayCardThisTurn(Card card, Game game, bool canPlaySorcerySpeedSpells)
-        {
-            bool canPlayCard = card.CanCast(game);
-            canPlayCard &= (canPlaySorcerySpeedSpells || card.IsAnInstant || card.StaticAbilities.Contains(StaticAbility.Flash));
-            canPlayCard &= (!card.IsALand || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
-
-            return canPlayCard;
-        }
-
         private void PrintManaPool()
         {
             Console.WriteLine("Mana Pool:");
