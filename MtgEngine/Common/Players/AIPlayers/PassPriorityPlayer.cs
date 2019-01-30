@@ -62,7 +62,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return blockers;
         }
 
-        public override Card ChooseTarget(IResolvable source, List<Card> possibleTargets)
+        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets)
         {
             return possibleTargets.Last();
         }

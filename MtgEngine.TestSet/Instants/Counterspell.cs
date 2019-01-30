@@ -1,8 +1,10 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common;
+using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
+using System.Collections.Generic;
 
 namespace MtgEngine.TestSet
 {
@@ -32,7 +34,7 @@ namespace MtgEngine.TestSet
             var possibleTargets = game.CardsOnStack();
             if (possibleTargets.Count == 0)
                 throw new InvalidOperationException("Counterspell can't be cast if there are no spells on the stack");
-            target = Controller.ChooseTarget(this, possibleTargets);
+            target = Controller.ChooseTarget(this, new List<ITarget>(possibleTargets)) as Card;
         }
 
         public override void OnResolve(Game game)

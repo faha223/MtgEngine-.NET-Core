@@ -20,6 +20,8 @@
         Swampwalk,
         Mountainwalk,
         Forestwalk,
-        Flash
+        Flash,
+        Shroud,
+        Hexproof
     }
 }

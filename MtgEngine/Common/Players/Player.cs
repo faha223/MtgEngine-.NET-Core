@@ -106,7 +106,7 @@ namespace MtgEngine.Common.Players
 
         public abstract List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> AttackingCreatures);
 
-        public abstract Card ChooseTarget(IResolvable source, List<Card> possibleTargets);
+        public abstract ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets);
 
         public abstract ManaColor ChooseColor();
 
@@ -129,6 +129,15 @@ namespace MtgEngine.Common.Players
 
             Hand.Remove(card);
             Graveyard.Add(card);
+        }
+
+        public virtual void Sacrifice(Card card)
+        {
+            if (!Battlefield.Contains(card))
+                return;
+
+            Battlefield.Remove(card);
+            card.Owner.Graveyard.Add(card);
         }
 
         #region Game Event Handlers

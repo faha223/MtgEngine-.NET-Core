@@ -187,7 +187,24 @@ namespace MtgEngineTest
         public override Card SelectTarget(string message, Func<Card, bool> targetSelector)
         {
             // TODO: Print a list of possible targets to the console and allow the user to select one, or none;
-            return null;
+            var possibleTargets = Battlefield.Where(c => targetSelector(c)).ToList();
+            int i = 0;
+            int? selection = null;
+
+            do
+            {
+                Console.WriteLine(message);    
+                for (i = 0; i < possibleTargets.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {possibleTargets[i].Name}");
+                }
+                Console.WriteLine($"{++i}: Cancel");
+                selection = ParseChoice(Console.ReadLine(), 1, i);
+            } while (!selection.HasValue);
+
+            if (selection.Value == i)
+                return null;
+            return possibleTargets[selection.Value - 1];
         }
 
         public override void ScryChoice(List<Card> scryedCards, out IEnumerable<Card> cardsOnTop, out IEnumerable<Card> cardsOnBottom)
@@ -236,13 +253,30 @@ namespace MtgEngineTest
                 cardsOnTop = scryedCards;
         }
 
-        public override Card ChooseTarget(IResolvable source, List<Card> possibleTargets)
+        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets)
         {
             if (possibleTargets.Count == 1)
                 return possibleTargets[0];
 
-            // TODO: Print the possibilities and have the player choose
-            return possibleTargets.Last();
+            int? selection = null;
+            while (!selection.HasValue)
+            {
+                if (source is Card)
+                    Console.WriteLine((source as Card).Text);
+                else if (source is Ability)
+                    Console.WriteLine((source as Ability).Text);
+
+                int i = 0;
+                foreach (var target in possibleTargets)
+                {
+                    if (target is Player)
+                        Console.WriteLine($"{++i}: {(target as Player).Name}");
+                    else if (target is Card)
+                        Console.WriteLine($"{++i}: {(target as Card).Name}");
+                }
+            }
+
+            return possibleTargets[selection.Value - 1];
         }
 
         #region Combat
@@ -487,18 +521,6 @@ namespace MtgEngineTest
                         Console.WriteLine($"{i++}: Pay {color}");
                     }
                 }
-                List<ManaAbility> manaAbilities = new List<ManaAbility>();
-                foreach(var land in Battlefield.Lands.Where(c => !c.IsTapped))
-                {
-                    foreach(var manaAbility in land.Abilities.Where(a => a is ManaAbility).Select(c => c as ManaAbility))
-                    {
-                        if (manaAbility.Cost.CanPay())
-                        {
-                            Console.WriteLine($"{i++}: {land.Name}: {manaAbility.Text}");
-                            manaAbilities.Add(manaAbility);
-                        }
-                    }
-                }
                 Console.WriteLine($"{i}: Cancel");
 
                 var selection = ParseChoice(Console.ReadLine(), 1, i);
@@ -511,13 +533,6 @@ namespace MtgEngineTest
                         var color = colorOptions[selection.Value - 1];
                         ManaPool[color]--;
                         return color;
-                    }
-                    else
-                    {
-                        var manaAbility = manaAbilities[selection.Value - colorOptions.Count - 1];
-                        manaAbility.Cost.Pay();
-                        ManaPool.Add(manaAbility.ManaGenerated);
-                        continue;
                     }
                 }
                 Console.WriteLine();

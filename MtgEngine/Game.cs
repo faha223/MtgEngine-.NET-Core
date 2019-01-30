@@ -37,6 +37,11 @@ namespace MtgEngine
             return Stack.ToList();
         }
 
+        public List<Player> Players()
+        {
+            return new List<Player>(_players);
+        }
+
         /// <summary>
         /// This method removes a spell from the stack and puts it in its owner's graveyard. If the given spell is not on the stack, then this effect does nothing.
         /// </summary>
@@ -63,6 +68,25 @@ namespace MtgEngine
                     topmost.Owner.Graveyard.Add(topmost);
             }
             CheckStateBasedActions();
+        }
+
+        /// <summary>
+        /// This spell destroys all lands that meet the selector's requirement
+        /// </summary>
+        /// <param name="selector"></param>
+        public void DestroyLands(Func<Card, bool> selector)
+        {
+            List<Card> landsDestroyed = new List<Card>();
+            foreach(var player in _players)
+            {
+                foreach(var land in player.Battlefield.Lands.Where(c => selector(c)).ToList())
+                {
+                    player.Battlefield.Remove(land);
+                    landsDestroyed.Add(land);
+                }
+            }
+
+            // TODO: Add Land On LeaveBattlefield or OnDestroy triggers to the stack in order
         }
 
         delegate void CardEvent(Card card);
@@ -122,36 +146,6 @@ namespace MtgEngine
             });
         }
 
-        public void ChangeZone(Card card, Zone newZone)
-        {
-            card.Controller.Hand.RemoveAll(c => c == card);
-            card.Controller.Battlefield.RemoveAll(c => c == card);
-            card.Controller.Graveyard.RemoveAll(c => c == card);
-            card.Controller.Exile.RemoveAll(c => c == card);
-
-            switch (newZone)
-            {
-                case Zone.Stack:
-                    Stack.Push(card);
-                    break;
-                case Zone.Battlefield:
-                    card.Controller.Battlefield.Add(card);
-                    break;
-                case Zone.CommandZone:
-                    card.Controller.CommandZone.Add(card);
-                    break;
-                case Zone.Exile:
-                    card.Owner.Exile.Add(card);
-                    break;
-                case Zone.Graveyard:
-                    card.Owner.Graveyard.Add(card);
-                    break;
-                case Zone.Hand:
-                    card.Owner.Hand.Add(card);
-                    break;
-            }
-        }
-        
         /// <summary>
         /// This method shuffles the Players collection by having the players Roll for Initiative, similarly to how we play in Paper MTG, except they roll d100 instead of 2d6
         /// </summary>
@@ -613,8 +607,10 @@ namespace MtgEngine
                                     var manaAbility = action.Ability as ManaAbility;
                                     if (manaAbility.Cost.CanPay())
                                     {
-                                        manaAbility.Cost.Pay();
-                                        manaAbility.OnResolve(this);
+                                        if (manaAbility.Cost.Pay())
+                                        {
+                                            manaAbility.OnResolve(this);
+                                        }
                                     }
                                 }
                                 else
@@ -638,6 +634,7 @@ namespace MtgEngine
                 foreach(var creature in deadCreatures)
                 {
                     creature.Controller.Battlefield.Remove(creature);
+                    creature.ClearCounters();
                     creature.Owner.Graveyard.Add(creature);
                 }
 
@@ -645,6 +642,7 @@ namespace MtgEngine
                 foreach(var planeswalker in deadPlaneswalkers)
                 {
                     planeswalker.Controller.Battlefield.Remove(planeswalker);
+                    planeswalker.ClearCounters();
                     planeswalker.Owner.Graveyard.Add(planeswalker);
                 }
             }
@@ -665,9 +663,6 @@ namespace MtgEngine
             // Remove the card from the player's hand and place it on the battlefield
             card.Controller.Hand.Remove(card);
             card.Controller.Battlefield.Add(card);
-
-            // Add any ETB triggers to the stack
-            ChangeZone(card, Zone.Battlefield);
         }
 
         /// <summary>

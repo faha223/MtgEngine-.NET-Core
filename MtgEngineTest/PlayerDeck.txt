@@ -1,8 +1,10 @@
 ﻿8x Plains
 16x Forest
 4x Savannah
-5x Rustwing Falcon
-5x Darksteel Myr
-5x Fencing Ace
-5x Giant Spider
+4x Rustwing Falcon
+4x Darksteel Myr
+4x Fencing Ace
+4x Giant Spider
+4x Ashnod's Altar
+4x Black Lotus
 5x Grizzly Bears

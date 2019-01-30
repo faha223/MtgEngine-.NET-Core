@@ -10,39 +10,9 @@ namespace MtgEngine.Common.Cards
     /// <summary>
     /// Cards can, generally, be put on the stack. The exception to this rule is Land cards
     /// </summary>
-    public abstract class Card : ITarget, IResolvable
+    public abstract partial class Card : ITarget, IResolvable
     {
         public bool UsesStack { get; }
-
-        public string CardId
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.CardId;
-        }
-
-        public string Name
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.Name;
-        }
-
-        public string Set
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.SetName;
-        }
-
-        public string ImageUri
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.ImageUri;
-        }
-
-        public string Text
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.Text;
-        }
-
-        public string FlavorText
-        {
-            get => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
-        }
 
         public List<StaticAbility> StaticAbilities { get; } = new List<StaticAbility>();
 
@@ -54,23 +24,13 @@ namespace MtgEngine.Common.Cards
         private CardType[] _types { get; }
         public virtual CardType[] Types { get { return _types; } }
 
-        public bool IsACreature { get { return Types.Contains(CardType.Creature); } }
+        public virtual bool CanBeTargetedBy(IResolvable other)
+        {            
+            return true;
+        }
 
-        public bool IsAnArtifact { get { return Types.Contains(CardType.Artifact); } }
-
-        public bool IsALand { get { return Types.Contains(CardType.Land); } }
-
-        public bool IsAnEnchantment { get { return Types.Contains(CardType.Enchantment); } }
-
-        public bool IsAnInstant { get { return Types.Contains(CardType.Instant); } }
-
-        public bool IsASorcery { get { return Types.Contains(CardType.Instant); } }
-
-        public bool IsAPlaneswalker { get { return Types.Contains(CardType.Planeswalker); } }
-
-        public bool IsATribal { get { return Types.Contains(CardType.Tribal); } }
-
-        public ManaColor[] ColorIdentity {
+        // This is virtual so that it can be overridden in token classes
+        public virtual ManaColor[] ColorIdentity {
             get
             {
                 if (StaticAbilities.Contains(StaticAbility.Devoid))
@@ -113,6 +73,9 @@ namespace MtgEngine.Common.Cards
             _isBasic = isBasic;
             _isLegendary = isLegendary;
             _isSnow = isSnow;
+
+            if (_cost == null)
+                _cost = new NoCost(this);
         }
 
         public virtual bool CanCast(Game game)

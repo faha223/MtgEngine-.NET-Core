@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MtgEngine.Common
 {
-    interface ITarget
+    public interface ITarget
     {
     }
 }
