@@ -5,6 +5,7 @@ using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MtgEngine.Common.Players
@@ -20,6 +21,35 @@ namespace MtgEngine.Common.Players
         public Zone Hand { get; } = new Zone();
 
         public List<Card> Library { get; } = new List<Card>();
+
+        private List<CounterType> counters { get; } = new List<CounterType>();
+        public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
+
+        public void AddCounters(int count, CounterType counter)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                switch (counter)
+                {
+                    case CounterType.Energy:
+                    case CounterType.Poison:
+                        counters.Add(counter);
+                        break;
+                    default:
+                        // Other types can't be placed on this object
+                        break;
+                }
+            }
+        }
+
+        public void RemoveCounters(int amount, CounterType counter)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                if (counters.Contains(counter))
+                    counters.Remove(counter);
+            }
+        }
 
         public Zone Battlefield { get; } = new Zone();
 
@@ -50,7 +80,6 @@ namespace MtgEngine.Common.Players
 
         public ManaPool ManaPool { get; } = new ManaPool();
 
-        public Dictionary<string, int> Counters { get; }
         public Zone CommandZone { get; } = new Zone();
 
         public int RollInitiative()
@@ -131,22 +160,23 @@ namespace MtgEngine.Common.Players
             Graveyard.Add(card);
         }
 
-        public virtual void Sacrifice(Card card)
+        public virtual bool Sacrifice(Card card)
         {
             if (!Battlefield.Contains(card))
-                return;
+                return false;
 
             Battlefield.Remove(card);
             card.Owner.Graveyard.Add(card);
+            return true;
         }
 
         #region Game Event Handlers
 
-        public virtual void CardHasEnteredStack(Card card)
+        public virtual void CardHasEnteredStack(Game game, Card card)
         {
         }
 
-        public virtual void CardHasEnteredBattlefield(Card card)
+        public virtual void CardHasEnteredBattlefield(Game game, Card card)
         {
         }
 

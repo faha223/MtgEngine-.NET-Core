@@ -43,6 +43,8 @@ namespace MtgEngine
             return Stack.Where(c => c is Ability).Select(c => c as Ability).ToList();
         }
 
+        private List<Ability> AbilitiesTriggered { get; } = new List<Ability>();
+
         public List<IResolvable> ObjectsOnStack()
         {
             return Stack.ToList();
@@ -103,9 +105,12 @@ namespace MtgEngine
             // TODO: Add Land On LeaveBattlefield or OnDestroy triggers to the stack in order
         }
 
-        delegate void CardEvent(Card card);
+        delegate void CardEvent(Game game, Card card);
         private event CardEvent CardHasEnteredStack;
         private event CardEvent CardHasEnteredBattlefield;
+
+        delegate void AbilityEvent(Game game, Ability ability);
+        private event AbilityEvent AbilityHasEnteredStack;
 
         delegate void GameStepEvent(string step);
         private event GameStepEvent CurrentStepHasChanged;
@@ -145,13 +150,23 @@ namespace MtgEngine
                 {
                     _players.ForEach(player => ResetLandsPlayed(player));
 
+                    CheckStateBasedActions();
+
                     BeginningPhase();
+
+                    CheckStateBasedActions();
 
                     MainPhase(true);
 
+                    CheckStateBasedActions();
+
                     CombatPhase();
 
+                    CheckStateBasedActions();
+
                     MainPhase(false);
+
+                    CheckStateBasedActions();
 
                     EndingPhase();
 
@@ -239,7 +254,11 @@ namespace MtgEngine
         {
             UntapStep();
 
+            CheckStateBasedActions();
+
             UpkeepStep();
+
+            CheckStateBasedActions();
 
             DrawStep();
         }
@@ -381,20 +400,40 @@ namespace MtgEngine
             // These creatures have been blocked
             var blockedCreatures = ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && c.DefendingPlayer.Battlefield.Creatures.Any(d => d.Blocking == c)).ToList();
 
+            // Have the active player sort blockers for each of their attackers
+            Dictionary<PermanentCard, List<PermanentCard>> blockerMap = new Dictionary<PermanentCard, List<PermanentCard>>(blockedCreatures.Count);
+            foreach(var attacker in blockedCreatures)
+            {
+                var blockers = attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker).ToList();
+
+                if (blockers.Count > 1)
+                    blockerMap.Add(attacker, ActivePlayer.SortBlockers(attacker, blockers).ToList());
+                else
+                    blockerMap.Add(attacker, blockers);
+            }
+
             // If any attackers have firststrike or doublestrike
             if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && (doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c))))
             {
                 // TODO: Deal First Strike Damage
                 foreach(var attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && (doesFirstStrikeDamage(c) || takesFirstStrikeDamage(c))))
                 {
-                    // Deal combat damage to, and take combat damage from, blockers
+                    // Deal combat damage to, and take combat damage from, blockers                    
                     CombatDamage(attacker, 
                         blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c))),
+                        blockerMap.ContainsKey(attacker) ? blockerMap[attacker].Where(c => doesFirstStrikeDamage(attacker) || doesFirstStrikeDamage(c)) : null,
                         true);
                 }
 
                 CheckStateBasedActions();
+            }
+
+            // Remove all blockers from the blocker map that have left the defending player's battlefield after firststrike damage before applying normal combat damage
+            foreach(var attacker in blockerMap.Keys)
+            {
+                var blockers = blockerMap[attacker];
+                blockers.RemoveAll(c => !c.Controller.Battlefield.Contains(c));
+                blockerMap[attacker] = blockers;
             }
 
             // If any remaining attackers have doublestrike or don't have firststrike
@@ -404,8 +443,8 @@ namespace MtgEngine
                 {
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker, 
-                        blockedCreatures.Contains(attacker), 
-                        attacker.DefendingPlayer.Battlefield.Creatures.Where(c => (c.Blocking == attacker) && (doesNormalDamage(attacker) || doesNormalDamage(c))),
+                        blockedCreatures.Contains(attacker),
+                        blockerMap.ContainsKey(attacker) ? blockerMap[attacker].Where(c => doesNormalDamage(attacker) || doesNormalDamage(c)) : null,
                         false);
                 }
 
@@ -420,15 +459,15 @@ namespace MtgEngine
             // If the defending player didn't block (we might not have blockers right now)
             if (!blocked)
             {
-                attacker.DefendingPlayer.LifeTotal -= attacker.Power;
-                PlayerTookDamage?.Invoke(attacker.DefendingPlayer, attacker.Power);
+                ApplyDamage(attacker.DefendingPlayer, attacker, attacker.Power);
             }
             else if(blockers != null)
             {
                 // Deal damage to the defending player's creatures
                 var damageOutput = attacker.Power;
 
-                foreach (var blocker in ActivePlayer.SortBlockers(attacker, blockers))
+                // Have the attacking creatures apply damage to and take damage from blocking creatures
+                foreach (var blocker in blockers)
                 {
                     // The attacker hits
                     if ((firstStrike && doesFirstStrikeDamage(attacker)) || (!firstStrike && doesNormalDamage(attacker)))
@@ -446,7 +485,11 @@ namespace MtgEngine
                         attacker.TakeDamage(blocker.Power, blocker);
                 }
 
-                // TODO: Trample Damage to defending player
+                // Trample Damage to defending player
+                if (attacker.HasTrample && damageOutput > 0)
+                {
+                    ApplyDamage(attacker.DefendingPlayer, attacker, damageOutput);
+                }
             }
         }
 
@@ -504,6 +547,8 @@ namespace MtgEngine
         private void EndingPhase()
         {
             EndStep();
+
+            CheckStateBasedActions();
 
             CleanupStep();
         }
@@ -570,7 +615,7 @@ namespace MtgEngine
                                     {
                                         PlayLand(action.Card as LandCard);
                                         player.LandsPlayedThisTurn++;
-                                        CardHasEnteredBattlefield?.Invoke(action.Card);
+                                        CardHasEnteredBattlefield?.Invoke(this, action.Card);
                                     }
                                     else
                                     {
@@ -585,38 +630,7 @@ namespace MtgEngine
                                         // Put the Card onto the stack
                                         action.Card.OnCast(this);
                                         player.Hand.Remove(action.Card);
-                                        Stack.Push(action.Card);
-                                        CardHasEnteredStack?.Invoke(action.Card);
-                                        ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
-
-                                        // If we made it back with no responses, resolve the spell
-                                        if (Stack.Count > 0)
-                                        {
-                                            var obj = Stack.Pop();
-                                            if (obj is Card)
-                                            {
-                                                var card = obj as Card;
-                                                if (card is PermanentCard)
-                                                {
-                                                    var permanent = card as PermanentCard;
-                                                    permanent.OnResolve(this);
-                                                    permanent.Controller.Battlefield.Add(permanent);
-                                                    if (permanent.IsACreature)
-                                                        (card as PermanentCard).HasSummoningSickness = true;
-                                                    CardHasEnteredBattlefield?.Invoke(permanent);
-                                                }
-                                                else if (card is SpellCard)
-                                                {
-                                                    card.OnResolve(this);
-                                                    card.Owner.Graveyard.Add(card);
-                                                }
-                                            }
-                                            else if(obj is Ability)
-                                            {
-                                                var ability = obj as Ability;
-                                                ability.OnResolve(this);
-                                            }
-                                        }
+                                        PushOntoStack(action.Card, _players[(_players.IndexOf(player) + 1) % _players.Count]);
                                     }
                                 }
                             }
@@ -645,8 +659,7 @@ namespace MtgEngine
                                     {
                                         if(activatedAbility.Cost.Pay())
                                         {
-                                            Stack.Push(activatedAbility);
-                                            ApNapLoop(_players[(_players.IndexOf(player) + 1) % _players.Count], false);
+                                            PushOntoStack(activatedAbility, _players[(_players.IndexOf(player) + 1) % _players.Count]);
                                         }
                                         
                                     }
@@ -656,6 +669,55 @@ namespace MtgEngine
                     }
                 } while (!playerHasPassedPriority);
             }
+        }
+
+        private void PushOntoStack(IResolvable resolvable, Player playerToGivePriority)
+        {
+            Stack.Push(resolvable);
+            if (resolvable is Card)
+                CardHasEnteredStack?.Invoke(this, resolvable as Card);
+            else if (resolvable is Ability)
+                AbilityHasEnteredStack?.Invoke(this, resolvable as Ability);
+            ApNapLoop(playerToGivePriority, false);
+            
+            // If we made it back with no responses, resolve the spell
+            while (Stack.Count > 0)
+            {
+                ResolveTopOfStack();
+                if (Stack.Count > 0)
+                {
+                    ApNapLoop(ActivePlayer, false);
+                }
+            }
+        }
+
+        private void ResolveTopOfStack()
+        {
+            if (Stack.Count > 0)
+            {
+                var obj = Stack.Pop();
+                if (obj is Card)
+                {
+                    var card = obj as Card;
+                    if (card is PermanentCard)
+                    {
+                        var permanent = card as PermanentCard;
+                        permanent.OnResolve(this);
+                        PutPermanentOnBattlefield(permanent);
+                    }
+                    else if (card is SpellCard)
+                    {
+                        card.OnResolve(this);
+                        card.Owner.Graveyard.Add(card);
+                    }
+                }
+                else if (obj is Ability)
+                {
+                    var ability = obj as Ability;
+                    ability.OnResolve(this);
+                }
+            }
+            CheckStateBasedActions();
         }
 
         private void CheckStateBasedActions()
@@ -681,10 +743,49 @@ namespace MtgEngine
             }
 
             // TODO: Any players with 0 life total lose the game
+
+            // TODO: Any players with 10 poison counters lose the game
             
             // TODO: If an effect has caused a player to win the game, all other players lose
 
             // TODO: If a player has lost the game, remove them from the _players list. If they were the active player, go to the start of the next player's turn
+
+            // Check State Triggered Abilities
+            foreach(var player in _players)
+            {
+                foreach(PermanentCard permanent in player.Battlefield)
+                {
+                    foreach(StateTriggeredAbility ability in permanent.Abilities.Where(c => c is StateTriggeredAbility))
+                    {
+                        if(ability.CheckState(this))
+                        {
+                            AbilitiesTriggered.Add(ability);
+                        }
+                    }
+                }
+            }
+            if(AbilitiesTriggered.Count > 0)
+            {
+                // If there was more than 1 trigger, they'll need to be sorted
+                if (AbilitiesTriggered.Count > 1)
+                {
+                    foreach (var player in AbilitiesTriggered.Select(c => c.Source.Controller).Distinct())
+                    {
+                        // TODO: Have the Player sort the abilities
+                    }
+                }
+
+                // Add the triggered abilities to the stack
+                foreach(var ability in AbilitiesTriggered)
+                    Stack.Push(ability);
+                
+                // Resolve the stack
+                while (Stack.Count > 0)
+                {
+                    ApNapLoop(ActivePlayer, false);
+                    ResolveTopOfStack();
+                }
+            }
         }
 
         /// <summary>
@@ -695,7 +796,7 @@ namespace MtgEngine
         {
             // Remove the card from the player's hand and place it on the battlefield
             card.Controller.Hand.Remove(card);
-            card.Controller.Battlefield.Add(card);
+            PutPermanentOnBattlefield(card);
         }
 
         /// <summary>
@@ -756,6 +857,26 @@ namespace MtgEngine
         private void DrainManaPools()
         {
             _players.ForEach(c => c.ManaPool.Clear());
+        }
+
+        public void AbilityTriggered(Ability ability)
+        {
+            AbilitiesTriggered.Add(ability);
+        }
+
+        public void ApplyDamage(IDamageable target, Card source, int amount)
+        {
+            target.TakeDamage(amount, source);
+            if(target is Player)
+                PlayerTookDamage?.Invoke(target as Player, amount);
+        }
+
+        public void PutPermanentOnBattlefield(PermanentCard permanent)
+        {
+            permanent.Controller.Battlefield.Add(permanent);
+            if (permanent.IsACreature)
+                permanent.HasSummoningSickness = true;
+            CardHasEnteredBattlefield?.Invoke(this, permanent);
         }
 
         #endregion Utility Methods

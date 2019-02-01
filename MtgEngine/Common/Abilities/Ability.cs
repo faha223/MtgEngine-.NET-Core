@@ -1,16 +1,17 @@
-﻿using MtgEngine.Common.Players;
+﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Abilities
 {
     public abstract class Ability : IResolvable
     {
-        public Player Controller { get; private set; }
+        public PermanentCard Source { get; private set; }
 
         public string Text { get; private set; }
 
-        protected Ability(Player controller, string text)
+        protected Ability(PermanentCard source, string text)
         {
-            Controller = controller;
+            Source = source;
             Text = text;
         }
 

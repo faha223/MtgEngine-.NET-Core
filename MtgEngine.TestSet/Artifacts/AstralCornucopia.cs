@@ -39,8 +39,8 @@ namespace MtgEngine.TestSet
             public override void OnResolve(Game game)
             {
                 var options = new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green };
-                var selection = Controller.ChooseColor();
-                Controller.ManaPool.Add(new ManaAmount(Source.Counters.Count(c => c == CounterType.Charge), selection));
+                var selection = Source.Controller.ChooseColor();
+                Source.Controller.ManaPool.Add(new ManaAmount(Source.Counters.Count(c => c == CounterType.Charge), selection));
             }
         }
     }

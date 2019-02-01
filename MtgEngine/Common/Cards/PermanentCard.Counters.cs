@@ -7,12 +7,12 @@ namespace MtgEngine.Common.Cards
     public abstract partial class PermanentCard : Card, IDamageable
     {
         // This isn't protected because we don't want inheriting classes modifying how counters are added or removed
-        private List<CounterType> counters { get; } = new List<CounterType>();
+        protected List<CounterType> counters { get; } = new List<CounterType>();
 
         // This returns a copy so that this can't be used to modify the counters
-        public ReadOnlyCollection<CounterType> Counters { get { return new ReadOnlyCollection<CounterType>(counters); } }
+        public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
 
-        public void AddCounters(int count, CounterType counter)
+        public virtual void AddCounters(int count, CounterType counter)
         {
             for (int i = 0; i < count; i++)
             {
@@ -30,8 +30,14 @@ namespace MtgEngine.Common.Cards
                         else
                             counters.Add(CounterType.Minus1Minus1);
                         break;
-                    default:
+                    case CounterType.Charge:
+                    case CounterType.Corpse:
+                    case CounterType.Ice:
+                    case CounterType.Spore:
                         counters.Add(counter);
+                        break;
+                    default:
+                        // Other types can't be placed on this object
                         break;
                 }
             }

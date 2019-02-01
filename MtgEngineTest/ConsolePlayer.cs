@@ -41,6 +41,7 @@ namespace MtgEngineTest
             }
 
             // TODO: Print to the Console a list of possible actions, and allow the user to select one
+            PrintBattlefield();
             PrintManaPool();
             PrintHand();
             Console.WriteLine($"You Have Priority (Active Player: {game.ActivePlayer.Name})");
@@ -59,7 +60,7 @@ namespace MtgEngineTest
             // Add each ability the player can activate to the 
             foreach(PermanentCard card in Battlefield)
             {
-                foreach(ActivatedAbility ability in card.Abilities)
+                foreach(ActivatedAbility ability in card.Abilities.Where(c => c is ActivatedAbility))
                 {
                     if(ability.Cost.CanPay())
                     {
@@ -122,6 +123,35 @@ namespace MtgEngineTest
             Console.WriteLine("Your Hand:");
             Hand.ForEach(card => Console.WriteLine(card.Name));
             Console.WriteLine();
+        }
+
+        private void PrintBattlefield()
+        {
+            Console.WriteLine("Battlefield:");
+            foreach(PermanentCard card in Battlefield)
+            {
+                string counters = null;
+                if(card.Counters.Count > 0)
+                {
+                    var counterTypes = card.Counters.Distinct();
+                    counters = string.Join(", ", counterTypes.Select(c => $"{c}: {card.Counters.Count(d => d == c)}"));
+                }
+                if (card.IsACreature)
+                {
+                    if (counters != null)
+                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}: {counters}");
+                    else
+                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}");
+
+                }
+                else
+                {
+                    if(counters != null)
+                        Console.WriteLine($"{card.Name}: {counters}");
+                    else
+                        Console.WriteLine($"{card.Name}");
+                }
+            }
         }
 
         public override void Draw(int howMany)
@@ -459,12 +489,12 @@ namespace MtgEngineTest
             Console.WriteLine();
         }
 
-        public override void CardHasEnteredBattlefield(Card card)
+        public override void CardHasEnteredBattlefield(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} has entered the battlefield under the control of {card.Controller.Name}.");
         }
 
-        public override void CardHasEnteredStack(Card card)
+        public override void CardHasEnteredStack(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} is now on the stack.");
         }

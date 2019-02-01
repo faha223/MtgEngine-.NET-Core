@@ -11,6 +11,23 @@ namespace MtgEngine.Common.Cards
             AddCounters(startingLoyalty, CounterType.Loyalty);
         }
 
+        public override void AddCounters(int count, CounterType counter)
+        {
+            // Planeswalkers can get loyalty counters
+            if (counter == CounterType.Loyalty)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    counters.Add(counter);
+                }
+            }
+            else
+            {
+                // Otherwise treat this as a creature/permanent/thing
+                base.AddCounters(count, counter);
+            }
+        }
+
         public override void TakeDamage(int amount, Card source)
         {
             RemoveCounters(amount, CounterType.Loyalty);

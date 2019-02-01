@@ -16,7 +16,7 @@ namespace MtgEngine.Common.Abilities
 
         public override void OnResolve(Game game)
         {
-            Controller.ManaPool.Add(ManaGenerated);
+            Source.Controller.ManaPool.Add(ManaGenerated);
         }
     }
 }

@@ -14,6 +14,21 @@ namespace MtgEngine.Common.Enums
         Minus1Minus1,
 
         [Counter("Loyalty")]
-        Loyalty
+        Loyalty,
+
+        [Counter("Spore")]
+        Spore,
+
+        [Counter("Energy")]
+        Energy,
+
+        [Counter("Ice")]
+        Ice,
+
+        [Counter("Corpse")]
+        Corpse,
+
+        [Counter("Poison")]
+        Poison
     }
 }

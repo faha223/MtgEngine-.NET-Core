@@ -39,7 +39,7 @@ namespace MtgEngine.TestSet
 
         public override void OnResolve(Game game)
         {
-            game.CounterSpell(target);
+            game.Counter(target);
         }
     }
 }

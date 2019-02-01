@@ -44,6 +44,8 @@ namespace MtgEngine.Common.Cards
 
         public bool HasShroud => StaticAbilities.Contains(StaticAbility.Shroud);
 
-        public bool HasHexproof => StaticAbilities.Contains(StaticAbility.Hexproof);        
+        public bool HasHexproof => StaticAbilities.Contains(StaticAbility.Hexproof);
+
+        public bool HasTrample => StaticAbilities.Contains(StaticAbility.Trample);
     }
 }

@@ -10,6 +10,7 @@
         Instant,
         Sorcery,
         Tribal,
-        Emblem
+        Emblem,
+        Token
     }
 }

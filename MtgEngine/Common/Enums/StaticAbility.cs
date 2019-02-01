@@ -22,6 +22,7 @@
         Forestwalk,
         Flash,
         Shroud,
-        Hexproof
+        Hexproof,
+        Trample
     }
 }

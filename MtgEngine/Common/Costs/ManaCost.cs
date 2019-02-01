@@ -17,19 +17,6 @@ namespace MtgEngine.Common.Costs
         public delegate void IntegerEvent(int X);
         public event IntegerEvent ValueforXChosen;
 
-        private Player _controller
-        {
-            get
-            {
-                Player controller = null;
-                if (_source is ActivatedAbility)
-                    controller = (_source as ActivatedAbility).Controller;
-                else if (_source is Card)
-                    controller = (_source as Card).Controller;
-                return controller;
-            }
-        }
-
         private ManaCost(IResolvable source, params ManaAmount[] manaAmounts) : base(source)
         {
             _manaAmounts = manaAmounts;
@@ -58,6 +45,8 @@ namespace MtgEngine.Common.Costs
                 return new ManaCost(source, new ManaAmount(1, ManaColor.RedWhite));
             else if (manaCost == "{3}")
                 return new ManaCost(source, new ManaAmount(3, ManaColor.Generic));
+            else if (manaCost == "{2}")
+                return new ManaCost(source, new ManaAmount(2, ManaColor.Generic));
             else if (manaCost == "{1}{W}")
                 return new ManaCost(source, new ManaAmount(1, ManaColor.Generic), new ManaAmount(1, ManaColor.White));
             else if (manaCost == "{3}{G}")
