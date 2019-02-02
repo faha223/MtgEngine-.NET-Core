@@ -40,33 +40,39 @@ namespace MtgEngine
                 }
             }
             CheckStateBasedActions();
-            if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
         }
 
         /// <summary>
         /// This spell destroys all lands that meet the selector's requirement
         /// </summary>
         /// <param name="selector"></param>
-        public void DestroyLands(Func<Card, bool> selector)
+        public void DestroyLands(Func<PermanentCard, bool> selector)
         {
-            List<Card> landsDestroyed = new List<Card>();
+            List<PermanentCard> landsDestroyed = new List<PermanentCard>();
             foreach (var player in _players)
             {
                 foreach (var land in player.Battlefield.Lands.Where(c => selector(c)).ToList())
                 {
-                    RemovePermanentFromBattlefield(land);
                     landsDestroyed.Add(land);
                 }
             }
 
             foreach(var land in landsDestroyed)
             {
-                land.Owner.Graveyard.Add(land);
-                CardHasChangedZones?.Invoke(this, land, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
+                DestroyPermanent(land);
             }
 
             // TODO: Add Land On LeaveBattlefield or OnDestroy triggers to the stack in order
+        }
+
+        public void DestroyPermanent(PermanentCard card)
+        {
+            if (card.Controller.Battlefield.Contains(card))
+            {
+                RemovePermanentFromBattlefield(card);
+                card.Owner.Graveyard.Add(card);
+                CardHasChangedZones?.Invoke(this, card, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
+            }
         }
     }
 }

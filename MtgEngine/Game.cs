@@ -129,33 +129,23 @@ namespace MtgEngine
                 {
                     _players.ForEach(player => ResetLandsPlayed(player));
 
-                    CheckStateBasedActions();
-                    if (Stack.Count > 0)
-                        ApNapLoop(ActivePlayer, false);
+                    CheckStateBasedActionsAndResolveStack();
 
                     BeginningPhase();
 
-                    CheckStateBasedActions();
-                    if (Stack.Count > 0)
-                        ApNapLoop(ActivePlayer, false);
+                    CheckStateBasedActionsAndResolveStack();
 
                     MainPhase(true);
 
-                    CheckStateBasedActions();
-                    if (Stack.Count > 0)
-                        ApNapLoop(ActivePlayer, false);
+                    CheckStateBasedActionsAndResolveStack();
 
                     CombatPhase();
 
-                    CheckStateBasedActions();
-                    if (Stack.Count > 0)
-                        ApNapLoop(ActivePlayer, false);
+                    CheckStateBasedActionsAndResolveStack();
 
                     MainPhase(false);
 
-                    CheckStateBasedActions();
-                    if (Stack.Count > 0)
-                        ApNapLoop(ActivePlayer, false);
+                    CheckStateBasedActionsAndResolveStack();
 
                     EndingPhase();
 
@@ -170,13 +160,13 @@ namespace MtgEngine
 
             CheckStateBasedActions();
             if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
+                ApNapLoop(false);
 
             UpkeepStep();
 
             CheckStateBasedActions();
             if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
+                ApNapLoop(false);
 
             DrawStep();
         }
@@ -196,7 +186,7 @@ namespace MtgEngine
 
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
             CheckForTriggeredAbilities();
-            ApNapLoop(ActivePlayer, false);
+            ApNapLoop(false);
 
             // Drain each player's mana pool
             DrainManaPools();
@@ -217,19 +207,11 @@ namespace MtgEngine
         {
             CurrentStepHasChanged?.Invoke(this, $"{(beforeCombat ? "Precombat" : "Postcombat")} Main Phase");
 
-            // TODO: Add Beginning of Main Phase Triggers to the stack
+            // CheckStateBasedActiont to add Beginning of Main Phase Triggers to the stack
+            CheckStateBasedActions();
 
-            if (beforeCombat)
-            {
-                // TODO: Add Beginning of Precombat Main Phase Triggers to the stack
-            }
-            else
-            {
-                // TODO: Add Beginning of Postcombat Main Phase Triggers to the stack
-            }
-
-            // TODO: Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
-            ApNapLoop(ActivePlayer, true);
+            // Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
+            ApNapLoop(true);
 
             DrainManaPools();
         }
@@ -259,7 +241,7 @@ namespace MtgEngine
 
             CheckStateBasedActions();
             if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
+                ApNapLoop(false);
 
             CleanupStep();
         }
@@ -269,7 +251,7 @@ namespace MtgEngine
             CurrentStepHasChanged?.Invoke(this, "End Step");
             
             CheckForTriggeredAbilities();
-            ApNapLoop(ActivePlayer, false);
+            ApNapLoop(false);
 
             DrainManaPools();
         }
@@ -289,7 +271,7 @@ namespace MtgEngine
             // Example: Madness is a triggered ability that happens when a player discards a card with Madness. This can potentially be put on the stack from the First part of the Cleanup step
             CheckStateBasedActions();
             if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
+                ApNapLoop(false);
 
             DrainManaPools();
         }
@@ -333,6 +315,15 @@ namespace MtgEngine
             CheckForTriggeredAbilities();
         }
 
+        private void CheckStateBasedActionsAndResolveStack()
+        {
+            CheckStateBasedActions();
+            if (Stack.Count > 0)
+                ApNapLoop(false);
+        }
+
+        #region Utility Methods
+
         /// <summary>
         /// Check for Abilities that have been triggered by events and changes in state, and put them on the stack in the desired or required order
         /// </summary>
@@ -364,14 +355,14 @@ namespace MtgEngine
 
                 // Add the triggered abilities to the stack
                 foreach (var ability in AbilitiesTriggered)
-                    Stack.Push(ability);
+                {
+                    PushOntoStack(ability, Common.Enums.Zone.Exile);
+                }
 
                 // Remove them from the queue, we don't want to accidentally add them to the stack more than once when they only triggered once.
                 AbilitiesTriggered.Clear();
             }
         }
-
-        #region Utility Methods
 
         /// <summary>
         /// 

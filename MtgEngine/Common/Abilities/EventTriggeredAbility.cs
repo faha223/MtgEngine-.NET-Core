@@ -32,7 +32,14 @@ namespace MtgEngine.Common.Abilities
 
         public virtual void PlayerDrewCards(Game game, Player player, int cardsDrawn)
         {
+        }
 
+        public virtual void AttackerDeclared(Game game, PermanentCard attacker, Player defendingPlayer)
+        {
+        }
+
+        public virtual void BlockerDeclared(Game game, PermanentCard attacker, PermanentCard blocker)
+        {
         }
     }
 }

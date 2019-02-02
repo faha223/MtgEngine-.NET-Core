@@ -4,47 +4,86 @@ using MtgEngine.Common.Cards;
 using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Utilities;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MtgEngine
 {
     public partial class Game
     {
+        public delegate void PlayerGainedPriorityEvent(Game game, Player player);
+        public event PlayerGainedPriorityEvent PlayerGainedPriority;
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="startingPlayer"></param>
         /// <param name="startingPlayerCanCastSorceries"></param>
-        private void ApNapLoop(Player startingPlayer, bool startingPlayerCanCastSorceries)
+        private void ApNapLoop(bool mainPhase)
         {
             bool repeatLoop;
             do
             {
-                repeatLoop = false;
-                foreach (var player in _players.StartAt(startingPlayer))
-                {
-                    // TODO: Give Priority
-                    _priorityPlayer = player;
+                var playersThatHavePassedPriority = new List<Player>(_players.Count);
 
-                    bool playerHasPassedPriority = false;
-                    do
+                // Make a queue of players starting at startingPlayer. This will allow us to enqueue all the players that have passed priority in case someone after them put something on the stack
+                var priorityQueue = new Queue<Player>(_players.StartAt(ActivePlayer));
+                repeatLoop = false;
+
+                while(priorityQueue.Count > 0)
+                {
+                    var player = priorityQueue.Dequeue();
+                    
+                    // Give Priority
+                    _priorityPlayer = player;
+                    PlayerGainedPriority?.Invoke(this, player);
+
+                    while (!playersThatHavePassedPriority.Contains(player))
                     {
-                        var chosenAction = player.GivePriority(this, player == startingPlayer && Stack.Count == 0 && startingPlayerCanCastSorceries);
+                        // The current player can only play sorcery-speed spells if the current player is the Active Player, and there is nothing on the stack, and it is currently their main phase
+                        bool playerCanCastSorceries = (player == ActivePlayer) && (Stack.Count == 0) && mainPhase;
+
+                        var chosenAction = player.GivePriority(this, playerCanCastSorceries);
 
                         switch (chosenAction.ActionType)
                         {
                             case ActionType.PassPriority:
-                                // If the player responds PassPriority, then go to the next player.
-                                playerHasPassedPriority = true;
+                                // This player passed priority, add them to the list
+                                playersThatHavePassedPriority.Add(player);
                                 break;
                             case ActionType.PlayCard:
-                                PlayCard(chosenAction as PlayCardAction, player, player == startingPlayer && startingPlayerCanCastSorceries);
+                                {
+                                    var action = chosenAction as PlayCardAction;
+                                    PlayCard(action, player, playerCanCastSorceries);
+
+                                    // If this player put something on the stack, we'll need to make sure all the players that have already passed priority are put back into the queue
+                                    // HINT: Playing a Land doesn't use the stack
+                                    if (action.Card.UsesStack && playersThatHavePassedPriority.Count > 0)
+                                    {
+                                        foreach (var other in playersThatHavePassedPriority)
+                                            priorityQueue.Enqueue(other);
+                                        playersThatHavePassedPriority.Clear();
+                                    }
+                                }
                                 break;
                             case ActionType.ActivateAbility:
-                                ActivateAbility(chosenAction as ActivateAbilityAction, player, player == startingPlayer && startingPlayerCanCastSorceries);
+                                {
+                                    var action = chosenAction as ActivateAbilityAction;
+                                    ActivateAbility(action, player, playerCanCastSorceries);
+
+                                    // If this player put something on the stack, we'll need to make sure all the players that have already passed priority are put back into the queue
+                                    // HINT: Mana Abilties don't use the stack
+                                    if (!(action.Ability is ManaAbility) && playersThatHavePassedPriority.Count > 0)
+                                    {
+                                        foreach (var other in playersThatHavePassedPriority)
+                                            priorityQueue.Enqueue(other);
+                                        playersThatHavePassedPriority.Clear();
+                                    }
+                                }
                                 break;
                         }
-                    } while (!playerHasPassedPriority);
+                    }
                 }
 
                 // All players have passed priority. Resolve the top of the stack, if necessary.
@@ -98,6 +137,8 @@ namespace MtgEngine
                     PushOntoStack(action.Card, Common.Enums.Zone.Hand);
                 }
             }
+
+            CheckStateBasedActions();
         }
 
         /// <summary>
@@ -182,6 +223,8 @@ namespace MtgEngine
                 CountersAddedToPermanent += ability.PermanentGotCounter;
                 CountersAddedToPlayer += ability.PlayerGotCounter;
                 PlayerDrewCards += ability.PlayerDrewCards;
+                AttackerDeclared += ability.AttackerDeclared;
+                BlockerDeclared += ability.BlockerDeclared;
             }
         }
 
@@ -198,6 +241,8 @@ namespace MtgEngine
                 CountersAddedToPermanent -= ability.PermanentGotCounter;
                 CountersAddedToPlayer -= ability.PlayerGotCounter;
                 PlayerDrewCards -= ability.PlayerDrewCards;
+                AttackerDeclared -= ability.AttackerDeclared;
+                BlockerDeclared -= ability.BlockerDeclared;
             }
         }
 
@@ -232,8 +277,6 @@ namespace MtgEngine
             }
 
             CheckStateBasedActions();
-            if (Stack.Count > 0)
-                ApNapLoop(ActivePlayer, false);
         }
     }
 }

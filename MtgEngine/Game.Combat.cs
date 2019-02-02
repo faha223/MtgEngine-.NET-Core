@@ -36,7 +36,7 @@ namespace MtgEngine
 
             CheckForTriggeredAbilities();
 
-            ApNapLoop(ActivePlayer, false);
+            ApNapLoop(false);
 
             DrainManaPools();
         }
@@ -67,7 +67,8 @@ namespace MtgEngine
             // Any "When this creature attacks" triggers get put onto the stack
             CheckForTriggeredAbilities();
 
-            ApNapLoop(ActivePlayer, false);
+            // Resolve the stack (this happens even if there's nothing already on the stack)
+            ApNapLoop(false);
 
             DrainManaPools();
         }
@@ -79,12 +80,14 @@ namespace MtgEngine
         {
             CurrentStepHasChanged?.Invoke(this, "Declare Blockers Step");
 
-            // TODO: Ask the Defending Players, in ApNap order, to declare Blockers
+            // Ask the Defending Players, in ApNap order, to declare Blockers
             var defendingPlayers = _players.StartAt(ActivePlayer)
                 .Where(p => ActivePlayer.Battlefield.Creatures.Any(c => c.DefendingPlayer == p));
+
             // Iterate over the defending players in turn order
             foreach (var player in defendingPlayers)
             {
+                // Have defending players declare blockers
                 var blockers = player.DeclareBlockers(ActivePlayer.Battlefield.Creatures.Where(c => c.DefendingPlayer == player).ToList());
                 if (blockers != null)
                 {
@@ -96,8 +99,13 @@ namespace MtgEngine
                 }
             }
 
-            ApNapLoop(ActivePlayer, false);
+            // Put any triggers on the stack
+            CheckForTriggeredAbilities();
 
+            // Resolve the stack (this happens even if there's nothing already on the stack)
+            ApNapLoop(false);
+            
+            // At the end of each phase, mana pools are emptied
             DrainManaPools();
         }
 
@@ -136,9 +144,7 @@ namespace MtgEngine
                         true);
                 }
 
-                CheckStateBasedActions();
-                if (Stack.Count > 0)
-                    ApNapLoop(ActivePlayer, false);
+                CheckStateBasedActionsAndResolveStack();
             }
 
             // Remove all blockers from the blocker map that have left the defending player's battlefield after firststrike damage before applying normal combat damage
@@ -161,9 +167,7 @@ namespace MtgEngine
                         false);
                 }
 
-                CheckStateBasedActions();
-                if (Stack.Count > 0)
-                    ApNapLoop(ActivePlayer, false);
+                CheckStateBasedActionsAndResolveStack();
             }
 
             DrainManaPools();
@@ -238,7 +242,8 @@ namespace MtgEngine
             CurrentStepHasChanged?.Invoke(this, "End of Combat Step");
 
             // Give Priority to Players
-            ApNapLoop(ActivePlayer, false);
+            CheckStateBasedActions();
+            ApNapLoop(false);
 
             // TODO: Add any "End of Combat" triggers to the stack
 

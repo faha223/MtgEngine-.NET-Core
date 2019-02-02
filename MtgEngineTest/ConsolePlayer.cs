@@ -81,6 +81,8 @@ namespace MtgEngineTest
             {
                 Console.Write("What do you want to do? ");
                 var parsed = ParseChoice(Console.ReadLine(), 1, i);
+                Console.WriteLine();
+
                 if (!parsed.HasValue)
                 {
                     Console.WriteLine("I don't understand your selection. Try Again.");
@@ -139,9 +141,9 @@ namespace MtgEngineTest
                 if (card.IsACreature)
                 {
                     if (counters != null)
-                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}: {counters}");
+                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}): {counters}");
                     else
-                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}");
+                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness})");
 
                 }
                 else
@@ -222,6 +224,8 @@ namespace MtgEngineTest
                 }
                 Console.WriteLine($"{++i}: Cancel");
                 selection = ParseChoice(Console.ReadLine(), 1, i);
+                Console.WriteLine();
+
             } while (!selection.HasValue);
 
             if (selection.Value == i)
@@ -327,6 +331,8 @@ namespace MtgEngineTest
                     Console.WriteLine($"{i}: Pass Priority");
 
                     var selection = ParseChoice(Console.ReadLine(), 1, i);
+                    Console.WriteLine();
+
                     if (selection.HasValue)
                     {
                         if (selection.Value <= creatures.Count)
@@ -358,6 +364,7 @@ namespace MtgEngineTest
                                         Console.Write("What is your selection? ");
                                         selection = ParseChoice(Console.ReadLine(), 1, i);
                                         Console.WriteLine();
+
                                         if (selection.HasValue)
                                         {
                                             creature.DefendingPlayer = opponents[selection.Value - 1];
@@ -401,6 +408,8 @@ namespace MtgEngineTest
 
                 Console.Write("What do you choose? ");
                 var selection = ParseChoice(Console.ReadLine(), 1, i);
+                Console.WriteLine();
+
                 if (selection.HasValue)
                 {
                     if (selection.Value <= attackingCreatures.Count)
@@ -422,6 +431,8 @@ namespace MtgEngineTest
                             Console.WriteLine($"{i}: Cancel");
                             Console.Write("Which do you choose? ");
                             selection = ParseChoice(Console.ReadLine(), 1, i);
+                            Console.WriteLine();
+
                             if (selection.HasValue)
                             {
                                 if (selection.Value == i)
@@ -506,16 +517,19 @@ namespace MtgEngineTest
         public void CardHasEnteredBattlefield(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} has entered the battlefield under the control of {card.Controller.Name}.");
+            Console.WriteLine();
         }
 
         public void CardHasEnteredStack(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} is now on the stack.");
+            Console.WriteLine();
         }
 
         public override void AbilityHasEnteredStack(Game game, Ability ability)
         {
             Console.WriteLine($"\"{ability.Text}\" is now on the stack.");
+            Console.WriteLine();
         }
 
         public override void PlayerTookDamage(Game game, Player player, int damageDealt)
@@ -534,10 +548,10 @@ namespace MtgEngineTest
                 Console.WriteLine($"Pay {cost}");
                 Console.Write("What value would you like for X? ");
                 var selection = ParseChoice(Console.ReadLine(), 0, int.MaxValue);
+                Console.WriteLine();
+
                 if (selection.HasValue)
                     return selection.Value;
-                else
-                    Console.WriteLine();
             } while (true);
         }
 
@@ -559,6 +573,8 @@ namespace MtgEngineTest
                 Console.WriteLine($"{i}: Cancel");
 
                 var selection = ParseChoice(Console.ReadLine(), 1, i);
+                Console.WriteLine();
+
                 if (selection.HasValue)
                 {
                     if (selection.Value == i)
@@ -586,9 +602,10 @@ namespace MtgEngineTest
                 }
                 Console.Write("Which Color do you choose? ");
                 var choice = ParseChoice(Console.ReadLine(), 1, options.Length);
+                Console.WriteLine();
+
                 if (choice.HasValue)
                     return options[choice.Value - 1];
-                Console.WriteLine();
             }
         }
 

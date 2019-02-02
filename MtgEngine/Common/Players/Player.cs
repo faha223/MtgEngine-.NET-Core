@@ -72,6 +72,11 @@ namespace MtgEngine.Common.Players
             LifeTotal -= amount;
         }
 
+        public void GainLife(int amount)
+        {
+            LifeTotal += amount;
+        }
+
         public void TakeDamage(int amount, Card source)
         {
             LoseLife(amount);
