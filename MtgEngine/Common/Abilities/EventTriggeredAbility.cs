@@ -10,11 +10,7 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
-        public virtual void PermanentEnteredBattlefield(Game game, PermanentCard card)
-        {
-        }
-
-        public virtual void PermanentGotCounter(Game game, PermanentCard card, CounterType counterType, int count)
+        public virtual void PermanentGotCounter(Game game, PermanentCard card, IResolvable source, CounterType counterType, int count)
         {
         }
 
@@ -22,8 +18,21 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
-        public virtual void PermanentChangedZones(Game game, PermanentCard card, Enums.Zone previousZone, Enums.Zone currentZone)
+        public virtual void PlayerTookDamage(Game game, Player player, int damageReceived)
         {
+        }
+
+        public virtual void CreatureTookDamage(Game game, PermanentCard creature, Card source, int damageReceived)
+        {
+        }
+
+        public virtual void CardHasChangedZones(Game game, Card card, Enums.Zone previousZone, Enums.Zone currentZone)
+        {
+        }
+
+        public virtual void PlayerDrewCards(Game game, Player player, int cardsDrawn)
+        {
+
         }
     }
 }

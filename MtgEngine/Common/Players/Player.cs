@@ -1,4 +1,5 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Abilities;
+using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players.Actions;
@@ -25,9 +26,13 @@ namespace MtgEngine.Common.Players
         private List<CounterType> counters { get; } = new List<CounterType>();
         public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
 
-        public void AddCounters(int count, CounterType counter)
+        public delegate void CountersEvent(Player player, CounterType counterType, int count);
+        public event CountersEvent CountersCreated;
+        public event CountersEvent CountersRemoved;        
+
+        public void AddCounters(int amount, CounterType counter)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < amount; i++)
             {
                 switch (counter)
                 {
@@ -40,6 +45,7 @@ namespace MtgEngine.Common.Players
                         break;
                 }
             }
+            CountersCreated?.Invoke(this, counter, amount);
         }
 
         public void RemoveCounters(int amount, CounterType counter)
@@ -49,6 +55,7 @@ namespace MtgEngine.Common.Players
                 if (counters.Contains(counter))
                     counters.Remove(counter);
             }
+            CountersRemoved?.Invoke(this, counter, amount);
         }
 
         public Zone Battlefield { get; } = new Zone();
@@ -115,6 +122,7 @@ namespace MtgEngine.Common.Players
 
         public virtual void Draw(int howMany)
         {
+            // TODO: Throw PlayerLostGame exception if the player is forced to draw more cards than are in their library.
             var cardsDrawn = Library.Take(howMany);
             Library.RemoveRange(0, howMany);
             Hand.AddRange(cardsDrawn);
@@ -172,19 +180,19 @@ namespace MtgEngine.Common.Players
 
         #region Game Event Handlers
 
-        public virtual void CardHasEnteredStack(Game game, Card card)
+        public virtual void CardHasChangedZones(Game game, Card card, Enums.Zone oldZone, Enums.Zone newZone)
         {
         }
 
-        public virtual void CardHasEnteredBattlefield(Game game, Card card)
+        public virtual void AbilityHasEnteredStack(Game game, Ability ability)
         {
         }
 
-        public virtual void GameStepChanged(string currentStep)
+        public virtual void GameStepChanged(Game game, string currentStep)
         {
         }
 
-        public virtual void PlayerTookDamage(Player player, int damageDealt)
+        public virtual void PlayerTookDamage(Game game, Player player, int damageDealt)
         {
         }
 

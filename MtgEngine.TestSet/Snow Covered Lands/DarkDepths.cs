@@ -13,7 +13,7 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
         public DarkDepths(Player owner) : base(owner, new[] { CardType.Land }, null, false, true, true)
         {
             // Dark Depths enters the battlefield with 10 ice counters on it
-            AddCounters(10, CounterType.Ice);
+            AddCounters(this, 10, CounterType.Ice);
 
             // {3}: Remove an ice counter from Dark Depths
             Abilities.Add(new DarkDepthsAbility(this));
@@ -30,7 +30,7 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
 
             public override void OnResolve(Game game)
             {
-                Source.RemoveCounters(1, CounterType.Ice);
+                Source.RemoveCounters(this, 1, CounterType.Ice);
             }
         }
 

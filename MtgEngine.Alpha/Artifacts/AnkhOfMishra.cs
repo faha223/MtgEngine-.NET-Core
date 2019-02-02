@@ -24,9 +24,10 @@ namespace MtgEngine.Alpha.Artifacts
             }
 
             // Whenever a land enters the battlefield, Ankh of Mishra deals 2 damage to that land’s controller.
-            public override void PermanentEnteredBattlefield(Game game, PermanentCard card)
+
+            public override void CardHasChangedZones(Game game, Card card, Zone previousZone, Zone currentZone)
             {
-                if (card.IsALand)
+                if(currentZone == Zone.Battlefield && card.IsALand)
                 {
                     player = card.Controller;
                     game.AbilityTriggered(this);

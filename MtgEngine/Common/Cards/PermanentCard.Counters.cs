@@ -6,15 +6,19 @@ namespace MtgEngine.Common.Cards
 {
     public abstract partial class PermanentCard : Card, IDamageable
     {
+        public delegate void CountersEvent(PermanentCard card, IResolvable source, CounterType counterType, int amount);
+        public event CountersEvent CountersCreated;
+        public event CountersEvent CountersRemoved;
+
         // This isn't protected because we don't want inheriting classes modifying how counters are added or removed
         protected List<CounterType> counters { get; } = new List<CounterType>();
 
         // This returns a copy so that this can't be used to modify the counters
         public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
 
-        public virtual void AddCounters(int count, CounterType counter)
+        public virtual void AddCounters(IResolvable source, int amount, CounterType counter)
         {
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < amount; i++)
             {
                 switch (counter)
                 {
@@ -41,15 +45,19 @@ namespace MtgEngine.Common.Cards
                         break;
                 }
             }
+
+            CountersCreated?.Invoke(this, source, counter, amount);
         }
 
-        public void RemoveCounters(int amount, CounterType counter)
+        public void RemoveCounters(IResolvable source, int amount, CounterType counter)
         {
             for (int i = 0; i < amount; i++)
             {
                 if (counters.Contains(counter))
                     counters.Remove(counter);
             }
+
+            CountersRemoved?.Invoke(this, source, counter, amount);
         }
 
         public void ClearCounters()

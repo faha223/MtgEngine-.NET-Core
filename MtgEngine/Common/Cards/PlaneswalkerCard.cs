@@ -8,10 +8,10 @@ namespace MtgEngine.Common.Cards
     {
         public PlaneswalkerCard(Player owner, Cost cost, CardType[] types, string[] subtypes, int startingLoyalty) : base(owner, true, cost, types, subtypes, false, true, false)
         {
-            AddCounters(startingLoyalty, CounterType.Loyalty);
+            AddCounters(this, startingLoyalty, CounterType.Loyalty);
         }
 
-        public override void AddCounters(int count, CounterType counter)
+        public override void AddCounters(IResolvable source, int count, CounterType counter)
         {
             // Planeswalkers can get loyalty counters
             if (counter == CounterType.Loyalty)
@@ -24,13 +24,13 @@ namespace MtgEngine.Common.Cards
             else
             {
                 // Otherwise treat this as a creature/permanent/thing
-                base.AddCounters(count, counter);
+                base.AddCounters(source, count, counter);
             }
         }
 
         public override void TakeDamage(int amount, Card source)
         {
-            RemoveCounters(amount, CounterType.Loyalty);
+            RemoveCounters(source, amount, CounterType.Loyalty);
         }
 
         public override bool IsDead => !Counters.Contains(CounterType.Loyalty);

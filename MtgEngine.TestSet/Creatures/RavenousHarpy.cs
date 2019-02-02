@@ -23,7 +23,7 @@ namespace MtgEngine.TestSet.Creatures
 
             public override void OnResolve(Game game)
             {
-                Source.AddCounters(1, Common.Enums.CounterType.Plus1Plus1);
+                Source.AddCounters(this, 1, Common.Enums.CounterType.Plus1Plus1);
             }
         }
     }

@@ -27,7 +27,7 @@ namespace MtgEngine.TestSet
 
         public override void OnResolve(Game game)
         {
-            AddCounters(_x, CounterType.Charge);
+            AddCounters(this, _x, CounterType.Charge);
         }
 
         private class AstralCornucopiaManaAbility : ManaAbility

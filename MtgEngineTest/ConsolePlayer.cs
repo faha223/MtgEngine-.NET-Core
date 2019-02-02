@@ -152,6 +152,7 @@ namespace MtgEngineTest
                         Console.WriteLine($"{card.Name}");
                 }
             }
+            Console.WriteLine();
         }
 
         public override void Draw(int howMany)
@@ -479,7 +480,7 @@ namespace MtgEngineTest
 
         #region Game State Updates
 
-        public override void GameStepChanged(string currentStep)
+        public override void GameStepChanged(Game game, string currentStep)
         {
             if (currentStep == "Untap Step")
                 passTurn = false;
@@ -489,22 +490,35 @@ namespace MtgEngineTest
             Console.WriteLine();
         }
 
-        public override void CardHasEnteredBattlefield(Game game, Card card)
+        public override void CardHasChangedZones(Game game, Card card, MtgEngine.Common.Enums.Zone oldZone, MtgEngine.Common.Enums.Zone newZone)
+        {
+            switch(newZone)
+            {
+                case MtgEngine.Common.Enums.Zone.Battlefield:
+                    CardHasEnteredBattlefield(game, card);
+                    break;
+                case MtgEngine.Common.Enums.Zone.Stack:
+                    CardHasEnteredStack(game, card);
+                    break;
+            }
+        }
+
+        public void CardHasEnteredBattlefield(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} has entered the battlefield under the control of {card.Controller.Name}.");
         }
 
-        public override void CardHasEnteredStack(Game game, Card card)
+        public void CardHasEnteredStack(Game game, Card card)
         {
             Console.WriteLine($"{card.Name} is now on the stack.");
         }
 
-        //public override void PlayerHasGainedControlOfCard(Card card)
-        //{
-        //    Console.WriteLine($"{card.Controller.Name} has gained control of {card.Name}.");
-        //}
+        public override void AbilityHasEnteredStack(Game game, Ability ability)
+        {
+            Console.WriteLine($"\"{ability.Text}\" is now on the stack.");
+        }
 
-        public override void PlayerTookDamage(Player player, int damageDealt)
+        public override void PlayerTookDamage(Game game, Player player, int damageDealt)
         {
             Console.WriteLine($"{player.Name} took {damageDealt} damage.");
             Console.WriteLine($"{player.Name}'s life total is now {player.LifeTotal}");
