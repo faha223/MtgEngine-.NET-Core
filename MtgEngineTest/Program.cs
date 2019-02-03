@@ -16,6 +16,8 @@ namespace MtgEngineTest
             //game.AddPlayer(new ConsolePlayer("Not Fred", 20, File.ReadAllText(deckFileLocation)));
             game.AddPlayer(new PassPriorityPlayer("Al", 20, File.ReadAllText(deckFileLocation)));
             game.Start().Wait();
+            System.Console.Write("Game Over. Press Enter to Exit...");
+            System.Console.ReadLine();
         }
     }
 }

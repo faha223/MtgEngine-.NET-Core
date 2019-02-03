@@ -10,7 +10,7 @@ namespace MtgEngine.Common.Cards
     {
         public List<Ability> Abilities { get; } = new List<Ability>();
 
-        public PermanentCard(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) : 
+        public PermanentCard(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) :
             base(owner, usesStack, cost, types, subtypes, false, isLegendary, isSnow)
         {
             _basePower = 0;
@@ -42,6 +42,29 @@ namespace MtgEngine.Common.Cards
                 }
             }
             return true;
+        }
+
+        public bool IsTapped { get; protected set; }
+
+        public virtual bool UntapsDuringUntapStep
+        {
+            get
+            {
+                // TODO: Check for Modifiers that would make this false
+                return true;
+            }
+        }
+
+        public virtual void Untap()
+        {
+            if (IsTapped)
+                IsTapped = false;
+        }
+
+        public virtual void Tap()
+        {
+            if (!IsTapped)
+                IsTapped = true;
         }
     }
 }

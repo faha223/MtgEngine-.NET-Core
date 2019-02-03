@@ -6,6 +6,7 @@ using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Exceptions;
 using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Utilities;
@@ -15,6 +16,7 @@ namespace MtgEngine
     public partial class Game
     {
         private List<Player> _players { get; } = new List<Player>();
+        private List<Player> _losingPlayers { get; } = new List<Player>();
 
         public Player ActivePlayer { get; private set; }
 
@@ -55,6 +57,9 @@ namespace MtgEngine
             return new List<Player>(_players);
         }
 
+        delegate void BasicGameEvent(Game game);
+        private event BasicGameEvent GameEndedInDraw;
+
         delegate void CardChangedZonesEvent(Game game, Card card, Common.Enums.Zone oldZone, Common.Enums.Zone newZone);
         private event CardChangedZonesEvent CardHasChangedZones;
 
@@ -67,6 +72,10 @@ namespace MtgEngine
         delegate void PlayerDrewCardEvent(Game game, Player player, int cardsDrawn);
         private event PlayerDrewCardEvent PlayerDrewCards;
 
+        delegate void PlayerLostTheGameEvent(Game game, Player player, string reason);
+        private event PlayerLostTheGameEvent PlayerLostTheGame;
+        private event PlayerLostTheGameEvent PlayerWonTheGame;
+
         public void AddPlayer(Player player)
         {
             if (!_players.Contains(player))
@@ -77,6 +86,9 @@ namespace MtgEngine
                 PlayerTookDamage += player.PlayerTookDamage;
                 player.CountersCreated += player_CountersCreated;
                 player.CountersRemoved += player_CountersRemoved;
+                PlayerWonTheGame += player.PlayerWonTheGame;
+                PlayerLostTheGame += player.PlayerLostTheGame;
+                GameEndedInDraw += player.GameEndedInDraw;
                 _players.Add(player);
             }
         }
@@ -125,32 +137,54 @@ namespace MtgEngine
                 OfferMulligans();
 
                 // Go to Player 1 Turn 1
-                do
+                try
                 {
-                    _players.ForEach(player => ResetLandsPlayed(player));
+                    do
+                    {
+                        try
+                        {
+                            _players.ForEach(player => ResetLandsPlayed(player));
 
-                    CheckStateBasedActionsAndResolveStack();
+                            CheckStateBasedActionsAndResolveStack();
 
-                    BeginningPhase();
+                            BeginningPhase();
 
-                    CheckStateBasedActionsAndResolveStack();
+                            CheckStateBasedActionsAndResolveStack();
 
-                    MainPhase(true);
+                            MainPhase(true);
 
-                    CheckStateBasedActionsAndResolveStack();
+                            CheckStateBasedActionsAndResolveStack();
 
-                    CombatPhase();
+                            CombatPhase();
 
-                    CheckStateBasedActionsAndResolveStack();
+                            CheckStateBasedActionsAndResolveStack();
 
-                    MainPhase(false);
+                            MainPhase(false);
 
-                    CheckStateBasedActionsAndResolveStack();
+                            CheckStateBasedActionsAndResolveStack();
 
-                    EndingPhase();
+                            EndingPhase();
 
-                    ActivePlayer = _nextPlayer;
-                } while (true);
+                            ActivePlayer = _nextPlayer;
+                        }
+                        catch (ActivePlayerLostTheGameException)
+                        {
+                            var temp = ActivePlayer;
+                            ActivePlayer = _nextPlayer;
+
+                            _players.Remove(temp);
+                            _losingPlayers.Add(temp);
+                        }
+                    } while (true);
+                }
+                catch(GameEndedInDrawException)
+                {
+                    GameEndedInDraw?.Invoke(this);
+                }
+                catch(PlayerWonTheGameException ex)
+                {
+                    PlayerWonTheGame?.Invoke(this, ex.Winner, ex.Message);
+                }
             });
         }
 
@@ -175,7 +209,14 @@ namespace MtgEngine
         {
             CurrentStepHasChanged?.Invoke(this, "Untap Step");
             ActivePlayer.Battlefield.Creatures.ForEach(c => c.HasSummoningSickness = false);
-            ActivePlayer.Battlefield.ForEach(c => c.Untap());
+            ActivePlayer.Battlefield.ForEach(c =>
+            {
+                if (c is PermanentCard) {
+                    var p = c as PermanentCard;
+                    if(p.UntapsDuringUntapStep)
+                        p.Untap();
+                }
+            });
 
             DrainManaPools();
         }
@@ -281,7 +322,7 @@ namespace MtgEngine
         /// </summary>
         private void CheckStateBasedActions()
         {
-            // TODO: Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
+            // Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
             foreach(var player in _players)
             {
                 var deadCreatures = player.Battlefield.Creatures.Where(c => c.IsDead).ToList();
@@ -303,13 +344,50 @@ namespace MtgEngine
                 }
             }
 
-            // TODO: Any players with 0 life total lose the game
-
-            // TODO: Any players with 10 poison counters lose the game
+            // Any players with 0 life total lose the game
+            Dictionary<Player, string> _deadPlayers = new Dictionary<Player, string>();
+            foreach (var player in _players)
+            {
+                if (player.LifeTotal <= 0)
+                {
+                    // Player has Died
+                    _deadPlayers.Add(player, "Life Total has Reached Zero");
+                }
+            }
+            
+            // Any players with 10 or more poison counters lose the game
+            foreach(var player in _players)
+            {
+                if (player.Counters.Count(c => c == CounterType.Poison) >= 10)
+                    _deadPlayers.Add(player, "Player has accumulated 10 poison counters");
+            }
 
             // TODO: If an effect has caused a player to win the game, all other players lose
 
-            // TODO: If a player has lost the game, remove them from the _players list. If they were the active player, go to the start of the next player's turn
+            // If All Players Lost Simultaneously, then it's a Draw
+            if (_players.Except(_deadPlayers.Keys).Count() == 0)
+                throw new GameEndedInDrawException();
+
+            // If a player has lost the game, remove them from the _players list.
+            foreach (var player in _deadPlayers.Keys)
+            {
+                PlayerLostTheGame?.Invoke(this, player, _deadPlayers[player]);
+
+                // Active Player gets removed after it gets changed to the next player
+                if (player != ActivePlayer)
+                {
+                    _players.Remove(player);
+                    _losingPlayers.Add(player);
+                }
+            }
+
+            // If only 1 players remains, that player won the game
+            if (_players.Except(_deadPlayers.Keys).Count() == 1)
+                throw new PlayerWonTheGameException(_players.Except(_deadPlayers.Keys).First(), "Last Man Standing");
+            
+            // If the active player died, go to the start of the next player's turn
+            if (_deadPlayers.ContainsKey(ActivePlayer))
+                throw new ActivePlayerLostTheGameException(_deadPlayers[ActivePlayer]);
 
             // Check State Triggered Abilities
             CheckForTriggeredAbilities();

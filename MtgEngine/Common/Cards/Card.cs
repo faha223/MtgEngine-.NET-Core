@@ -56,8 +56,6 @@ namespace MtgEngine.Common.Cards
         private bool _isSnow { get; }
         public virtual bool IsSnow { get { return _isSnow; } }
 
-        public bool IsTapped { get; protected set; }
-
         public Player Controller { get; private set; }
 
         public Player Owner { get; }
@@ -94,18 +92,6 @@ namespace MtgEngine.Common.Cards
         /// <param name="game"></param>
         public virtual void OnResolve(Game game)
         {
-        }
-
-        public void Untap()
-        {
-            if (IsTapped)
-                IsTapped = false;
-        }
-
-        public void Tap()
-        {
-            if (!IsTapped)
-                IsTapped = true;
         }
 
         public void GiveControl(Player player)

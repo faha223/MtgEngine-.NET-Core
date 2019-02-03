@@ -201,6 +201,18 @@ namespace MtgEngine.Common.Players
         {
         }
 
+        public virtual void PlayerLostTheGame(Game game, Player player, string reason)
+        {
+        }
+
+        public virtual void GameEndedInDraw(Game game)
+        {
+        }
+
+        public virtual void PlayerWonTheGame(Game game, Player player, string reason)
+        {
+        }
+
         #endregion Game Event Handlers
 
         /// <summary>

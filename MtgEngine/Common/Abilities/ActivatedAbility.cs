@@ -5,7 +5,7 @@ namespace MtgEngine.Common.Abilities
 {
     public abstract class ActivatedAbility : Ability
     {
-        public Cost Cost { get; private set; }
+        public Cost Cost { get; protected set; }
 
         protected ActivatedAbility(PermanentCard source, Cost cost, string text) : base(source, text)
         {

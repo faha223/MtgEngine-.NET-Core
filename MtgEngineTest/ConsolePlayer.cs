@@ -493,6 +493,8 @@ namespace MtgEngineTest
 
         public override void GameStepChanged(Game game, string currentStep)
         {
+            this.currentStep = currentStep;
+
             if (currentStep == "Untap Step")
                 passTurn = false;
 
@@ -536,6 +538,24 @@ namespace MtgEngineTest
         {
             Console.WriteLine($"{player.Name} took {damageDealt} damage.");
             Console.WriteLine($"{player.Name}'s life total is now {player.LifeTotal}");
+            Console.WriteLine();
+        }
+
+        public override void PlayerWonTheGame(Game game, Player player, string reason)
+        {
+            Console.WriteLine($"{player.Name} Wins the Game: {reason}");
+            Console.WriteLine();
+        }
+
+        public override void PlayerLostTheGame(Game game, Player player, string reason)
+        {
+            Console.WriteLine($"{player.Name} Lost the Game: {reason}");
+            Console.WriteLine();
+        }
+
+        public override void GameEndedInDraw(Game game)
+        {
+            Console.WriteLine("Game Ended in Draw");
             Console.WriteLine();
         }
 

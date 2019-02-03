@@ -4,19 +4,19 @@ namespace MtgEngine.Common.Costs
 {
     public class TapCost : Cost
     {
-        public TapCost(IResolvable source) : base(source)
+        public TapCost(PermanentCard source) : base(source)
         {
 
         }
 
         public override bool CanPay()
         {
-            return !((Card)_source).IsTapped;
+            return !(_source as PermanentCard).IsTapped;
         }
 
         public override bool Pay()
         {
-            ((Card)_source).Tap();
+            (_source as PermanentCard).Tap();
             return true;
         }
 

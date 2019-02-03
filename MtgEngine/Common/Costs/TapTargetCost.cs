@@ -26,7 +26,7 @@ namespace MtgEngine.Common.Costs
 
             if(controller != null)
             {
-                return controller.Battlefield.Any(c => _targetSelector(c) && !c.IsTapped);
+                return controller.Battlefield.Any(c => _targetSelector(c) && c is PermanentCard && !(c as PermanentCard).IsTapped);
             }
 
             return false;
