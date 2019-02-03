@@ -2,7 +2,7 @@
 {
     public class SacrificeCreatureCost : SacrificeTargetCost
     {
-        public SacrificeCreatureCost(IResolvable source) : base(source, card => card.IsACreature)
+        public SacrificeCreatureCost(IResolvable source) : base(source, card => card.IsACreature, "Sacrifice a Creature")
         {
         }
 
