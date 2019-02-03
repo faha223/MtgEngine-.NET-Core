@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MtgEngine.Common.Enums;
+using System;
 using System.Linq;
+using System.Reflection;
 
 namespace MtgEngine.Common.Counters
 {
@@ -11,10 +13,14 @@ namespace MtgEngine.Common.Counters
             Name = name;
         }
 
-        public static CounterAttribute GetAttribute(Type counterType)
+        public static CounterAttribute GetCounterAttribute(CounterType counter)
         {
-            var attributes = counterType.GetCustomAttributes(typeof(CounterAttribute), true);
-            return attributes.FirstOrDefault(c => c is CounterAttribute) as CounterAttribute;
+            MemberInfo memberInfo = typeof(CounterType).GetMember(counter.ToString()).FirstOrDefault();
+            if (memberInfo != null)
+            {
+                return memberInfo.GetCustomAttribute(typeof(CounterAttribute), false) as CounterAttribute;
+            }
+            return null;
         }
     }
 }

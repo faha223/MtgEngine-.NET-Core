@@ -1,4 +1,5 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Abilities;
+using MtgEngine.Common.Cards;
 
 namespace MtgEngine.Common.Costs
 {
@@ -23,6 +24,11 @@ namespace MtgEngine.Common.Costs
                 return true;
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"Sacrifice {(_source as Card).Name}";
         }
     }
 }

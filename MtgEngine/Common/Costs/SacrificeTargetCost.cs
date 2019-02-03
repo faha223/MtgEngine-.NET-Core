@@ -7,10 +7,12 @@ namespace MtgEngine.Common.Costs
     public class SacrificeTargetCost : Cost
     {
         private Func<Card, bool> _targetSelector;
+        private string text;
 
-        public SacrificeTargetCost(IResolvable source, Func<Card, bool> targetSelector) : base(source)
+        public SacrificeTargetCost(IResolvable source, Func<Card, bool> targetSelector, string text) : base(source)
         {
             _targetSelector = targetSelector;
+            this.text = text;
         }
 
         public override bool CanPay()
@@ -28,6 +30,11 @@ namespace MtgEngine.Common.Costs
 
             card.Controller.Sacrifice(target);
             return true;
+        }
+
+        public override string ToString()
+        {
+            return text;
         }
     }
 }

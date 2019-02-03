@@ -1,4 +1,5 @@
-﻿using MtgEngine.Common.Enums;
+﻿using MtgEngine.Common.Counters;
+using MtgEngine.Common.Enums;
 using System.Linq;
 
 namespace MtgEngine.Common.Costs
@@ -31,6 +32,11 @@ namespace MtgEngine.Common.Costs
                 return true;
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"{count} {CounterAttribute.GetCounterAttribute(type).Name}";
         }
     }
 }

@@ -15,5 +15,10 @@
         {
             return true;
         }
+
+        public override string ToString()
+        {
+            return "{0}";
+        }
     }
 }
