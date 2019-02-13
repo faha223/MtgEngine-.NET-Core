@@ -17,7 +17,10 @@ namespace MtgEngine.Common.Cards
 
         public virtual void TakeDamage(int amount, Card source)
         {
-            DamageAccumulated += amount;
+            if((source is PermanentCard) && (source as PermanentCard).HasInfect)
+                AddCounters(source, amount, CounterType.Minus1Minus1);
+            else
+                DamageAccumulated += amount;
         }
 
         public virtual bool IsDead => DamageAccumulated >= Toughness;

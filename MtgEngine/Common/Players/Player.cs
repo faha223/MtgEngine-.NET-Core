@@ -79,7 +79,10 @@ namespace MtgEngine.Common.Players
 
         public void TakeDamage(int amount, Card source)
         {
-            LoseLife(amount);
+            if((source is PermanentCard) && (source as PermanentCard).HasInfect)
+                AddCounters(amount, CounterType.Poison);
+            else
+                LoseLife(amount);
         }
 
         public bool IsDead => LifeTotal <= 0;
@@ -113,6 +116,14 @@ namespace MtgEngine.Common.Players
         }
 
         public abstract ManaColor? PayManaCost(string cost);
+
+        public abstract List<Card> MakeChoice(string message, int count, List<Card> options);
+
+        public abstract List<PermanentCard> MakeChoice(string message, int count, List<PermanentCard> options);
+
+        public abstract List<PermanentCard> Sort(string message, List<PermanentCard> options);
+
+        public abstract List<Card> Sort(string message, List<Card> options);
 
         public abstract int GetValueForX(string cost);
 

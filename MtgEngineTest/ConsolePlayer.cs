@@ -610,6 +610,98 @@ namespace MtgEngineTest
             } while (true);
         }
 
+        public override List<PermanentCard> MakeChoice(string message, int count, List<PermanentCard> options)
+        {
+            do
+            {
+                Console.WriteLine(message);
+                int i = 0;
+                foreach (var card in options)
+                {
+                    if (card.IsACreature)
+                        Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power})");
+                    else
+                        Console.WriteLine($"{++i}: {card.Name}");
+                }
+
+                Console.Write("Choose: ");
+
+                var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
+                if(selection != null)
+                {
+                    return options.OrderByIndexList(selection);
+                }
+            } while (true);
+        }
+
+        public override List<Card> MakeChoice(string message, int count, List<Card> options)
+        {
+            do
+            {
+                Console.WriteLine(message);
+                int i = 0;
+                foreach (var card in options)
+                {
+                    if (card.IsACreature)
+                        Console.WriteLine($"{++i}: {card.Name} ({(card as PermanentCard).Power}/{(card as PermanentCard).Power})");
+                    else
+                        Console.WriteLine($"{++i}: {card.Name}");
+                }
+
+                Console.Write("Choose: ");
+
+                var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
+                if (selection != null)
+                {
+                    return options.OrderByIndexList(selection);
+                }
+            } while (true);
+        }
+
+        public override List<PermanentCard> Sort(string message, List<PermanentCard> options)
+        {
+            do
+            {
+                Console.WriteLine(message);
+                int i = 0;
+                foreach(var card in options)
+                {
+                    if (card.IsACreature)
+                        Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power})");
+                    else
+                        Console.WriteLine($"{++i}: {card.Name}");
+                }
+                Console.Write("Sort: ");
+                var selection = ParseChoice(Console.ReadLine(), options.Count, options.Count, 1, i, true);
+                if (selection != null)
+                {
+                    return options.OrderByIndexList(selection);
+                }
+            } while (true);
+        }
+
+        public override List<Card> Sort(string message, List<Card> options)
+        {
+            do
+            {
+                Console.WriteLine(message);
+                int i = 0;
+                foreach (var card in options)
+                {
+                    if (card.IsACreature)
+                        Console.WriteLine($"{++i}: {card.Name} ({(card as PermanentCard).Power}/{(card as PermanentCard).Power})");
+                    else
+                        Console.WriteLine($"{++i}: {card.Name}");
+                }
+                Console.Write("Sort: ");
+                var selection = ParseChoice(Console.ReadLine(), options.Count, options.Count, 1, i, true);
+                if (selection != null)
+                {
+                    return options.OrderByIndexList(selection);
+                }
+            } while (true);
+        }
+
         public override ManaColor ChooseColor()
         {
             var options = new[] { ManaColor.White, ManaColor.Blue, ManaColor.Black, ManaColor.Red, ManaColor.Green };

@@ -23,6 +23,7 @@
         Flash,
         Shroud,
         Hexproof,
-        Trample
+        Trample,
+        Infect
     }
 }
