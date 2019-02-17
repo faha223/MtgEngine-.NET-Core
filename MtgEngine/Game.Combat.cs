@@ -22,8 +22,8 @@ namespace MtgEngine
         delegate void CreatureTookDamageEvent(Game game, PermanentCard creature, Card source, int DamageTaken);
         private event CreatureTookDamageEvent CreatureTookDamage;
 
-        delegate void PlayerTookDamageEvent(Game game, Player player, int damageDealt);
-        private event PlayerTookDamageEvent PlayerTookDamage;
+        delegate void PlayertookDamageEvent(Game game, Player player, Card source, int DamageTaken);
+        private event PlayertookDamageEvent PlayerTookDamage;
 
         #endregion Combat Events
 
@@ -228,10 +228,6 @@ namespace MtgEngine
         public void ApplyDamage(IDamageable target, Card source, int amount)
         {
             target.TakeDamage(amount, source);
-            if (target is Player)
-                PlayerTookDamage?.Invoke(this, target as Player, amount);
-            else if (target is PermanentCard && (target as PermanentCard).IsACreature)
-                CreatureTookDamage?.Invoke(this, target as PermanentCard, source, amount);
         }
 
         /// <summary>

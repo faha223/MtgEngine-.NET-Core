@@ -80,10 +80,10 @@ namespace MtgEngine
         {
             if (!_players.Contains(player))
             {
+                player.TookDamage += player_tookDamage;
                 CurrentStepHasChanged += player.GameStepChanged;
                 CardHasChangedZones += player.CardHasChangedZones;
                 AbilityHasEnteredStack += player.AbilityHasEnteredStack;
-                PlayerTookDamage += player.PlayerTookDamage;
                 player.CountersCreated += player_CountersCreated;
                 player.CountersRemoved += player_CountersRemoved;
                 PlayerWonTheGame += player.PlayerWonTheGame;
@@ -105,6 +105,16 @@ namespace MtgEngine
         private void player_CountersRemoved(Player player, CounterType counterType, int amount)
         {
             CountersRemovedFromPlayer?.Invoke(this, player, counterType, amount);
+        }
+
+        private void player_tookDamage(IDamageable player, Card source, int amount)
+        {
+            PlayerTookDamage?.Invoke(this, (Player)player, source, amount);
+        }
+
+        private void creature_tookDamage(IDamageable creature, Card source, int amount)
+        {
+            CreatureTookDamage?.Invoke(this, (PermanentCard)creature, source, amount);
         }
 
         public delegate void PermanentCountersEvent(Game game, PermanentCard card, IResolvable source, CounterType counterType, int amount);
@@ -208,11 +218,11 @@ namespace MtgEngine
         private void UntapStep()
         {
             CurrentStepHasChanged?.Invoke(this, "Untap Step");
-            ActivePlayer.Battlefield.Creatures.ForEach(c => c.HasSummoningSickness = false);
             ActivePlayer.Battlefield.ForEach(c =>
             {
                 if (c is PermanentCard) {
                     var p = c as PermanentCard;
+                    p.HasSummoningSickness = false;
                     if(p.UntapsDuringUntapStep)
                         p.Untap();
                 }

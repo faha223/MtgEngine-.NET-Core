@@ -13,6 +13,12 @@ namespace MtgEngine.Common.Players
 {
     public abstract class Player : ITarget, IDamageable
     {
+        public delegate void PlayerLostLifeEventHandler(Player player, IResolvable source, int amount);
+
+        public event PlayerLostLifeEventHandler LostLife;
+
+        public event TookDamageEventHandler TookDamage; //IDamageable
+
         public int MulligansTaken { get; set; } = 0;
 
         public string Name { get; }
@@ -67,8 +73,9 @@ namespace MtgEngine.Common.Players
         private int _startingLifeTotal { get; } = 20;
         public int LifeTotal { get; set; } = 20;
 
-        public void LoseLife(int amount)
+        public void LoseLife(int amount, Card source)
         {
+            LostLife?.Invoke(this, source, amount);
             LifeTotal -= amount;
         }
 
@@ -79,10 +86,13 @@ namespace MtgEngine.Common.Players
 
         public void TakeDamage(int amount, Card source)
         {
-            if((source is PermanentCard) && (source as PermanentCard).HasInfect)
+            if ((source is PermanentCard) && (source as PermanentCard).HasInfect)
                 AddCounters(amount, CounterType.Poison);
             else
-                LoseLife(amount);
+            {
+                TookDamage?.Invoke(this, source, amount);
+                LoseLife(amount, source);
+            }
         }
 
         public bool IsDead => LifeTotal <= 0;

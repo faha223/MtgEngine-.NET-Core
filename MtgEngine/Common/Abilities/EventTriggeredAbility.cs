@@ -18,7 +18,7 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
-        public virtual void PlayerTookDamage(Game game, Player player, int damageReceived)
+        public virtual void PlayerTookDamage(Game game, Player player, Card source, int damageReceived)
         {
         }
 

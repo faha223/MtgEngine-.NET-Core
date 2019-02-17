@@ -15,8 +15,12 @@ namespace MtgEngine.Common.Cards
 
         public int DamageAccumulated { get; private set; } = 0;
 
+        public event TookDamageEventHandler TookDamage;
+
         public virtual void TakeDamage(int amount, Card source)
         {
+            TookDamage?.Invoke(this, source, amount);
+
             if((source is PermanentCard) && (source as PermanentCard).HasInfect)
                 AddCounters(source, amount, CounterType.Minus1Minus1);
             else
@@ -42,9 +46,11 @@ namespace MtgEngine.Common.Cards
                     return false;
                 if (HasDefender && !canAttackAsThoughItDidntHaveDefender())
                     return false;
-                if (HasHaste)
-                    return true;
-                return !(HasSummoningSickness || IsTapped);
+                if (IsTapped)
+                    return false;
+                if (HasSummoningSickness && !HasHaste)
+                    return false;
+                return true;
             }
         }
 

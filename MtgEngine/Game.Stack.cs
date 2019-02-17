@@ -196,8 +196,9 @@ namespace MtgEngine
         public void PutPermanentOnBattlefield(PermanentCard permanent)
         {
             permanent.Controller.Battlefield.Add(permanent);
-            if (permanent.IsACreature)
-                permanent.HasSummoningSickness = true;
+
+            // Whenever a permanent enters the battlefield, it gets summoning sickness. This only affects whether creatures can attack or activate abilities that require them to tap/untap
+            permanent.HasSummoningSickness = true;
 
             SubscribeToEvents(permanent);
 
@@ -214,6 +215,7 @@ namespace MtgEngine
         {
             card.CountersCreated += permanent_CountersCreated;
             card.CountersRemoved += permanent_CountersRemoved;
+            card.TookDamage += creature_tookDamage;
 
             foreach (EventTriggeredAbility ability in card.Abilities.Where(c => c is EventTriggeredAbility))
             {

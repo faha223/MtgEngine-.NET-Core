@@ -141,17 +141,17 @@ namespace MtgEngineTest
                 if (card.IsACreature)
                 {
                     if (counters != null)
-                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness}): {counters}");
+                        Console.WriteLine($"{(card.IsTapped ? "(tapped) ": string.Empty)}{card.Name} ({card.Power}/{card.Toughness}): {counters}");
                     else
-                        Console.WriteLine($"{card.Name} ({card.Power}/{card.Toughness})");
+                        Console.WriteLine($"{(card.IsTapped ? "(tapped) " : string.Empty)}{card.Name} ({card.Power}/{card.Toughness})");
 
                 }
                 else
                 {
                     if(counters != null)
-                        Console.WriteLine($"{card.Name}: {counters}");
+                        Console.WriteLine($"{(card.IsTapped ? "(tapped) " : string.Empty)}{card.Name}: {counters}");
                     else
-                        Console.WriteLine($"{card.Name}");
+                        Console.WriteLine($"{(card.IsTapped ? "(tapped) " : string.Empty)}{card.Name}");
                 }
             }
             Console.WriteLine();
@@ -310,7 +310,7 @@ namespace MtgEngineTest
         public override List<AttackerDeclaration> DeclareAttackers(List<Player> opponents)
         {
             var attackers = new List<AttackerDeclaration>(Battlefield.Count);
-            var creatures = Battlefield.Creatures.Where(c => !c.HasSummoningSickness).ToList();
+            var creatures = Battlefield.Creatures.Where(c => c.CanAttack).ToList();
             if (creatures.Count > 0)
             {
                 bool done = false;
