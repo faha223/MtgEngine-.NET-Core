@@ -81,14 +81,16 @@ namespace MtgEngine
             if (!_players.Contains(player))
             {
                 player.TookDamage += player_tookDamage;
+                player.CountersCreated += player_CountersCreated;
+                player.CountersRemoved += player_CountersRemoved;
+                
                 CurrentStepHasChanged += player.GameStepChanged;
                 CardHasChangedZones += player.CardHasChangedZones;
                 AbilityHasEnteredStack += player.AbilityHasEnteredStack;
-                player.CountersCreated += player_CountersCreated;
-                player.CountersRemoved += player_CountersRemoved;
                 PlayerWonTheGame += player.PlayerWonTheGame;
                 PlayerLostTheGame += player.PlayerLostTheGame;
                 GameEndedInDraw += player.GameEndedInDraw;
+                CountersAddedToPlayer += player.CountersAddedToPlayer;
                 _players.Add(player);
             }
         }

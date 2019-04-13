@@ -222,6 +222,10 @@ namespace MtgEngine.Common.Players
         {
         }
 
+        public virtual void CountersAddedToPlayer(Game game, Player player, CounterType counterType, int count)
+        {
+        }
+
         public virtual void PlayerLostTheGame(Game game, Player player, string reason)
         {
         }

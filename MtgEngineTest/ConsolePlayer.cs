@@ -528,6 +528,13 @@ namespace MtgEngineTest
             Console.WriteLine();
         }
 
+        public override void CountersAddedToPlayer(Game game, Player player, CounterType counterType, int count)
+        {
+            Console.WriteLine($"{player.Name} got {count} {counterType} counter{(count == 1 ? string.Empty : "s")}");
+            int accumulated = player.Counters.ToList().Count(c => c == counterType);
+            Console.WriteLine($"{player.Name} now has {accumulated} {counterType} counter{(accumulated == 1 ? string.Empty : "s")}");
+        }
+
         public override void AbilityHasEnteredStack(Game game, Ability ability)
         {
             Console.WriteLine($"\"{ability.Text}\" is now on the stack.");
