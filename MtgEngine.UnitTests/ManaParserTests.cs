@@ -37,6 +37,18 @@ namespace MtgEngine.UnitTests
         }
 
         [TestMethod]
+        public void Test2BB()
+        {
+            testManaParser("{2}{B}{B}", new[] { new ManaAmount(2, ManaColor.Generic), new ManaAmount(2, ManaColor.Black) });
+        }
+
+        [TestMethod]
+        public void Test2BG()
+        {
+            testManaParser("{2}{B}{G}", new[] { new ManaAmount(2, ManaColor.Generic), new ManaAmount(1, ManaColor.Black), new ManaAmount(1, ManaColor.Green) });
+        }
+
+        [TestMethod]
         public void TestWUBRG()
         {
             testManaParser("{W}{U}{B}{R}{G}", new[]
@@ -59,6 +71,12 @@ namespace MtgEngine.UnitTests
         public void Test2W()
         {
             testManaParser("{2/W}", new[] { new ManaAmount(1, ManaColor.TwoOrWhite) });
+        }
+
+        [TestMethod]
+        public void TestRW()
+        {
+            testManaParser("{R/W}", new[] { new ManaAmount(1, ManaColor.RedWhite) });
         }
 
         [TestMethod]

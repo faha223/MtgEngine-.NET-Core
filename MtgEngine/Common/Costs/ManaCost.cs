@@ -33,27 +33,6 @@ namespace MtgEngine.Common.Costs
 
         public static Cost Parse(IResolvable source, string manaCost)
         {
-            if (manaCost == "{1}{G}")
-                return new ManaCost(source, new ManaAmount(1, ManaColor.Generic), new ManaAmount(1, ManaColor.Green));
-            else if (manaCost == "{X}{X}{X}")
-                return new ManaCost(source, new ManaAmount(3, ManaColor.GenericX));
-            else if (manaCost == "{U}{U}")
-                return new ManaCost(source, new ManaAmount(2, ManaColor.Blue));
-            else if (manaCost == "{W}{U}{B}{R}{G}")
-                return new ManaCost(source, new ManaAmount(1, ManaColor.White), new ManaAmount(1, ManaColor.Blue), new ManaAmount(1, ManaColor.Black), new ManaAmount(1, ManaColor.Red), new ManaAmount(1, ManaColor.Green));
-            else if (manaCost == "{R/W}")
-                return new ManaCost(source, new ManaAmount(1, ManaColor.RedWhite));
-            else if (manaCost == "{3}")
-                return new ManaCost(source, new ManaAmount(3, ManaColor.Generic));
-            else if (manaCost == "{2}")
-                return new ManaCost(source, new ManaAmount(2, ManaColor.Generic));
-            else if (manaCost == "{1}{W}")
-                return new ManaCost(source, new ManaAmount(1, ManaColor.Generic), new ManaAmount(1, ManaColor.White));
-            else if (manaCost == "{3}{G}")
-                return new ManaCost(source, new ManaAmount(3, ManaColor.Generic), new ManaAmount(1, ManaColor.Green));
-            else if (manaCost == "{W}")
-                return new ManaCost(source, new ManaAmount(1, ManaColor.White));
-
             var manaAmounts = ManaParser.Parse(manaCost);
             if (manaAmounts == null)
                 return new NoCost(source);
