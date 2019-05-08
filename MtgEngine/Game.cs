@@ -257,7 +257,7 @@ namespace MtgEngine
             CheckStateBasedActions();
 
             // Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
-            ApNapLoop(true);
+            ApNapLoop(false);
 
             DrainManaPools();
         }
@@ -416,9 +416,9 @@ namespace MtgEngine
                 var sacrificedLegends = new List<PermanentCard>();
 
                 // While the player has duplicate legends
-                while (player.Battlefield.Except(sacrificedLegends).Any(card => card.IsLegendary && player.Battlefield.Count(c => c.Name == card.Name && c.IsLegendary) > 1))
+                while (player.Battlefield.Except(sacrificedLegends).Any(card => card.IsLegendary && player.Battlefield.Except(sacrificedLegends).Count(c => c.Name == card.Name && c.IsLegendary) > 1))
                 {
-                    var playerControlledLegends = player.Battlefield.Except(sacrificedLegends).Where(card => card.IsLegendary && player.Battlefield.Count(c => c.Name == card.Name && c.IsLegendary) > 1).ToList();
+                    var playerControlledLegends = player.Battlefield.Except(sacrificedLegends).Where(card => card.IsLegendary && player.Battlefield.Except(sacrificedLegends).Count(c => c.Name == card.Name && c.IsLegendary) > 1).ToList();
                     var selected = player.MakeChoice("You control duplicate legends. Choose one to sacrifice", 1, playerControlledLegends).First() as PermanentCard;
                     sacrificedLegends.Add(selected);
                 }
@@ -426,7 +426,9 @@ namespace MtgEngine
                 // If the player had to sacrifice permanents, then sacrifice them
                 if (sacrificedLegends.Count > 0)
                 {
-                    sacrificedLegends = player.Sort("Choose the order that you wish these permanents to enter the graveyard", sacrificedLegends);
+                    // If the player needed to sacrifice more than 1 permanent, then they need to sort them because they enter the graveyard one at a time
+                    if(sacrificedLegends.Count > 1)
+                        sacrificedLegends = player.Sort("Choose the order that you wish these permanents to enter the graveyard", sacrificedLegends);
                     foreach (var permanent in sacrificedLegends)
                     {
                         MoveFromBattlefieldToGraveyard(permanent);

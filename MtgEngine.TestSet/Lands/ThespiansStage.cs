@@ -78,11 +78,46 @@ namespace MtgEngine.TestSet.Lands
         {
             get
             {
+                if (copiedCardAbilities == null)
+                    return base.Abilities;
+
                 var list = new List<Ability>();
-                list.AddRange(base.Abilities);
+                list.AddRange(base.Abilities.Where(c => c is CopyAbility));
                 if (copiedCardAbilities != null)
                     list.AddRange(copiedCardAbilities);
                 return list;
+            }
+        }
+
+        private bool? copiedCardIsLegendary = null;
+        public override bool IsLegendary {
+            get
+            {
+                if (copiedCardIsLegendary.HasValue)
+                    return copiedCardIsLegendary.Value;
+                return base.IsLegendary;
+            }
+        }
+
+        private CardType[] copiedCardTypes = null;
+        public override CardType[] Types
+        {
+            get
+            {
+                if (copiedCardTypes != null)
+                    return copiedCardTypes;
+                return base.Types;
+            }
+        }
+
+        private string[] copiedCardSubtypes = null;
+        public override string[] Subtypes
+        {
+            get
+            {
+                if (copiedCardSubtypes != null)
+                    return copiedCardSubtypes;
+                return base.Subtypes;
             }
         }
 
@@ -98,6 +133,9 @@ namespace MtgEngine.TestSet.Lands
             copiedCardText = land.Text;
             copiedCardFlavorText = land.FlavorText;
             copiedCardCost = land.Cost.Copy(this);
+            copiedCardTypes = land.Types;
+            copiedCardSubtypes = land.Subtypes;
+            copiedCardIsLegendary = land.IsLegendary;
             copiedCardAbilities = land.Abilities.Select(a => a.Copy(this)).ToList();
         }
 

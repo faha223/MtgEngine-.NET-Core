@@ -484,7 +484,7 @@ namespace MtgEngineTest
                 Console.Write($"In what order would you like {attacker.Name} to deal damage to blockers?");
                 var response = ParseChoice(Console.ReadLine(), blockers.Count(), blockers.Count(), 1, blockers.Count(), true);
                 if (response != null && response.Count == blockers.Count())
-                    return blockers.ToList().OrderByIndexList(response);
+                    return blockers.ToList().OrderByIndexList(response.Select(c => c - 1));
                 Console.WriteLine();
             }
         }
@@ -638,7 +638,7 @@ namespace MtgEngineTest
                 var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
                 if(selection != null)
                 {
-                    return options.OrderByIndexList(selection);
+                    return options.OrderByIndexList(selection.Select(c => c - 1));
                 }
             } while (true);
         }
@@ -651,8 +651,22 @@ namespace MtgEngineTest
                 int i = 0;
                 foreach (var card in options)
                 {
-                    if (card.IsACreature)
-                        Console.WriteLine($"{++i}: {card.Name} ({(card as PermanentCard).Power}/{(card as PermanentCard).Power})");
+                    if (card is PermanentCard)
+                    {
+                        var permanent = card as PermanentCard;
+                        string counters = string.Empty;
+                        if(permanent.Counters.Count > 0)
+                        {
+                            foreach(var counterType in permanent.Counters.Distinct())
+                            {
+                                counters += $" ({counterType}: {permanent.Counters.Count(c => c == counterType)})";
+                            }
+                        }
+                        if (permanent.IsACreature)
+                            Console.WriteLine($"{++i}: {permanent.Name} ({permanent.Power}/{permanent.Power}){counters}");
+                        else
+                            Console.WriteLine($"{++i}: {permanent.Name}{counters}");
+                    }
                     else
                         Console.WriteLine($"{++i}: {card.Name}");
                 }
@@ -662,7 +676,7 @@ namespace MtgEngineTest
                 var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
                 if (selection != null)
                 {
-                    return options.OrderByIndexList(selection);
+                    return options.OrderByIndexList(selection.Select(c => c - 1));
                 }
             } while (true);
         }
@@ -684,7 +698,7 @@ namespace MtgEngineTest
                 var selection = ParseChoice(Console.ReadLine(), options.Count, options.Count, 1, i, true);
                 if (selection != null)
                 {
-                    return options.OrderByIndexList(selection);
+                    return options.OrderByIndexList(selection.Select(c => c - 1));
                 }
             } while (true);
         }
@@ -706,7 +720,7 @@ namespace MtgEngineTest
                 var selection = ParseChoice(Console.ReadLine(), options.Count, options.Count, 1, i, true);
                 if (selection != null)
                 {
-                    return options.OrderByIndexList(selection);
+                    return options.OrderByIndexList(selection.Select(c => c - 1));
                 }
             } while (true);
         }
