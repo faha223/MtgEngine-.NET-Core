@@ -67,11 +67,9 @@ namespace MtgEngine
 
         public void DestroyPermanent(PermanentCard card)
         {
-            if (card.Controller.Battlefield.Contains(card))
+            if (card.Controller.Battlefield.Contains(card) && !card.HasIndestructible)
             {
-                RemovePermanentFromBattlefield(card);
-                card.Owner.Graveyard.Add(card);
-                CardHasChangedZones?.Invoke(this, card, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
+                MoveFromBattlefieldToGraveyard(card);
             }
         }
     }

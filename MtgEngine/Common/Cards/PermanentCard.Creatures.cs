@@ -17,6 +17,7 @@ namespace MtgEngine.Common.Cards
             {
                 return BasePower
                     + Counters.Count(c => c == CounterType.Plus1Plus1)
+                    + (2 * Counters.Count(c => c == CounterType.Plus2Plus0))
                     - Counters.Count(c => c == CounterType.Minus1Minus1);
             }
         }
@@ -33,6 +34,7 @@ namespace MtgEngine.Common.Cards
             {
                 return BaseToughness
                     + Counters.Count(c => c == CounterType.Plus1Plus1)
+                    + (2 * Counters.Count(c => c == CounterType.Plus0Plus2))
                     - Counters.Count(c => c == CounterType.Minus1Minus1);
             }
         }

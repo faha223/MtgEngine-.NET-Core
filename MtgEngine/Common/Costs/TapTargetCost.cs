@@ -42,6 +42,11 @@ namespace MtgEngine.Common.Costs
             return false;
         }
 
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new TapTargetCost(newSource, _targetSelectionMessage, _targetSelector, _text);
+        }
+
         public override string ToString()
         {
             return _text;

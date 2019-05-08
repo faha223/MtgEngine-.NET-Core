@@ -13,6 +13,8 @@ namespace MtgEngine.Common.Players
 {
     public abstract class Player : ITarget, IDamageable
     {
+        public Game Game;
+
         public delegate void PlayerLostLifeEventHandler(Player player, IResolvable source, int amount);
 
         public event PlayerLostLifeEventHandler LostLife;
@@ -28,6 +30,8 @@ namespace MtgEngine.Common.Players
         public Zone Hand { get; } = new Zone();
 
         public List<Card> Library { get; } = new List<Card>();
+
+        public bool PlayerAttemptedToDrawIntoEmptyLibrary { get; protected set; } = false;
 
         private List<CounterType> counters { get; } = new List<CounterType>();
         public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
@@ -149,7 +153,13 @@ namespace MtgEngine.Common.Players
         public virtual void Draw(int howMany)
         {
             // TODO: Throw PlayerLostGame exception if the player is forced to draw more cards than are in their library.
+
             var cardsDrawn = Library.Take(howMany);
+
+            // If the library didn't have sufficient cards, mark the player. They will lose when state based actions are checked.
+            if (cardsDrawn.Count() < howMany)
+                PlayerAttemptedToDrawIntoEmptyLibrary = true;
+
             Library.RemoveRange(0, howMany);
             Hand.AddRange(cardsDrawn);
         }
@@ -194,13 +204,12 @@ namespace MtgEngine.Common.Players
             Graveyard.Add(card);
         }
 
-        public virtual bool Sacrifice(Card card)
+        public virtual bool Sacrifice(PermanentCard card)
         {
             if (!Battlefield.Contains(card))
                 return false;
 
-            Battlefield.Remove(card);
-            card.Owner.Graveyard.Add(card);
+            Game.MoveFromBattlefieldToGraveyard(card);
             return true;
         }
 

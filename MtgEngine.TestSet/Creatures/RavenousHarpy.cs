@@ -21,6 +21,11 @@ namespace MtgEngine.TestSet.Creatures
             {
             }
 
+            public override Ability Copy(PermanentCard newSource)
+            {
+                return new RavenousHarpyAbility(newSource);
+            }
+
             public override void OnResolve(Game game)
             {
                 Source.AddCounters(this, 1, Common.Enums.CounterType.Plus1Plus1);

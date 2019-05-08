@@ -10,6 +10,12 @@ namespace MtgEngine.Common.Enums
         [Counter("+1/+1")]
         Plus1Plus1,
 
+        [Counter("+2/+0")]
+        Plus2Plus0,
+
+        [Counter("+0/+2")]
+        Plus0Plus2,
+
         [Counter("-1/-1")]
         Minus1Minus1,
 

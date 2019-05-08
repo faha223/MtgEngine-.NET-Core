@@ -80,6 +80,7 @@ namespace MtgEngine
         {
             if (!_players.Contains(player))
             {
+                player.Game = this;
                 player.TookDamage += player_tookDamage;
                 player.CountersCreated += player_CountersCreated;
                 player.CountersRemoved += player_CountersRemoved;
@@ -253,6 +254,11 @@ namespace MtgEngine
             ActivePlayer.Draw(1);
             PlayerDrewCards?.Invoke(this, ActivePlayer, 1);
 
+            CheckStateBasedActions();
+
+            // Cycle Priority starting with the Active Player, give only the Active Player the ability to play Sorcery-speed spells
+            ApNapLoop(true);
+
             DrainManaPools();
         }
 
@@ -340,19 +346,13 @@ namespace MtgEngine
                 var deadCreatures = player.Battlefield.Creatures.Where(c => c.IsDead).ToList();
                 foreach(var creature in deadCreatures)
                 {
-                    RemovePermanentFromBattlefield(creature);
-                    creature.ClearCounters();
-                    creature.Owner.Graveyard.Add(creature);
-                    CardHasChangedZones?.Invoke(this, creature, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
+                    MoveFromBattlefieldToGraveyard(creature);
                 }
 
                 var deadPlaneswalkers = player.Battlefield.Planeswalkers.Where(c => c.IsDead).ToList();
                 foreach(var planeswalker in deadPlaneswalkers)
                 {
-                    RemovePermanentFromBattlefield(planeswalker);
-                    planeswalker.ClearCounters();
-                    planeswalker.Owner.Graveyard.Add(planeswalker);
-                    CardHasChangedZones?.Invoke(this, planeswalker, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
+                    MoveFromBattlefieldToGraveyard(planeswalker);
                 }
             }
 
@@ -366,9 +366,17 @@ namespace MtgEngine
                     _deadPlayers.Add(player, "Life Total has Reached Zero");
                 }
             }
-            
+
+            // Any players that have attempted to draw from an empty library lose the game
+            foreach (var player in _players)
+            {
+                if (player.PlayerAttemptedToDrawIntoEmptyLibrary)
+                    // Player has Died
+                    _deadPlayers.Add(player, "Player Attempted to Draw into an Empty Library");
+            }
+
             // Any players with 10 or more poison counters lose the game
-            foreach(var player in _players)
+            foreach (var player in _players)
             {
                 if (player.Counters.Count(c => c == CounterType.Poison) >= 10)
                     _deadPlayers.Add(player, "Player has accumulated 10 poison counters");
@@ -400,6 +408,31 @@ namespace MtgEngine
             // If the active player died, go to the start of the next player's turn
             if (_deadPlayers.ContainsKey(ActivePlayer))
                 throw new ActivePlayerLostTheGameException(_deadPlayers[ActivePlayer]);
+
+            // Legend Rule (players cannot control more than 1 copy of a legendary permanent with the same name
+            foreach (var player in _players)
+            {
+                // Create a list to hold all the legends that will be removed
+                var sacrificedLegends = new List<PermanentCard>();
+
+                // While the player has duplicate legends
+                while (player.Battlefield.Except(sacrificedLegends).Any(card => card.IsLegendary && player.Battlefield.Count(c => c.Name == card.Name && c.IsLegendary) > 1))
+                {
+                    var playerControlledLegends = player.Battlefield.Except(sacrificedLegends).Where(card => card.IsLegendary && player.Battlefield.Count(c => c.Name == card.Name && c.IsLegendary) > 1).ToList();
+                    var selected = player.MakeChoice("You control duplicate legends. Choose one to sacrifice", 1, playerControlledLegends).First() as PermanentCard;
+                    sacrificedLegends.Add(selected);
+                }
+
+                // If the player had to sacrifice permanents, then sacrifice them
+                if (sacrificedLegends.Count > 0)
+                {
+                    sacrificedLegends = player.Sort("Choose the order that you wish these permanents to enter the graveyard", sacrificedLegends);
+                    foreach (var permanent in sacrificedLegends)
+                    {
+                        MoveFromBattlefieldToGraveyard(permanent);
+                    }
+                }
+            }
 
             // Check State Triggered Abilities
             CheckForTriggeredAbilities();
@@ -461,6 +494,18 @@ namespace MtgEngine
         public void AbilityTriggered(Ability ability)
         {
             AbilitiesTriggered.Add(ability);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="permanent"></param>
+        public void MoveFromBattlefieldToGraveyard(PermanentCard permanent)
+        {
+            RemovePermanentFromBattlefield(permanent);
+            permanent.ClearCounters();
+            permanent.Owner.Graveyard.Add(permanent);
+            CardHasChangedZones?.Invoke(this, permanent, Common.Enums.Zone.Battlefield, Common.Enums.Zone.Graveyard);
         }
 
         #endregion Utility Methods

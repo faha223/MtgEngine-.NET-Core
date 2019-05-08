@@ -45,5 +45,10 @@ namespace MtgEngine.TestSet.Creatures
             game.DestroyPermanent(otherPermanent);
             Source.Controller.GainLife(otherPermanent.Toughness);
         }
+
+        public override Ability Copy(PermanentCard newSource)
+        {
+            return new EngulfingSlagwurmAbility(newSource);
+        }
     }
 }

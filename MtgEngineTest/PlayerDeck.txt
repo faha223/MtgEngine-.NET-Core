@@ -1,2 +1,3 @@
-﻿30x Forest
+﻿20x Dark Depths
+20x Thespian's Stage
 20x Plague Myr

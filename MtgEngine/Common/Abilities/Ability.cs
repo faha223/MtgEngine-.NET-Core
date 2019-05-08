@@ -1,5 +1,4 @@
 ﻿using MtgEngine.Common.Cards;
-using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Abilities
 {
@@ -16,5 +15,7 @@ namespace MtgEngine.Common.Abilities
         }
 
         public abstract void OnResolve(Game game);
+
+        public abstract Ability Copy(PermanentCard newSource);
     }
 }

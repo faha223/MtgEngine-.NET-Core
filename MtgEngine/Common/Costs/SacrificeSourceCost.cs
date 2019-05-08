@@ -1,5 +1,4 @@
-﻿using MtgEngine.Common.Abilities;
-using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Cards;
 
 namespace MtgEngine.Common.Costs
 {
@@ -19,11 +18,16 @@ namespace MtgEngine.Common.Costs
         {
             if (CanPay())
             {
-                var card = _source as Card;
+                var card = _source as PermanentCard;
                 card.Controller.Sacrifice(card);
                 return true;
             }
             return false;
+        }
+
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new SacrificeSourceCost(newSource);
         }
 
         public override string ToString()

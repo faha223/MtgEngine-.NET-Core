@@ -24,12 +24,17 @@ namespace MtgEngine.Common.Costs
         public override bool Pay()
         {
             var card = _source as Card;
-            var target = card.Controller.SelectTarget("Choose a Target to Sacrifice", _targetSelector);
+            var target = card.Controller.SelectTarget("Choose a Target to Sacrifice", _targetSelector) as PermanentCard;
             if (target == null)
                 return false;
 
             card.Controller.Sacrifice(target);
             return true;
+        }
+
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new SacrificeTargetCost(newSource, _targetSelector, text);
         }
 
         public override string ToString()

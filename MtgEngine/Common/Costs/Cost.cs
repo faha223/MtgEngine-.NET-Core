@@ -25,6 +25,8 @@ namespace MtgEngine.Common.Costs
 
         public abstract bool CanPay();
 
+        public abstract Cost Copy(IResolvable newSource);
+
         protected Cost(IResolvable source)
         {
             _source = source;

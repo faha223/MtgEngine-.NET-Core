@@ -32,6 +32,11 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
             {
                 Source.RemoveCounters(this, 1, CounterType.Ice);
             }
+
+            public override Ability Copy(PermanentCard newSource)
+            {
+                return new DarkDepthsAbility(newSource);
+            }
         }
 
         public class MaritLageAbility : StateTriggeredAbility
@@ -57,6 +62,11 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
                 {
                     game.PutPermanentOnBattlefield(new MaritLage(controller));
                 }
+            }
+
+            public override Ability Copy(PermanentCard newSource)
+            {
+                return new MaritLageAbility(newSource);
             }
         }
 

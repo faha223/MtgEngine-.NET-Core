@@ -18,5 +18,10 @@ namespace MtgEngine.Common.Abilities
         {
             Source.Controller.ManaPool.Add(ManaGenerated);
         }
+
+        public override Ability Copy(PermanentCard newSource)
+        {
+            return new ManaAbility(newSource, Cost, ManaGenerated, Text);
+        }
     }
 }

@@ -34,6 +34,11 @@ namespace MtgEngine.Common.Costs
             return false;
         }
 
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new PayCountersCost(newSource, type, count);
+        }
+
         public override string ToString()
         {
             return $"{count} {CounterAttribute.GetCounterAttribute(type).Name}";

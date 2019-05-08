@@ -300,6 +300,8 @@ namespace MtgEngineTest
                     else if (target is Card)
                         Console.WriteLine($"{++i}: {(target as Card).Name}");
                 }
+
+                selection = ParseChoice(Console.ReadLine(), 1, i);
             }
 
             return possibleTargets[selection.Value - 1];

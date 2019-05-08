@@ -166,6 +166,11 @@ namespace MtgEngine
             else
             {
                 var activatedAbility = action.Ability as ActivatedAbility;
+                if(activatedAbility is ITargeting)
+                {
+                    // This ability needs a target, get one now
+                    (activatedAbility as ITargeting).SelectTargets(this);
+                }
                 if (activatedAbility.Cost.CanPay())
                 {
                     if (activatedAbility.Cost.Pay())

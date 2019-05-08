@@ -30,6 +30,11 @@ namespace MtgEngine.Common.Costs
             return true;
         }
 
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new TapCost(newSource as PermanentCard);
+        }
+
         public override string ToString()
         {
             return "{T}";

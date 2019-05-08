@@ -117,6 +117,11 @@ namespace MtgEngine.Common.Costs
             return sb.ToString();
         }
 
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new ManaCost(newSource, _manaAmounts);
+        }
+
         public override string ToString()
         {
             return stringify(_manaAmounts);

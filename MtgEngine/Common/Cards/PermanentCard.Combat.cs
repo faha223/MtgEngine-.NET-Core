@@ -18,7 +18,7 @@ namespace MtgEngine.Common.Cards
         public event TookDamageEventHandler TookDamage;
 
         public virtual void TakeDamage(int amount, Card source)
-        {
+        { 
             TookDamage?.Invoke(this, source, amount);
 
             if((source is PermanentCard) && (source as PermanentCard).HasInfect)
@@ -27,7 +27,7 @@ namespace MtgEngine.Common.Cards
                 DamageAccumulated += amount;
         }
 
-        public virtual bool IsDead => DamageAccumulated >= Toughness;
+        public virtual bool IsDead => Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible);
 
         public void ResetDamage()
         {

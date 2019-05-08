@@ -30,6 +30,11 @@ namespace MtgEngine.Common.Costs
         {
             innerCosts = costs;
         }
+        
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new AggregateCost(newSource, innerCosts.Select(c => c.Copy(newSource)).ToArray());
+        }
 
         public override string ToString()
         {

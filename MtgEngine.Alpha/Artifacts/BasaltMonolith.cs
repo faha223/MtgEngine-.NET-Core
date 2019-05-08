@@ -18,7 +18,7 @@ namespace MtgEngine.Alpha.Artifacts
             Abilities.Add(new ManaAbility(this, new TapCost(this), new ManaAmount(3, ManaColor.Colorless), "{T}: Add {C}{C}{C}"));
 
             // {3}: Untap Basalt Monolith
-            Abilities.Add(new BasaltMonolithUntapAbility(this, ManaCost.Parse(this, "{3}")));
+            Abilities.Add(new BasaltMonolithUntapAbility(this));
         }
 
         // Basalt Monolith doesn't untap during your untap step.
@@ -26,9 +26,14 @@ namespace MtgEngine.Alpha.Artifacts
 
         public class BasaltMonolithUntapAbility : ActivatedAbility
         {
-            public BasaltMonolithUntapAbility(PermanentCard source, Cost cost) : base(source, null, "{3}: Untap Basalt Monolith")
+            public BasaltMonolithUntapAbility(PermanentCard source) : base(source, null, "{3}: Untap Basalt Monolith")
             {
                 Cost = ManaCost.Parse(this, "{3}");
+            }
+
+            public override Ability Copy(PermanentCard newSource)
+            {
+                return new BasaltMonolithUntapAbility(newSource);
             }
 
             public override void OnResolve(Game game)

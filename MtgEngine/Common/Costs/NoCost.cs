@@ -16,6 +16,11 @@
             return true;
         }
 
+        public override Cost Copy(IResolvable newSource)
+        {
+            return new NoCost(newSource);
+        }
+
         public override string ToString()
         {
             return "{0}";

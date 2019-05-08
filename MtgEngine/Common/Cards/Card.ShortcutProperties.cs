@@ -8,15 +8,15 @@ namespace MtgEngine.Common.Cards
     {
         public string CardId => MtgCardAttribute.GetAttribute(GetType())?.CardId;
 
-        public string Name => MtgCardAttribute.GetAttribute(GetType())?.Name;
+        public virtual string Name => MtgCardAttribute.GetAttribute(GetType())?.Name;
 
-        public string Set => MtgCardAttribute.GetAttribute(GetType())?.SetName;
+        public virtual string Set => MtgCardAttribute.GetAttribute(GetType())?.SetName;
 
-        public string ImageUri => MtgCardAttribute.GetAttribute(GetType())?.ImageUri;
+        public virtual string ImageUri => MtgCardAttribute.GetAttribute(GetType())?.ImageUri;
 
-        public string Text => MtgCardAttribute.GetAttribute(GetType())?.Text;
+        public virtual string Text => MtgCardAttribute.GetAttribute(GetType())?.Text;
 
-        public string FlavorText => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
+        public virtual string FlavorText => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
 
         public bool IsACreature => Types.Contains(CardType.Creature);
 
