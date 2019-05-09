@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MtgEngine.Alpha\MtgEngine.Alpha.csproj" />
     <ProjectReference Include="..\MtgEngine\MtgEngine.csproj" />
   </ItemGroup>
 
