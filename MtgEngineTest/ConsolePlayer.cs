@@ -307,6 +307,31 @@ namespace MtgEngineTest
             return possibleTargets[selection.Value - 1];
         }
 
+        public override Player ChoosePlayer(string message, IEnumerable<Player> playerOptions)
+        {
+            do
+            {
+                Console.WriteLine(message);
+                int i = 0;
+                foreach (var player in playerOptions)
+                {
+                    Dictionary<string, int> stats = new Dictionary<string, int>();
+                    stats.Add("Life", player.LifeTotal);
+                    stats.Add("Cards in Hand", player.Hand.Count);
+                    foreach (var counterType in player.Counters.Distinct())
+                    {
+                        stats.Add(counterType.ToString(), player.Counters.Count(c => c == counterType));
+                    }
+                    Console.WriteLine($"{++i}: {player.Name} ({string.Join(", ", stats.Select(c => $"{c.Key}: {c.Value}"))}");
+                }
+                Console.Write("Choose one: ");
+                int? selection = ParseChoice(Console.ReadLine(), 1, i);
+                if (selection.HasValue)
+                    return playerOptions.ToList()[selection.Value-1];
+                Console.WriteLine();
+            } while (true);
+        }
+
         #region Combat
 
         public override List<AttackerDeclaration> DeclareAttackers(List<Player> opponents)

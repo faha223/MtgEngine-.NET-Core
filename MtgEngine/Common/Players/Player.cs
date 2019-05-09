@@ -183,6 +183,8 @@ namespace MtgEngine.Common.Players
 
         public abstract ManaColor ChooseColor();
 
+        public abstract Player ChoosePlayer(string message, IEnumerable<Player> playerOptions);
+
         public virtual void DiscardToHandSize()
         {
             while (Hand.Count > MaxHandSize)

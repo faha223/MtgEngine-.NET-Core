@@ -2,6 +2,7 @@
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
+using MtgEngine.Common.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,11 @@ namespace MtgEngine.Common.Players.AIPlayers
         public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets)
         {
             return possibleTargets.Last();
+        }
+
+        public override Player ChoosePlayer(string message, IEnumerable<Player> playerOptions)
+        {
+            return playerOptions.ToList().Random();
         }
 
         public override ManaColor? PayManaCost(string cost)

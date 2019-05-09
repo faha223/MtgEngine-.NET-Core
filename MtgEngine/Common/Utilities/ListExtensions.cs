@@ -32,6 +32,13 @@ namespace MtgEngine.Common.Utilities
             return temp;
         }
 
+        public static T Random<T>(this List<T> self)
+        {
+            var rand = new Random();
+
+            return self[Math.Abs(rand.Next()) % self.Count];
+        }
+
         public static void ForEach<T>(this IEnumerable<T> self, Action<T> action)
         {
             foreach (var x in self)
