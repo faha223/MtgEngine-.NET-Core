@@ -8,7 +8,17 @@ namespace MtgEngine.Common.Cards
 {
     public abstract partial class PermanentCard : Card, IDamageable
     {
-        public virtual List<Ability> Abilities { get; } = new List<Ability>();
+        protected List<Ability> _copiedCardAbilities;
+        protected List<Ability> _abilities { get; } = new List<Ability>();
+        public virtual List<Ability> Abilities
+        {
+            get
+            {
+                if (_copiedCardAbilities == null)
+                    return _copiedCardAbilities;
+                return _abilities;
+            }
+        }
 
         public PermanentCard(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) :
             base(owner, usesStack, cost, types, subtypes, false, isLegendary, isSnow)

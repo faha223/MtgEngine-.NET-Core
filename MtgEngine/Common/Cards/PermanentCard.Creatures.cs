@@ -6,9 +6,15 @@ namespace MtgEngine.Common.Cards
     public abstract partial class PermanentCard : Card, IDamageable
     {
         protected int _basePower { get; }
+        protected int? _copiedCardBasePower { get; set; }
         public virtual int BasePower
         {
-            get { return _basePower; }
+            get
+            {
+                if (_copiedCardBasePower.HasValue)
+                    return _copiedCardBasePower.Value;
+                return _basePower;
+            }
         }
 
         public int Power
@@ -23,9 +29,15 @@ namespace MtgEngine.Common.Cards
         }
 
         protected int _baseToughness { get; }
+        protected int? _copiedCardBaseToughness { get; set; }
         public virtual int BaseToughness
         {
-            get { return _baseToughness; }
+            get
+            {
+                if (_copiedCardBaseToughness.HasValue)
+                    return _copiedCardBaseToughness.Value;
+                return _baseToughness;
+            }
         }
 
         public int Toughness

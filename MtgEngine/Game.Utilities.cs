@@ -127,6 +127,17 @@ namespace MtgEngine
             _players.ForEach(c => c.ManaPool.Clear());
         }
 
+        public Common.Zone Battlefield
+        {
+            get
+            {
+                var bfield = new Common.Zone();
+                foreach (var player in _players)
+                    bfield.AddRange(player.Battlefield);
+                return bfield;
+            }
+        }
+
         #region Combat Utilities
 
         /// <summary>

@@ -12,22 +12,6 @@ namespace MtgEngine.TestSet.Lands
     [MtgCard("Thespian's Stage", "TestSet", "", "", Text = "{T}: Add {C}\n{2},{T}: Thespian's Stage becomes a copy of target land, except it has this ability.", FlavorText = "Amid rumors of war, the third act of The Absolution of the Guildpact was quickly rewritten as a tragedy.")]
     public class ThespiansStage : LandCard
     {
-        public override int BasePower
-        {
-            get
-            {
-                return base.BasePower;
-            }
-        }
-
-        public override int BaseToughness
-        {
-            get
-            {
-                return base.BaseToughness;
-            }
-        }
-
         private string copiedCardName = null;
         public override string Name
         {
@@ -73,18 +57,17 @@ namespace MtgEngine.TestSet.Lands
             }
         }
 
-        private List<Ability> copiedCardAbilities = null;
         public override List<Ability> Abilities
         {
             get
             {
-                if (copiedCardAbilities == null)
+                if (_copiedCardAbilities == null)
                     return base.Abilities;
 
                 var list = new List<Ability>();
                 list.AddRange(base.Abilities.Where(c => c is CopyAbility));
-                if (copiedCardAbilities != null)
-                    list.AddRange(copiedCardAbilities);
+                if (_copiedCardAbilities != null)
+                    list.AddRange(_copiedCardAbilities);
                 return list;
             }
         }
@@ -127,16 +110,18 @@ namespace MtgEngine.TestSet.Lands
             base.Abilities.Add(new CopyAbility(this));
         }
 
-        public void Copy(PermanentCard land)
+        public void Copy(PermanentCard other)
         {
-            copiedCardName = land.Name;
-            copiedCardText = land.Text;
-            copiedCardFlavorText = land.FlavorText;
-            copiedCardCost = land.Cost.Copy(this);
-            copiedCardTypes = land.Types;
-            copiedCardSubtypes = land.Subtypes;
-            copiedCardIsLegendary = land.IsLegendary;
-            copiedCardAbilities = land.Abilities.Select(a => a.Copy(this)).ToList();
+            copiedCardName = other.Name;
+            copiedCardText = other.Text;
+            copiedCardFlavorText = other.FlavorText;
+            copiedCardCost = other.Cost.Copy(this);
+            copiedCardTypes = other.Types;
+            copiedCardSubtypes = other.Subtypes;
+            copiedCardIsLegendary = other.IsLegendary;
+            _copiedCardAbilities = other.Abilities.Select(a => a.Copy(this)).ToList();
+            _copiedCardBasePower = other.BasePower;
+            _copiedCardBaseToughness = other.BaseToughness;
         }
 
         class CopyAbility : ActivatedAbility, ITargeting

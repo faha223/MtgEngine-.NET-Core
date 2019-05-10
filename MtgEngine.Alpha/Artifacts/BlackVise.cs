@@ -6,7 +6,7 @@ using MtgEngine.Common.Players;
 using System;
 using System.Linq;
 
-namespace MtgEngine.Alpha.Enchantments
+namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Black Vise", "LEA", "", "", Text = "As Black Vise enters the battlefield, choose an opponent.\n\nAt the beginning of the chosen player’s upkeep, Black Vise deals X damage to that player, where X is the number of cards in their hand minus 4.")]
     public class BlackVise : PermanentCard

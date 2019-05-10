@@ -4,7 +4,7 @@ using MtgEngine.Common.Enums;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : ITarget, IResolvable
+    public partial class Card : ITarget, IResolvable
     {
         public string CardId => MtgCardAttribute.GetAttribute(GetType())?.CardId;
 
