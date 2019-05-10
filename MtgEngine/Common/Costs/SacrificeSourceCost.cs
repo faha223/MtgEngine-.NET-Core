@@ -18,7 +18,7 @@ namespace MtgEngine.Common.Costs
         {
             if (CanPay())
             {
-                var card = _source as PermanentCard;
+                var card = _source as Card;
                 card.Controller.Sacrifice(card);
                 return true;
             }

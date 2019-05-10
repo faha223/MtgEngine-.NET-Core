@@ -8,9 +8,9 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Basalt Monolith", "LEA", "", "")]
-    public class BasaltMonolith : ArtifactCard
+    public class BasaltMonolith : Card
     {
-        public BasaltMonolith(Player owner) : base(owner, true, null, new[] { CardType.Artifact }, null, false, false)
+        public BasaltMonolith(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
         {
             Cost = ManaCost.Parse(this, "{3}");
 
@@ -26,12 +26,12 @@ namespace MtgEngine.Alpha.Artifacts
 
         public class BasaltMonolithUntapAbility : ActivatedAbility
         {
-            public BasaltMonolithUntapAbility(PermanentCard source) : base(source, null, "{3}: Untap Basalt Monolith")
+            public BasaltMonolithUntapAbility(Card source) : base(source, null, "{3}: Untap Basalt Monolith")
             {
                 Cost = ManaCost.Parse(this, "{3}");
             }
 
-            public override Ability Copy(PermanentCard newSource)
+            public override Ability Copy(Card newSource)
             {
                 return new BasaltMonolithUntapAbility(newSource);
             }

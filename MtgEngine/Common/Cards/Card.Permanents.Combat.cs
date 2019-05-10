@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class PermanentCard : Card, IDamageable
+    public abstract partial class Card : IDamageable
     {
         public Player DefendingPlayer { get; set; } = null;
 
@@ -21,13 +21,20 @@ namespace MtgEngine.Common.Cards
         { 
             TookDamage?.Invoke(this, source, amount);
 
-            if((source is PermanentCard) && (source as PermanentCard).HasInfect)
-                AddCounters(source, amount, CounterType.Minus1Minus1);
+            if (IsAPlaneswalker && !IsACreature)
+            {
+                RemoveCounters(source, amount, CounterType.Loyalty);
+            }
             else
-                DamageAccumulated += amount;
+            { 
+                if (source.HasInfect)
+                    AddCounters(source, amount, CounterType.Minus1Minus1);
+                else
+                    DamageAccumulated += amount;
+            }
         }
 
-        public virtual bool IsDead => Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible);
+        public virtual bool IsDead => (IsACreature && (Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible))) || (IsAPlaneswalker && Counters.Count(c => c == CounterType.Loyalty) == 0);
 
         public void ResetDamage()
         {
@@ -54,7 +61,7 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        public bool CanBlock(PermanentCard permanent)
+        public bool CanBlock(Card permanent)
         {
             // This permanent can't block if it is not a creature (Vehicles can only attack/block if they're creatures)
             if (!IsACreature)

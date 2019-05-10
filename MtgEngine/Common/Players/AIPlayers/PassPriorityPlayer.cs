@@ -57,7 +57,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return null;
         }
 
-        public override IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers)
+        public override IEnumerable<Card> SortBlockers(Card attacker, IEnumerable<Card> blockers)
         {
             // Never Block
             return blockers;
@@ -78,19 +78,9 @@ namespace MtgEngine.Common.Players.AIPlayers
             return null;
         }
 
-        public override List<PermanentCard> MakeChoice(string message, int count, List<PermanentCard> options)
-        {
-            return options.Take(count).ToList();
-        }
-
         public override List<Card> MakeChoice(string message, int count, List<Card> options)
         {
             return options.Take(count).ToList();
-        }
-
-        public override List<PermanentCard> Sort(string message, List<PermanentCard> options)
-        {
-            return options;
         }
 
         public override List<Card> Sort(string message, List<Card> options)
@@ -111,7 +101,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return options[Math.Abs(rand.Next()) % options.Length];
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> attackingCreatures)
+        public override List<BlockerDeclaration> DeclareBlockers(List<Card> attackingCreatures)
         {
             return null;
         }

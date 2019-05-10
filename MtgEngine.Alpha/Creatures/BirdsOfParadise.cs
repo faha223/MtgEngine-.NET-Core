@@ -7,9 +7,9 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Creatures
 {
     [MtgCard("Birds of Paradise", "LEA", "", "")]
-    public class BirdsOfParadise : PermanentCard
+    public class BirdsOfParadise : Card
     {
-        public BirdsOfParadise(Player owner) : base(owner, true, null, new[] { CardType.Creature }, new[] { "Bird" }, false, 0, 1, false, false)
+        public BirdsOfParadise(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Bird" }, false, 0, 1, false, false)
         {
             Cost = ManaCost.Parse(this, "{G}");
 

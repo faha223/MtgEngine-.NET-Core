@@ -58,7 +58,7 @@ namespace MtgEngineTest
             }
 
             // Add each ability the player can activate to the 
-            foreach(PermanentCard card in Battlefield)
+            foreach(Card card in Battlefield)
             {
                 foreach(ActivatedAbility ability in card.Abilities.Where(c => c is ActivatedAbility))
                 {
@@ -130,7 +130,7 @@ namespace MtgEngineTest
         private void PrintBattlefield()
         {
             Console.WriteLine("Battlefield:");
-            foreach(PermanentCard card in Battlefield)
+            foreach(Card card in Battlefield)
             {
                 string counters = null;
                 if(card.Counters.Count > 0)
@@ -411,7 +411,7 @@ namespace MtgEngineTest
             return attackers;
         }
 
-        public override List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> attackingCreatures)
+        public override List<BlockerDeclaration> DeclareBlockers(List<Card> attackingCreatures)
         {
             var availableBlockers = Battlefield.Creatures.Where(c => !c.IsTapped).ToList();
             var blockers = new List<BlockerDeclaration>(availableBlockers.Count);
@@ -496,7 +496,7 @@ namespace MtgEngineTest
             return blockers;
         }
 
-        public override IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers)
+        public override IEnumerable<Card> SortBlockers(Card attacker, IEnumerable<Card> blockers)
         {
             if (blockers.Count() == 1)
                 return blockers;
@@ -644,30 +644,6 @@ namespace MtgEngineTest
             } while (true);
         }
 
-        public override List<PermanentCard> MakeChoice(string message, int count, List<PermanentCard> options)
-        {
-            do
-            {
-                Console.WriteLine(message);
-                int i = 0;
-                foreach (var card in options)
-                {
-                    if (card.IsACreature)
-                        Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power})");
-                    else
-                        Console.WriteLine($"{++i}: {card.Name}");
-                }
-
-                Console.Write("Choose: ");
-
-                var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
-                if(selection != null)
-                {
-                    return options.OrderByIndexList(selection.Select(c => c - 1));
-                }
-            } while (true);
-        }
-
         public override List<Card> MakeChoice(string message, int count, List<Card> options)
         {
             do
@@ -676,21 +652,20 @@ namespace MtgEngineTest
                 int i = 0;
                 foreach (var card in options)
                 {
-                    if (card is PermanentCard)
+                    if (card.IsAPermanent)
                     {
-                        var permanent = card as PermanentCard;
                         string counters = string.Empty;
-                        if(permanent.Counters.Count > 0)
+                        if(card.Counters.Count > 0)
                         {
-                            foreach(var counterType in permanent.Counters.Distinct())
+                            foreach(var counterType in card.Counters.Distinct())
                             {
-                                counters += $" ({counterType}: {permanent.Counters.Count(c => c == counterType)})";
+                                counters += $" ({counterType}: {card.Counters.Count(c => c == counterType)})";
                             }
                         }
-                        if (permanent.IsACreature)
-                            Console.WriteLine($"{++i}: {permanent.Name} ({permanent.Power}/{permanent.Power}){counters}");
+                        if (card.IsACreature)
+                            Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power}){counters}");
                         else
-                            Console.WriteLine($"{++i}: {permanent.Name}{counters}");
+                            Console.WriteLine($"{++i}: {card.Name}{counters}");
                     }
                     else
                         Console.WriteLine($"{++i}: {card.Name}");
@@ -706,7 +681,7 @@ namespace MtgEngineTest
             } while (true);
         }
 
-        public override List<PermanentCard> Sort(string message, List<PermanentCard> options)
+        public override List<Card> Sort(string message, List<Card> options)
         {
             do
             {
@@ -716,28 +691,6 @@ namespace MtgEngineTest
                 {
                     if (card.IsACreature)
                         Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power})");
-                    else
-                        Console.WriteLine($"{++i}: {card.Name}");
-                }
-                Console.Write("Sort: ");
-                var selection = ParseChoice(Console.ReadLine(), options.Count, options.Count, 1, i, true);
-                if (selection != null)
-                {
-                    return options.OrderByIndexList(selection.Select(c => c - 1));
-                }
-            } while (true);
-        }
-
-        public override List<Card> Sort(string message, List<Card> options)
-        {
-            do
-            {
-                Console.WriteLine(message);
-                int i = 0;
-                foreach (var card in options)
-                {
-                    if (card.IsACreature)
-                        Console.WriteLine($"{++i}: {card.Name} ({(card as PermanentCard).Power}/{(card as PermanentCard).Power})");
                     else
                         Console.WriteLine($"{++i}: {card.Name}");
                 }

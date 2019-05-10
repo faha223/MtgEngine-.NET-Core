@@ -6,9 +6,9 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Sorceries
 {
     [MtgCard("Armageddon", "LEA", "", "", Text = "Destroy all lands.")]
-    public class Armageddon : SpellCard
+    public class Armageddon : Card
     {
-        public Armageddon(Player owner) : base(owner, null, new[] { CardType.Sorcery }, null, false)
+        public Armageddon(Player owner) : base(owner, new[] { CardType.Sorcery }, null, false)
         {
             Cost = ManaCost.Parse(this, "{3}{W}");
         }

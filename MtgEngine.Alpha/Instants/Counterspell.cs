@@ -9,12 +9,11 @@ using System.Collections.Generic;
 namespace MtgEngine.Alpha.Instants
 {
     [MtgCard("Counterspell", "LEA", "", "", "Counter target spell")]
-    public class Counterspell : SpellCard
+    public class Counterspell : Card
     {
         Card target;
 
-        public Counterspell(Player owner) :
-            base(owner, null, new[] { CardType.Instant }, null, false)
+        public Counterspell(Player owner) : base(owner, new[] { CardType.Instant }, null, false)
         {
             Cost = ManaCost.Parse(this, "{U}{U}");
         }

@@ -7,9 +7,9 @@ using System.Linq;
 namespace MtgEngine.Alpha.Sorceries
 {
     [MtgCard("Balance", "LEA", "", "", Text = "Each player chooses a number of lands they control equal to the number of lands controlled by the player who controls the fewest, then sacrifices the rest. Players discard cards and sacrifice creatures the same way.")]
-    public class Balance : SpellCard
+    public class Balance : Card
     {
-        public Balance(Player owner) : base(owner, null, new[] { CardType.Sorcery }, null, false)
+        public Balance(Player owner) : base(owner, new[] { CardType.Sorcery }, null, false)
         {
             Cost = ManaCost.Parse(this, "{1}{W}");
         }

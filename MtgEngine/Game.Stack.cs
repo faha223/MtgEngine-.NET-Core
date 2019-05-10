@@ -100,7 +100,7 @@ namespace MtgEngine
         /// Play the specified Land card
         /// </summary>
         /// <param name="card"></param>
-        private void PlayLand(LandCard card)
+        private void PlayLand(Card card)
         {
             // Remove the card from the player's hand and place it on the battlefield
             card.Controller.Hand.Remove(card);
@@ -116,12 +116,12 @@ namespace MtgEngine
         private void PlayCard(PlayCardAction action, Player player, bool playerCanCastSorceries)
         {
             // If it's a land card, it bypasses the stack
-            if (action.Card is LandCard)
+            if (action.Card.IsALand)
             {
                 // Only play the land if the player is allowed to play a turn right now
                 if (playerCanCastSorceries && player.LandsPlayedThisTurn < player.MaxLandsPlayedThisTurn)
                 {
-                    PlayLand(action.Card as LandCard);
+                    PlayLand(action.Card);
                     player.LandsPlayedThisTurn++;
                     CardHasChangedZones?.Invoke(this, action.Card, Common.Enums.Zone.Stack, Common.Enums.Zone.Battlefield);
                 }
@@ -198,7 +198,7 @@ namespace MtgEngine
         /// 
         /// </summary>
         /// <param name="permanent"></param>
-        public void PutPermanentOnBattlefield(PermanentCard permanent)
+        public void PutPermanentOnBattlefield(Card permanent)
         {
             permanent.Controller.Battlefield.Add(permanent);
 
@@ -210,13 +210,13 @@ namespace MtgEngine
             CardHasChangedZones?.Invoke(this, permanent, Common.Enums.Zone.Stack, Common.Enums.Zone.Battlefield);
         }
 
-        public void RemovePermanentFromBattlefield(PermanentCard permanent)
+        public void RemovePermanentFromBattlefield(Card permanent)
         {
             permanent.Controller.Battlefield.Remove(permanent);
             UnsubscribeFromEvents(permanent);
         }
 
-        private void SubscribeToEvents(PermanentCard card)
+        private void SubscribeToEvents(Card card)
         {
             card.CountersCreated += permanent_CountersCreated;
             card.CountersRemoved += permanent_CountersRemoved;
@@ -235,7 +235,7 @@ namespace MtgEngine
             }
         }
 
-        private void UnsubscribeFromEvents(PermanentCard card)
+        private void UnsubscribeFromEvents(Card card)
         {
             card.CountersCreated -= permanent_CountersCreated;
             card.CountersRemoved -= permanent_CountersRemoved;
@@ -264,17 +264,12 @@ namespace MtgEngine
                 if (obj is Card)
                 {
                     var card = obj as Card;
-                    if (card is PermanentCard)
-                    {
-                        var permanent = card as PermanentCard;
-                        permanent.OnResolve(this);
-                        PutPermanentOnBattlefield(permanent);
-                    }
-                    else if (card is SpellCard)
-                    {
-                        card.OnResolve(this);
+                    card.OnResolve(this);
+
+                    if (card.IsAPermanent)
+                        PutPermanentOnBattlefield(card);
+                    else if (card.IsASpell)
                         card.Owner.Graveyard.Add(card);
-                    }
                 }
                 else if (obj is Ability)
                 {

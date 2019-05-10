@@ -9,11 +9,11 @@ using System.Linq;
 namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Black Vise", "LEA", "", "", Text = "As Black Vise enters the battlefield, choose an opponent.\n\nAt the beginning of the chosen player’s upkeep, Black Vise deals X damage to that player, where X is the number of cards in their hand minus 4.")]
-    public class BlackVise : PermanentCard
+    public class BlackVise : Card
     {
         public Player chosenOpponent;
 
-        public BlackVise(Player owner) : base(owner, true, null, new[] { CardType.Artifact }, null, false, false, false)
+        public BlackVise(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false, false)
         {
             Cost = ManaCost.Parse(this, "{1}");
 
@@ -27,11 +27,11 @@ namespace MtgEngine.Alpha.Artifacts
 
         public class BlackViseAbility : EventTriggeredAbility
         {
-            public BlackViseAbility(PermanentCard source) : base(source, "At the beginning of the chosen player’s upkeep, Black Vise deals X damage to that player, where X is the number of cards in their hand minus 4.")
+            public BlackViseAbility(Card source) : base(source, "At the beginning of the chosen player’s upkeep, Black Vise deals X damage to that player, where X is the number of cards in their hand minus 4.")
             {
             }
 
-            public override Ability Copy(PermanentCard newSource)
+            public override Ability Copy(Card newSource)
             {
                 throw new NotImplementedException();
             }

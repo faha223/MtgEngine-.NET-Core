@@ -33,5 +33,9 @@ namespace MtgEngine.Common.Cards
         public bool IsAPlaneswalker => Types.Contains(CardType.Planeswalker);
 
         public bool IsATribal => Types.Contains(CardType.Tribal);
+
+        public bool IsAPermanent => IsAnArtifact || IsACreature || IsAnEnchantment || IsALand || IsAPlaneswalker;
+
+        public bool IsASpell => IsAnInstant || IsASorcery;
     }
 }

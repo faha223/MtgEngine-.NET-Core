@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class PermanentCard : Card, IDamageable
+    public abstract partial class Card : IDamageable
     {
-        public delegate void CountersEvent(PermanentCard card, IResolvable source, CounterType counterType, int amount);
+        public delegate void CountersEvent(Card card, IResolvable source, CounterType counterType, int amount);
         public event CountersEvent CountersCreated;
         public event CountersEvent CountersRemoved;
 

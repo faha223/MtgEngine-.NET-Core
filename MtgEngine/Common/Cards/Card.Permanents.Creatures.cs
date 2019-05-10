@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class PermanentCard : Card, IDamageable
+    public abstract partial class Card : IDamageable
     {
         protected int _basePower { get; }
         protected int? _copiedCardBasePower { get; set; }

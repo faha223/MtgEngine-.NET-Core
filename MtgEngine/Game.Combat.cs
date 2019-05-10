@@ -13,13 +13,13 @@ namespace MtgEngine
     {
         #region Combat Events
 
-        delegate void AttackerDeclarationEvent(Game game, PermanentCard attacker, Player defendingPlayer);
+        delegate void AttackerDeclarationEvent(Game game, Card attacker, Player defendingPlayer);
         private event AttackerDeclarationEvent AttackerDeclared;
 
-        delegate void BlockerDeclarationEvent(Game game, PermanentCard blocker, PermanentCard attacker);
+        delegate void BlockerDeclarationEvent(Game game, Card blocker, Card attacker);
         private event BlockerDeclarationEvent BlockerDeclared;
 
-        delegate void CreatureTookDamageEvent(Game game, PermanentCard creature, Card source, int DamageTaken);
+        delegate void CreatureTookDamageEvent(Game game, Card creature, Card source, int DamageTaken);
         private event CreatureTookDamageEvent CreatureTookDamage;
 
         delegate void PlayertookDamageEvent(Game game, Player player, Card source, int DamageTaken);
@@ -120,7 +120,7 @@ namespace MtgEngine
             var blockedCreatures = ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && c.DefendingPlayer.Battlefield.Creatures.Any(d => d.Blocking == c)).ToList();
 
             // Have the active player sort blockers for each of their attackers
-            Dictionary<PermanentCard, List<PermanentCard>> blockerMap = new Dictionary<PermanentCard, List<PermanentCard>>(blockedCreatures.Count);
+            Dictionary<Card, List<Card>> blockerMap = new Dictionary<Card, List<Card>>(blockedCreatures.Count);
             foreach (var attacker in blockedCreatures)
             {
                 var blockers = attacker.DefendingPlayer.Battlefield.Creatures.Where(c => c.Blocking == attacker).ToList();
@@ -158,7 +158,7 @@ namespace MtgEngine
             // If any remaining attackers have doublestrike or don't have firststrike
             if (ActivePlayer.Battlefield.Creatures.Any(c => c.IsAttacking && (doesNormalDamage(c) || takesNormalDamage(c))))
             {
-                foreach (PermanentCard attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesNormalDamage(c)))
+                foreach (var attacker in ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && doesNormalDamage(c)))
                 {
                     // Deal combat damage to, and take combat damage from, blockers
                     CombatDamage(attacker,
@@ -180,7 +180,7 @@ namespace MtgEngine
         /// <param name="blocked"></param>
         /// <param name="blockers"></param>
         /// <param name="firstStrike"></param>
-        private void CombatDamage(PermanentCard attacker, bool blocked, IEnumerable<PermanentCard> blockers, bool firstStrike)
+        private void CombatDamage(Card attacker, bool blocked, IEnumerable<Card> blockers, bool firstStrike)
         {
             // If the defending player didn't block (we might not have blockers right now)
             if (!blocked)

@@ -7,7 +7,7 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Underground Sea", "LEA", "", "", "({T}: Add {U} or {B})")]
-    public class UndergroundSea : LandCard
+    public class UndergroundSea : Card
     {
         public UndergroundSea(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Island", "Swamp" }, false, false, false)
         {

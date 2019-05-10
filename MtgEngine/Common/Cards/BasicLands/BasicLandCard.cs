@@ -6,7 +6,7 @@ using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Cards.BasicLands
 {
-    public abstract class BasicLandCard : LandCard
+    public abstract class BasicLandCard : Card
     {
         protected BasicLandCard(Player owner, ManaColor color, CardType[] types, string[] subtypes, bool isSnow) : 
             base(owner, types, subtypes, true, false, isSnow)

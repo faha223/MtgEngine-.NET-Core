@@ -7,7 +7,7 @@ namespace MtgEngine.Common.Abilities
     {
         public abstract bool CheckState(Game game);
 
-        protected StateTriggeredAbility(PermanentCard source, string text) : base(source, text)
+        protected StateTriggeredAbility(Card source, string text) : base(source, text)
         {
         }
     }

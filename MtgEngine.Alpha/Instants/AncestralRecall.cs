@@ -8,11 +8,11 @@ using System.Collections.Generic;
 namespace MtgEngine.Alpha.Instants
 {
     [MtgCard("Ancestral Recall", "LEA", "", "", Text = "Target player draws three cards.")]
-    public class AncestralRecall : SpellCard
+    public class AncestralRecall : Card
     {
         Player _target;
 
-        public AncestralRecall(Player owner) : base(owner, null, new[] { CardType.Instant }, null, false)
+        public AncestralRecall(Player owner) : base(owner, new[] { CardType.Instant }, null, false)
         {
             Cost = ManaCost.Parse(this, "{U}");
         }

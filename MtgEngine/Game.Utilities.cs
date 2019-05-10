@@ -143,7 +143,7 @@ namespace MtgEngine
         /// <summary>
         /// Do first strike damage only if the creature has first strike or double strike
         /// </summary>
-        private bool doesFirstStrikeDamage(PermanentCard creature)
+        private bool doesFirstStrikeDamage(Card creature)
         {
             if (creature.StaticAbilities.Contains(StaticAbility.FirstStrike) || creature.StaticAbilities.Contains(StaticAbility.DoubleStrike))
                 return true;
@@ -155,7 +155,7 @@ namespace MtgEngine
         /// </summary>
         /// <param name="attacker">The attacking creature</param>
         /// <returns>True if the attacker or any of its blockers have first strike or doublestrike. Otherwise false.</returns>
-        private bool takesFirstStrikeDamage(PermanentCard attacker)
+        private bool takesFirstStrikeDamage(Card attacker)
         {
             return attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker && doesFirstStrikeDamage(c));
         }
@@ -165,7 +165,7 @@ namespace MtgEngine
         /// </summary>
         /// <param name="creature">The creature</param>
         /// <returns>True if the creature does normal damage.</returns>
-        private bool doesNormalDamage(PermanentCard creature)
+        private bool doesNormalDamage(Card creature)
         {
             if (creature.StaticAbilities.Contains(StaticAbility.DoubleStrike))
                 return true;
@@ -179,7 +179,7 @@ namespace MtgEngine
         /// </summary>
         /// <param name="attacker">The attacking creature</param>
         /// <returns>True if the attacking creature or any of the blocking creatures do normal damage.</returns>
-        private bool takesNormalDamage(PermanentCard attacker)
+        private bool takesNormalDamage(Card attacker)
         {
             return attacker.DefendingPlayer.Battlefield.Creatures.Any(c => c.Blocking == attacker && doesNormalDamage(c));
         }

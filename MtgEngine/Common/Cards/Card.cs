@@ -46,11 +46,6 @@ namespace MtgEngine.Common.Cards
         protected CardType[] _types { get; }
         public virtual CardType[] Types { get { return _types; } }
 
-        public virtual bool CanBeTargetedBy(IResolvable other)
-        {            
-            return true;
-        }
-
         // This is virtual so that it can be overridden in token classes
         protected ManaColor[] _copiedCardColorIdentity { get; set; }
         public virtual ManaColor[] ColorIdentity {
@@ -121,7 +116,7 @@ namespace MtgEngine.Common.Cards
 
         public Player Owner { get; }
 
-        protected Card(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow)
+        private Card(Player owner, bool usesStack, Cost cost, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow)
         {
             Owner = owner;
             Controller = owner;
@@ -135,6 +130,28 @@ namespace MtgEngine.Common.Cards
 
             if (_cost == null)
                 _cost = new NoCost(this);
+        }
+
+        // Land Constructor
+        protected Card(Player owner, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) : this(owner, false, null, types, subtypes, isBasic, isLegendary, isSnow)
+        {
+        }
+
+        // Spell Constructor
+        protected Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary) : this(owner, true, null, types, subtypes, false, isLegendary, false)
+        {
+        }
+
+        // Non-Land Permanent Constructor
+        protected Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary, bool isSnow) : this(owner, true, null, types, subtypes, false, isLegendary, isSnow)
+        {
+        }
+
+        // Creature Constructor
+        public Card(Player owner, CardType[] types, string[] subtypes, bool isBasic, int basePower, int baseToughness, bool isLegendary, bool isSnow) : this(owner, true, null, types, subtypes, false, isLegendary, isSnow)
+        {
+            _basePower = basePower;
+            _baseToughness = baseToughness;
         }
 
         public virtual bool CanCast(Game game)
@@ -158,6 +175,11 @@ namespace MtgEngine.Common.Cards
         public void GiveControl(Player player)
         {
             Controller = player;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

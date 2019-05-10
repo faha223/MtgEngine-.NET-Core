@@ -7,7 +7,7 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Bayou", "LEA", "", "", "({T}: Add {B} or {G})")]
-    public class Bayou : LandCard
+    public class Bayou : Card
     {
         public Bayou(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Swamp", "Forest" }, false, false, false)
         {

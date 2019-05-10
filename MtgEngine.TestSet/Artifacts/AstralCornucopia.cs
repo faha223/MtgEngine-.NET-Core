@@ -10,11 +10,11 @@ using System.Linq;
 namespace MtgEngine.TestSet
 {
     [MtgCard("Astral Cornucopia", "TestSet", "", "", "Astral Cornucopia enters the battlefield with X charge counters on it.\n{T}: Choose a color. Add one mana of that color for each charge counter on Astral Cornucopia.")]
-    public class AstralCornucopia : ArtifactCard
+    public class AstralCornucopia : Card
     {
         private int _x;
 
-        public AstralCornucopia(Player owner) : base(owner, true, null, new[] { CardType.Artifact }, null, false, false)
+        public AstralCornucopia(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
         {
             Cost = ManaCost.Parse(this, "{X}{X}{X}");
 
@@ -32,7 +32,7 @@ namespace MtgEngine.TestSet
 
         private class AstralCornucopiaManaAbility : ManaAbility
         {
-            public AstralCornucopiaManaAbility(PermanentCard source) : base(source, new TapCost(source), null, "{T}: Choose a color. Add one mana of that color for each charge counter on Astral Cornucopia.")
+            public AstralCornucopiaManaAbility(Card source) : base(source, new TapCost(source), null, "{T}: Choose a color. Add one mana of that color for each charge counter on Astral Cornucopia.")
             {
             }
 

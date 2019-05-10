@@ -6,11 +6,11 @@ namespace MtgEngine.Common.Abilities
 {
     public abstract class EventTriggeredAbility : TriggeredAbility
     {
-        protected EventTriggeredAbility(PermanentCard source, string text) : base(source, text)
+        protected EventTriggeredAbility(Card source, string text) : base(source, text)
         {
         }
 
-        public virtual void PermanentGotCounter(Game game, PermanentCard card, IResolvable source, CounterType counterType, int count)
+        public virtual void PermanentGotCounter(Game game, Card card, IResolvable source, CounterType counterType, int count)
         {
         }
 
@@ -22,7 +22,7 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
-        public virtual void CreatureTookDamage(Game game, PermanentCard creature, Card source, int damageReceived)
+        public virtual void CreatureTookDamage(Game game, Card creature, Card source, int damageReceived)
         {
         }
 
@@ -34,11 +34,11 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
-        public virtual void AttackerDeclared(Game game, PermanentCard attacker, Player defendingPlayer)
+        public virtual void AttackerDeclared(Game game, Card attacker, Player defendingPlayer)
         {
         }
 
-        public virtual void BlockerDeclared(Game game, PermanentCard attacker, PermanentCard blocker)
+        public virtual void BlockerDeclared(Game game, Card attacker, Card blocker)
         {
         }
     }

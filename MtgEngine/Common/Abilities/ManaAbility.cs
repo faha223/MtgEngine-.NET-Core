@@ -9,7 +9,7 @@ namespace MtgEngine.Common.Abilities
     {
         public ManaAmount ManaGenerated { get; private set; }
 
-        public ManaAbility(PermanentCard source, Cost cost, ManaAmount manaGenerated, string text) : base(source, cost, text)
+        public ManaAbility(Card source, Cost cost, ManaAmount manaGenerated, string text) : base(source, cost, text)
         {
             ManaGenerated = manaGenerated;
         }
@@ -19,7 +19,7 @@ namespace MtgEngine.Common.Abilities
             Source.Controller.ManaPool.Add(ManaGenerated);
         }
 
-        public override Ability Copy(PermanentCard newSource)
+        public override Ability Copy(Card newSource)
         {
             return new ManaAbility(newSource, Cost, ManaGenerated, Text);
         }

@@ -4,7 +4,7 @@ namespace MtgEngine.Common.Players.Gameplay
 {
     public class BlockerDeclaration
     {
-        public PermanentCard Attacker { get; set; }
-        public PermanentCard Blocker { get; set; }
+        public Card Attacker { get; set; }
+        public Card Blocker { get; set; }
     }
 }

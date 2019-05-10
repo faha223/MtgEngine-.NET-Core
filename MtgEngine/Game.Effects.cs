@@ -46,9 +46,9 @@ namespace MtgEngine
         /// This spell destroys all lands that meet the selector's requirement
         /// </summary>
         /// <param name="selector"></param>
-        public void DestroyLands(Func<PermanentCard, bool> selector)
+        public void DestroyLands(Func<Card, bool> selector)
         {
-            List<PermanentCard> landsDestroyed = new List<PermanentCard>();
+            List<Card> landsDestroyed = new List<Card>();
             foreach (var player in _players)
             {
                 foreach (var land in player.Battlefield.Lands.Where(c => selector(c)).ToList())
@@ -65,7 +65,7 @@ namespace MtgEngine
             // TODO: Add Land On LeaveBattlefield or OnDestroy triggers to the stack in order
         }
 
-        public void DestroyPermanent(PermanentCard card)
+        public void DestroyPermanent(Card card)
         {
             if (card.Controller.Battlefield.Contains(card) && !card.HasIndestructible)
             {

@@ -9,11 +9,11 @@ using System.Linq;
 namespace MtgEngine.Alpha.Enchantments
 { 
     [MtgCard("Black Ward", "LEA", "", "", Text= "Enchant creature\n\nEnchanted creature has protection from black.This effect doesn’t remove Black Ward.")]
-    public class BlackWard : PermanentCard, ITargeting
+    public class BlackWard : Card, ITargeting
     {
-        public PermanentCard enchantedCreature;
+        public Card enchantedCreature;
 
-        public BlackWard(Player owner) : base(owner, true, null, new[] { CardType.Enchantment }, new[] { "Aura" }, false, false, false)
+        public BlackWard(Player owner) : base(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false, false, false)
         {
             Cost = ManaCost.Parse(this, "{W}");
         }
@@ -21,7 +21,7 @@ namespace MtgEngine.Alpha.Enchantments
         public void SelectTargets(Game game)
         {
             var possibleTargets = game.Battlefield.Creatures.AsEnumerable<ITarget>().ToList();
-            enchantedCreature = (PermanentCard)Controller.ChooseTarget(this, possibleTargets);
+            enchantedCreature = (Card)Controller.ChooseTarget(this, possibleTargets);
         }
 
         public override void OnResolve(Game game)

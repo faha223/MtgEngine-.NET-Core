@@ -10,7 +10,7 @@ using System.Linq;
 namespace MtgEngine.TestSet.Lands
 {
     [MtgCard("Thespian's Stage", "TestSet", "", "", Text = "{T}: Add {C}\n{2},{T}: Thespian's Stage becomes a copy of target land, except it has this ability.", FlavorText = "Amid rumors of war, the third act of The Absolution of the Guildpact was quickly rewritten as a tragedy.")]
-    public class ThespiansStage : LandCard
+    public class ThespiansStage : Card
     {
         private string copiedCardName = null;
         public override string Name
@@ -110,7 +110,7 @@ namespace MtgEngine.TestSet.Lands
             base.Abilities.Add(new CopyAbility(this));
         }
 
-        public void Copy(PermanentCard other)
+        public void Copy(Card other)
         {
             copiedCardName = other.Name;
             copiedCardText = other.Text;
@@ -126,14 +126,14 @@ namespace MtgEngine.TestSet.Lands
 
         class CopyAbility : ActivatedAbility, ITargeting
         {
-            PermanentCard targetLand = null;
+            Card targetLand = null;
 
-            public CopyAbility(PermanentCard source) : base(source, null, "{2},{T}: Thespian's Stage becomes a copy of target land, except it has this ability.")
+            public CopyAbility(Card source) : base(source, null, "{2},{T}: Thespian's Stage becomes a copy of target land, except it has this ability.")
             {
                 Cost = new AggregateCost(this, ManaCost.Parse(this, "{2}"), new TapCost(source));
             }
 
-            public override Ability Copy(PermanentCard newSource)
+            public override Ability Copy(Card newSource)
             {
                 return new CopyAbility(newSource);
             }
@@ -149,7 +149,7 @@ namespace MtgEngine.TestSet.Lands
                 foreach (var player in game.Players())
                     Lands.AddRange(player.Battlefield.Lands);
 
-                targetLand = (PermanentCard)Source.Controller.ChooseTarget(this, Lands);
+                targetLand = (Card)Source.Controller.ChooseTarget(this, Lands);
             }
         }
     }

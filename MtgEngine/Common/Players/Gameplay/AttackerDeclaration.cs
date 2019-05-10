@@ -7,6 +7,6 @@ namespace MtgEngine.Common.Players.Gameplay
     {
         public Player DefendingPlayer { get; set; }
         
-        public PermanentCard AttackingCreature { get; set; }
+        public Card AttackingCreature { get; set; }
     }
 }

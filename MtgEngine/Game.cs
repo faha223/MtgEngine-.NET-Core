@@ -117,19 +117,19 @@ namespace MtgEngine
 
         private void creature_tookDamage(IDamageable creature, Card source, int amount)
         {
-            CreatureTookDamage?.Invoke(this, (PermanentCard)creature, source, amount);
+            CreatureTookDamage?.Invoke(this, (Card)creature, source, amount);
         }
 
-        public delegate void PermanentCountersEvent(Game game, PermanentCard card, IResolvable source, CounterType counterType, int amount);
+        public delegate void PermanentCountersEvent(Game game, Card card, IResolvable source, CounterType counterType, int amount);
         public event PermanentCountersEvent CountersAddedToPermanent;
         public event PermanentCountersEvent CoutnersRemovedFromPermanent;
 
-        private void permanent_CountersCreated(PermanentCard card, IResolvable source, CounterType counterType, int amount)
+        private void permanent_CountersCreated(Card card, IResolvable source, CounterType counterType, int amount)
         {
             CountersAddedToPermanent?.Invoke(this, card, source, counterType, amount);
         }
 
-        private void permanent_CountersRemoved(PermanentCard card, IResolvable source, CounterType counterType, int amount)
+        private void permanent_CountersRemoved(Card card, IResolvable source, CounterType counterType, int amount)
         {
             CoutnersRemovedFromPermanent?.Invoke(this, card, source, counterType, amount);
         }
@@ -223,12 +223,9 @@ namespace MtgEngine
             CurrentStepHasChanged?.Invoke(this, "Untap Step");
             ActivePlayer.Battlefield.ForEach(c =>
             {
-                if (c is PermanentCard) {
-                    var p = c as PermanentCard;
-                    p.HasSummoningSickness = false;
-                    if(p.UntapsDuringUntapStep)
-                        p.Untap();
-                }
+                c.HasSummoningSickness = false;
+                if(c.UntapsDuringUntapStep)
+                    c.Untap();
             });
 
             DrainManaPools();
@@ -413,13 +410,13 @@ namespace MtgEngine
             foreach (var player in _players)
             {
                 // Create a list to hold all the legends that will be removed
-                var sacrificedLegends = new List<PermanentCard>();
+                var sacrificedLegends = new List<Card>();
 
                 // While the player has duplicate legends
                 while (player.Battlefield.Except(sacrificedLegends).Any(card => card.IsLegendary && player.Battlefield.Except(sacrificedLegends).Count(c => c.Name == card.Name && c.IsLegendary) > 1))
                 {
                     var playerControlledLegends = player.Battlefield.Except(sacrificedLegends).Where(card => card.IsLegendary && player.Battlefield.Except(sacrificedLegends).Count(c => c.Name == card.Name && c.IsLegendary) > 1).ToList();
-                    var selected = player.MakeChoice("You control duplicate legends. Choose one to sacrifice", 1, playerControlledLegends).First() as PermanentCard;
+                    var selected = player.MakeChoice("You control duplicate legends. Choose one to sacrifice", 1, playerControlledLegends).First();
                     sacrificedLegends.Add(selected);
                 }
 
@@ -456,7 +453,7 @@ namespace MtgEngine
         {
             foreach (var player in _players)
             {
-                foreach (PermanentCard permanent in player.Battlefield)
+                foreach (var permanent in player.Battlefield)
                 {
                     foreach (StateTriggeredAbility ability in permanent.Abilities.Where(c => c is StateTriggeredAbility))
                     {
@@ -502,7 +499,7 @@ namespace MtgEngine
         /// 
         /// </summary>
         /// <param name="permanent"></param>
-        public void MoveFromBattlefieldToGraveyard(PermanentCard permanent)
+        public void MoveFromBattlefieldToGraveyard(Card permanent)
         {
             RemovePermanentFromBattlefield(permanent);
             permanent.ClearCounters();

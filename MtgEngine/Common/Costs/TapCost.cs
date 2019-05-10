@@ -4,8 +4,8 @@ namespace MtgEngine.Common.Costs
 {
     public class TapCost : Cost
     {
-        private PermanentCard _src;
-        public TapCost(PermanentCard source) : base(source)
+        private Card _src;
+        public TapCost(Card source) : base(source)
         {
             _src = source;
         }
@@ -26,13 +26,13 @@ namespace MtgEngine.Common.Costs
 
         public override bool Pay()
         {
-            (_source as PermanentCard).Tap();
+            (_source as Card).Tap();
             return true;
         }
 
         public override Cost Copy(IResolvable newSource)
         {
-            return new TapCost(newSource as PermanentCard);
+            return new TapCost(newSource as Card);
         }
 
         public override string ToString()

@@ -7,7 +7,7 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Taiga", "LEA", "", "", "({T}: Add {R} or {G})")]
-    public class Taiga : LandCard
+    public class Taiga : Card
     {
         public Taiga(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Mountain", "Forest" }, false, false, false)
         {

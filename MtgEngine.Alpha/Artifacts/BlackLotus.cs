@@ -8,9 +8,9 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Black Lotus", "LEA", "", "", Text = "{T}, Sacrifice Black Lotus: Add three mana of any one color.")]
-    public class BlackLotus : ArtifactCard
+    public class BlackLotus : Card
     {
-        public BlackLotus(Player owner) : base(owner, true, null, new[] { CardType.Artifact }, null, false, false)
+        public BlackLotus(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
         {
             Abilities.Add(new ManaAbility(this, new AggregateCost(this, new TapCost(this), new SacrificeSourceCost(this)), new ManaAmount(3, ManaColor.White), "{T}, Sacrifice Black Lotus: Add {W}{W}{W}"));
             Abilities.Add(new ManaAbility(this, new AggregateCost(this, new TapCost(this), new SacrificeSourceCost(this)), new ManaAmount(3, ManaColor.Blue), "{T}, Sacrifice Black Lotus: Add {U}{U}{U}"));

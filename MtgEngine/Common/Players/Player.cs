@@ -90,7 +90,7 @@ namespace MtgEngine.Common.Players
 
         public void TakeDamage(int amount, Card source)
         {
-            if ((source is PermanentCard) && (source as PermanentCard).HasInfect)
+            if ((source is Card) && (source as Card).HasInfect)
                 AddCounters(amount, CounterType.Poison);
             else
             {
@@ -133,10 +133,6 @@ namespace MtgEngine.Common.Players
 
         public abstract List<Card> MakeChoice(string message, int count, List<Card> options);
 
-        public abstract List<PermanentCard> MakeChoice(string message, int count, List<PermanentCard> options);
-
-        public abstract List<PermanentCard> Sort(string message, List<PermanentCard> options);
-
         public abstract List<Card> Sort(string message, List<Card> options);
 
         public abstract int GetValueForX(string cost);
@@ -177,7 +173,7 @@ namespace MtgEngine.Common.Players
 
         public abstract List<AttackerDeclaration> DeclareAttackers(List<Player> opponents);
 
-        public abstract List<BlockerDeclaration> DeclareBlockers(List<PermanentCard> AttackingCreatures);
+        public abstract List<BlockerDeclaration> DeclareBlockers(List<Card> AttackingCreatures);
 
         public abstract ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets);
 
@@ -195,7 +191,7 @@ namespace MtgEngine.Common.Players
 
         public abstract void Discard();
 
-        public abstract IEnumerable<PermanentCard> SortBlockers(PermanentCard attacker, IEnumerable<PermanentCard> blockers);
+        public abstract IEnumerable<Card> SortBlockers(Card attacker, IEnumerable<Card> blockers);
 
         public virtual void Discard(Card card)
         {
@@ -206,7 +202,7 @@ namespace MtgEngine.Common.Players
             Graveyard.Add(card);
         }
 
-        public virtual bool Sacrifice(PermanentCard card)
+        public virtual bool Sacrifice(Card card)
         {
             if (!Battlefield.Contains(card))
                 return false;

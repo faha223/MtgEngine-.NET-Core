@@ -7,7 +7,7 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Tundra", "LEA", "", "", "({T}: Add {W} or {U})")]
-    public class Tundra : LandCard
+    public class Tundra : Card
     {
         public Tundra(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Plains", "Island" }, false, false, false)
         {

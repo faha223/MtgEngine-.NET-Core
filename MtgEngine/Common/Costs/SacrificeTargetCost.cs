@@ -24,7 +24,7 @@ namespace MtgEngine.Common.Costs
         public override bool Pay()
         {
             var card = _source as Card;
-            var target = card.Controller.SelectTarget("Choose a Target to Sacrifice", _targetSelector) as PermanentCard;
+            var target = card.Controller.SelectTarget("Choose a Target to Sacrifice", _targetSelector);
             if (target == null)
                 return false;
 
