@@ -1,6 +1,9 @@
-﻿using MtgEngine.Common.Enums;
+﻿using MtgEngine.Common.Abilities;
+using MtgEngine.Common.Damage;
+using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MtgEngine.Common.Cards
@@ -13,7 +16,7 @@ namespace MtgEngine.Common.Cards
 
         public Card Blocking { get; set; } = null;
 
-        public int DamageAccumulated { get; private set; } = 0;
+        public List<DamageInfo> DamageAccumulated { get; private set; } = new List<DamageInfo>();
 
         public event TookDamageEventHandler TookDamage;
 
@@ -26,19 +29,61 @@ namespace MtgEngine.Common.Cards
                 RemoveCounters(source, amount, CounterType.Loyalty);
             }
             else
-            { 
+            {
                 if (source.HasInfect)
                     AddCounters(source, amount, CounterType.Minus1Minus1);
                 else
-                    DamageAccumulated += amount;
+                {
+                    DamageAccumulated.Add(new DamageInfo(source, amount));
+                }
             }
         }
 
-        public bool IsDead => (IsACreature && (Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible))) || (IsAPlaneswalker && Counters.Count(c => c == CounterType.Loyalty) == 0);
+        public bool IsDead
+        {
+            get
+            {
+                int damageAccumulated = DamageAccumulated.Sum(c => c.DamageAmount);
+                if(IsACreature)
+                {
+                    // If toughness goes below 0, then dead
+                    if (Toughness <= 0)
+                        return true;
+
+                    // If Indestructible, then cannot be destroyed by damage
+                    if (!HasIndestructible)
+                    {
+                        if (damageAccumulated >= Toughness)
+                            return true;
+
+                        // Check all the damage sources and see if any come from a card that has deathtouch
+                        foreach(var damageSource in DamageAccumulated.Where(c => c.DamageAmount >= 1).Select(c => c.DamageSource))
+                        {
+                            Card sourceCard = null;
+
+                            if(damageSource is Card)
+                                sourceCard = damageSource as Card;
+                            else if(damageSource is Ability)
+                                sourceCard = (damageSource as Ability).Source;
+
+                            if (sourceCard != null && sourceCard.HasDeathtouch)
+                                return true;
+                        }
+                    }
+                }
+                else if(IsAPlaneswalker)
+                {
+                    return Counters.Count(c => c == CounterType.Loyalty) <= 0;
+                }
+                return false;
+                
+            }
+        }
+            
 
         public void ResetDamage()
         {
-            DamageAccumulated = 0;
+            DamageAccumulated.Clear();
         }
 
         private Func<bool> canAttackAsThoughItDidntHaveDefender = () => { return false; };
@@ -130,35 +175,35 @@ namespace MtgEngine.Common.Cards
             // Creatures with Plainswalk can't be blocked if we control a Plains
             if (permanent.HasPlainswalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Plains")))
+                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Plains")))
                     return false;
             }
 
             // Creatures with Islandwalk can't be blocked if we control a Island
             if (permanent.HasIslandwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Island")))
+                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Island")))
                     return false;
             }
 
             // Creatures with Swampwalk can't be blocked if we control a Swamp
             if (permanent.HasSwampwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Swamp")))
+                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Swamp")))
                     return false;
             }
 
             // Creatures with Mountainwalk can't be blocked if we control a Mountain
             if (permanent.HasMountainwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Mountain")))
+                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Mountain")))
                     return false;
             }
 
             // Creatures with Forestwalk can't be blocked if we control a Forest
             if (permanent.HasForestwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Forest")))
+                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Forest")))
                     return false;
             }
 

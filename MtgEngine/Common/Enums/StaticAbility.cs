@@ -5,6 +5,7 @@
         Flying,
         Reach,
         Haste,
+        Deathtouch,
         Defender,
         Indestructible,
         Fear,

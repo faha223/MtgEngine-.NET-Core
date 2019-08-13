@@ -1,7 +1,9 @@
 ﻿using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Modifiers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
@@ -13,6 +15,35 @@ namespace MtgEngine.Common.Cards
             get
             {
                 return _abilities;
+            }
+        }
+
+        public List<Ability> AbilitiesAfterModifiersApplied
+        {
+            get
+            {
+                var abilities = new List<Ability>(Abilities);
+                if(Modifiers.Any(c => c.Property == nameof(Abilities)))
+                {
+                    foreach(AbilityModifier modifier in Modifiers.Where(c => c.Property == nameof(Abilities)))
+                    {
+                        if (modifier.Mode == ModifierMode.Add)
+                        {
+                            abilities.Add(modifier.Value);
+                        }
+                        else if(modifier.Mode == ModifierMode.Remove)
+                        {
+                            abilities.Remove(modifier.Value);
+                        }
+                        else if(modifier.Mode == ModifierMode.Override)
+                        {
+                            abilities.RemoveAll(c => true);
+                            if(modifier.Value != null)
+                                abilities.Add(modifier.Value);
+                        }
+                    }
+                }
+                return abilities;
             }
         }
 

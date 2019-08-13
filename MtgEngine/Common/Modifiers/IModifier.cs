@@ -1,14 +1,20 @@
-﻿using MtgEngine.Common.Cards;
-using MtgEngine.Common.Enums;
+﻿using MtgEngine.Common.Enums;
 
 namespace MtgEngine.Common.Modifiers
 {
-    public interface IModifier
+    public abstract class Modifier
     {
-        Card Source { get; set; }
+        public Modifier(IResolvable source, string property, ModifierMode mode)
+        {
+            Source = source;
+            Property = property;
+            Mode = mode;
+        }
 
-        string Property { get; set; }
+        public IResolvable Source { get; set; }
 
-        ModifierMode Mode { get;set; }
+        public string Property { get; set; }
+
+        public ModifierMode Mode { get;set; }
     }
 }

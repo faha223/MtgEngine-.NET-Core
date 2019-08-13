@@ -60,7 +60,7 @@ namespace MtgEngineTest
             // Add each ability the player can activate to the 
             foreach(Card card in Battlefield)
             {
-                foreach(ActivatedAbility ability in card.Abilities.Where(c => c is ActivatedAbility))
+                foreach(ActivatedAbility ability in card.AbilitiesAfterModifiersApplied.Where(c => c is ActivatedAbility))
                 {
                     if(ability.Cost.CanPay())
                     {

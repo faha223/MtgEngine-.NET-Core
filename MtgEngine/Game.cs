@@ -406,6 +406,17 @@ namespace MtgEngine
             if (_deadPlayers.ContainsKey(ActivePlayer))
                 throw new ActivePlayerLostTheGameException(_deadPlayers[ActivePlayer]);
 
+            foreach(var player in _players)
+            {
+                foreach(var card in player.Graveyard)
+                {
+                    if (card.IsAToken)
+                        player.Graveyard.Remove(card);
+                    else if (card.IsCopying != null)
+                        card.StopCopying(card.IsCopying, card.copyingSource);
+                }
+            }
+
             // Legend Rule (players cannot control more than 1 copy of a legendary permanent with the same name
             foreach (var player in _players)
             {
@@ -455,7 +466,7 @@ namespace MtgEngine
             {
                 foreach (var permanent in player.Battlefield)
                 {
-                    foreach (StateTriggeredAbility ability in permanent.Abilities.Where(c => c is StateTriggeredAbility))
+                    foreach (StateTriggeredAbility ability in permanent.AbilitiesAfterModifiersApplied.Where(c => c is StateTriggeredAbility))
                     {
                         if (ability.CheckState(this))
                         {

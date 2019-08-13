@@ -3,6 +3,7 @@ using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,14 @@ namespace MtgEngine.TestSet.Lands
 
             public override void OnResolve(Game game)
             {
-                // TODO: Copy Target Land
+                // Stop copying whatever else we're copying right now
+                Source.StopCopying(Source.IsCopying, this);
+
+                // Copy Target Land
+                Source.Copy(targetLand, this);
+
+                // Except it retains this ability
+                Source.Modifiers.Add(new AbilityModifier(this, nameof(Card.Abilities), ModifierMode.Add, this));
             }
 
             public void SelectTargets(Game game)
