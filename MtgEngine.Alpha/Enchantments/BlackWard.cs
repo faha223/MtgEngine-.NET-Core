@@ -1,32 +1,35 @@
-﻿using MtgEngine.Common;
-using MtgEngine.Common.Abilities;
-using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
-using System.Linq;
 
 namespace MtgEngine.Alpha.Enchantments
 { 
     [MtgCard("Black Ward", "LEA", "", "", Text= "Enchant creature\n\nEnchanted creature has protection from black.This effect doesn’t remove Black Ward.")]
-    public class BlackWard : Card, ITargeting
+    public class BlackWard : CardSource
     {
         public Card enchantedCreature;
 
-        public BlackWard(Player owner) : base(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{W}");
-        }
+            var card = new Card(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-        public void SelectTargets(Game game)
-        {
-            var possibleTargets = game.Battlefield.Creatures.AsEnumerable<ITarget>().ToList();
-            enchantedCreature = (Card)Controller.ChooseTarget(this, possibleTargets);
-        }
+            card.Cost = ManaCost.Parse(card, "{W}");
 
-        public override void OnResolve(Game game)
-        {
-            // TODO: Give Enchanted Creature Protecton from Black
+            card.OnCast = game =>
+            {
+                var target = card.Controller.SelectTarget("Enchant Creature", (c) => c.IsACreature);
+                card.SetVar("Target", target);
+            };
+
+            card.OnResolve = Game =>
+            {
+                var target = card.GetVar<Card>("Target");
+                // TODO: Attach Aura to Target
+            };
+
+            return card;
         }
     }
 }

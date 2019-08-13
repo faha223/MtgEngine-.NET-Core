@@ -9,20 +9,26 @@ using System.Linq;
 namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Black Vise", "LEA", "", "", Text = "As Black Vise enters the battlefield, choose an opponent.\n\nAt the beginning of the chosen player’s upkeep, Black Vise deals X damage to that player, where X is the number of cards in their hand minus 4.")]
-    public class BlackVise : Card
+    public class BlackVise : CardSource
     {
         public Player chosenOpponent;
 
-        public BlackVise(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}");
+            var card = new Card(owner, new[] { CardType.Artifact }, null, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            Abilities.Add(new BlackViseAbility(this));
-        }
+            card.Cost = ManaCost.Parse(card, "{1}");
 
-        public override void OnResolve(Game game)
-        {
-            Controller.ChoosePlayer("As Black Vise enters the battlefield, choose an opponent.", game.Players().Except(new[] { Controller }));
+            card.Abilities.Add(new BlackViseAbility(card));
+
+            card.OnResolve = (Game game) =>
+            {
+                var chosenPlayer = card.Controller.ChoosePlayer("As Black Vise enters the battlefield, choose an opponent.", game.Players().Except(new[] { card.Controller }));
+                card.SetVar("Chosen Player", chosenPlayer);
+            };
+
+            return card;
         }
 
         public class BlackViseAbility : EventTriggeredAbility
@@ -33,17 +39,20 @@ namespace MtgEngine.Alpha.Artifacts
 
             public override Ability Copy(Card newSource)
             {
-                throw new NotImplementedException();
+                return new BlackViseAbility(newSource);
             }
 
             public override void OnResolve(Game game)
             {
-                Player opponent = (Source as BlackVise).chosenOpponent;
-                int cardsInHand = opponent.Hand.Count;
-                int X = cardsInHand - 4;
-                if (X > 0)
+                Player opponent = Source.GetVar<Player>("Chosen Opponent");
+                if (opponent != null)
                 {
-                    opponent.LoseLife(X, Source);
+                    int cardsInHand = opponent.Hand.Count;
+                    int X = cardsInHand - 4;
+                    if (X > 0)
+                    {
+                        opponent.LoseLife(X, Source);
+                    }
                 }
             }
         }

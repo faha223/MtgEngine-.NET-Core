@@ -7,12 +7,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Scrubland", "LEA", "", "", "({T}: Add {W} or {B})")]
-    public class Scrubland : Card
+    public class Scrubland : CardSource
     {
-        public Scrubland(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Plains", "Swamp" }, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {W}"));
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {B}"));
+            var card = new Card(owner, new[] { CardType.Land }, new[] { "Plains", "Swamp" }, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+        
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {W}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {B}"));
+
+            return card;
         }
     }
 }

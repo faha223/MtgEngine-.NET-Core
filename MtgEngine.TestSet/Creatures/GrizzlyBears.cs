@@ -6,11 +6,16 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet
 {
     [MtgCard("Grizzly Bears", "TestSet", "", "", null, "\"We cannot forget that among all of Dominaria's wonders, a system of life exists, with prey and predators that will never fight wars nor vie for ancient power.\"\n-Jorael, empress of beasts")]
-    public class GrizzlyBears : Card
+    public class GrizzlyBears : CardSource
     {
-        public GrizzlyBears(Player owner) : base(owner, new CardType[] { CardType.Creature }, new string[] { "Bear" }, false, 2, 2, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}{G}");
+            var card = new Card(owner, new CardType[] { CardType.Creature }, new string[] { "Bear" }, false, 2, 2, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{1}{G}");
+
+            return card;
         }
     }
 }

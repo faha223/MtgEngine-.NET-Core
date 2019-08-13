@@ -6,8 +6,12 @@ namespace MtgEngine.Alpha
     [MtgCard("Swamp", "LEA", "", "")]
     public class Swamp : Common.Cards.BasicLands.Swamp
     {
-        public Swamp(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

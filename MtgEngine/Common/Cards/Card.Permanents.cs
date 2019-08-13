@@ -1,26 +1,22 @@
 ﻿using MtgEngine.Common.Abilities;
-using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
-using MtgEngine.Common.Players;
+using System;
 using System.Collections.Generic;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : IDamageable
+    public sealed partial class Card : IDamageable
     {
-        protected List<Ability> _copiedCardAbilities;
-        protected List<Ability> _abilities { get; } = new List<Ability>();
-        public virtual List<Ability> Abilities
+        private List<Ability> _abilities { get; } = new List<Ability>();
+        public List<Ability> Abilities
         {
             get
             {
-                if (_copiedCardAbilities != null)
-                    return _copiedCardAbilities;
                 return _abilities;
             }
         }
 
-        public virtual bool CanBeTargetedBy(IResolvable other)
+        public bool CanBeTargetedBy(IResolvable other)
         {
             // Permanents with Shroud cannot be targeted by spells
             if (StaticAbilities.Contains(StaticAbility.Shroud))
@@ -40,24 +36,17 @@ namespace MtgEngine.Common.Cards
             return true;
         }
 
-        public bool IsTapped { get; protected set; }
+        public bool IsTapped { get; private set; }
 
-        public virtual bool UntapsDuringUntapStep
-        {
-            get
-            {
-                // TODO: Check for Modifiers that would make this false
-                return true;
-            }
-        }
+        public Func<bool> UntapsDuringUntapStep = () => { return true; };
 
-        public virtual void Untap()
+        public void Untap()
         {
             if (IsTapped)
                 IsTapped = false;
         }
 
-        public virtual void Tap()
+        public void Tap()
         {
             if (!IsTapped)
                 IsTapped = true;

@@ -5,6 +5,5 @@
     /// </summary>
     public interface IResolvable
     {
-        void OnResolve(Game game);
     }
 }

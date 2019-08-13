@@ -4,10 +4,14 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Common.Cards.BasicSnowLands
 {
     [MtgCard("Snow Covered Mountain", "", "", "")]
-    public class SnowCoveredMountain : BasicSnowLand
+    public class SnowCoveredMountain : BasicSnowLandSource
     {
-        public SnowCoveredMountain(Player owner) : base(owner, ManaColor.Red, new[] { CardType.Land }, new[] { "Mountain" })
+        public override Card GetCard(Player owner)
         {
+            var card = GetBasicSnowLand(owner, ManaColor.Red, new[] { CardType.Land }, new[] { "Mountain" });
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

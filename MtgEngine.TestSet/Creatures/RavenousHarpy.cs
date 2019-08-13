@@ -6,13 +6,18 @@ using MtgEngine.Common.Players;
 
 namespace MtgEngine.TestSet.Creatures
 {
-    public class RavenousHarpy : Card
+    public class RavenousHarpy : CardSource
     {
-        public RavenousHarpy(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Harpy" }, false, 1, 2, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{2}{B}");
-            StaticAbilities.Add(StaticAbility.Flying);
-            Abilities.Add(new RavenousHarpyAbility(this));
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Harpy" }, false, 1, 2, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{2}{B}");
+            card.StaticAbilities.Add(StaticAbility.Flying);
+            card.Abilities.Add(new RavenousHarpyAbility(card));
+
+            return card;
         }
 
         private class RavenousHarpyAbility : ActivatedAbility

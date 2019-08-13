@@ -4,19 +4,19 @@ using System.Collections.ObjectModel;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : IDamageable
+    public sealed partial class Card : IDamageable
     {
         public delegate void CountersEvent(Card card, IResolvable source, CounterType counterType, int amount);
         public event CountersEvent CountersCreated;
         public event CountersEvent CountersRemoved;
 
         // This isn't protected because we don't want inheriting classes modifying how counters are added or removed
-        protected List<CounterType> counters { get; } = new List<CounterType>();
+        private List<CounterType> counters { get; } = new List<CounterType>();
 
         // This returns a copy so that this can't be used to modify the counters
         public ReadOnlyCollection<CounterType> Counters => new ReadOnlyCollection<CounterType>(counters);
 
-        public virtual void AddCounters(IResolvable source, int amount, CounterType counter)
+        public void AddCounters(IResolvable source, int amount, CounterType counter)
         {
             for (int i = 0; i < amount; i++)
             {

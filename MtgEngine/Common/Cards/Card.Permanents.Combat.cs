@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : IDamageable
+    public sealed partial class Card : IDamageable
     {
         public Player DefendingPlayer { get; set; } = null;
 
@@ -17,7 +17,7 @@ namespace MtgEngine.Common.Cards
 
         public event TookDamageEventHandler TookDamage;
 
-        public virtual void TakeDamage(int amount, Card source)
+        public void TakeDamage(int amount, Card source)
         { 
             TookDamage?.Invoke(this, source, amount);
 
@@ -34,14 +34,14 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        public virtual bool IsDead => (IsACreature && (Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible))) || (IsAPlaneswalker && Counters.Count(c => c == CounterType.Loyalty) == 0);
+        public bool IsDead => (IsACreature && (Toughness <= 0 || (DamageAccumulated >= Toughness && !HasIndestructible))) || (IsAPlaneswalker && Counters.Count(c => c == CounterType.Loyalty) == 0);
 
         public void ResetDamage()
         {
             DamageAccumulated = 0;
         }
 
-        protected virtual bool canAttackAsThoughItDidntHaveDefender() => false;
+        private Func<bool> canAttackAsThoughItDidntHaveDefender = () => { return false; };
 
         public bool CanAttack
         {

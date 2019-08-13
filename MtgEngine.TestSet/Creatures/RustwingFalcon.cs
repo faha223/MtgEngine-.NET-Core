@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Rustwing Falcon", "TestSet", "", "", Text ="Flying", FlavorText = "Native to wide prairies and scrublands, falcons occasionally roost in dragon skeletons.")]
-    public class RustwingFalcon : Card
+    public class RustwingFalcon : CardSource
     {
-        public RustwingFalcon(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Bird" }, false, 1, 2, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{W}");
-            StaticAbilities.Add(StaticAbility.Flying);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Bird" }, false, 1, 2, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{W}");
+            card.StaticAbilities.Add(StaticAbility.Flying);
+
+            return card;
         }
     }
 }

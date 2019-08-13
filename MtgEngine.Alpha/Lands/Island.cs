@@ -6,8 +6,12 @@ namespace MtgEngine.Alpha
     [MtgCard("Island", "LEA", "", "")]
     public class Island : Common.Cards.BasicLands.Island
     {
-        public Island(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

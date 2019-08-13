@@ -7,12 +7,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Taiga", "LEA", "", "", "({T}: Add {R} or {G})")]
-    public class Taiga : Card
+    public class Taiga : CardSource
     {
-        public Taiga(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Mountain", "Forest" }, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {R}"));
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {G}"));
+            var card = new Card(owner, new[] { CardType.Land }, new[] { "Mountain", "Forest" }, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {R}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {G}"));
+
+            return card;
         }
     }
 }

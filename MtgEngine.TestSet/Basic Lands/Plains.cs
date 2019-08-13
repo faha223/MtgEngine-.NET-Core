@@ -6,9 +6,12 @@ namespace MtgEngine.TestSet
     [MtgCard("Plains", "TestSet", "", "")]
     public class Plains : Common.Cards.BasicLands.Plains
     {
-        public Plains(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
+            return card;
         }
     }
 }

@@ -6,8 +6,12 @@ namespace MtgEngine.TestSet
     [MtgCard("Snow Covered Island", "TestSet", "", "")]
     public class SnowCoveredIsland : Common.Cards.BasicSnowLands.SnowCoveredIsland
     {
-        public SnowCoveredIsland(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

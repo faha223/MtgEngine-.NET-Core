@@ -8,21 +8,26 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Artifacts
 {
     [MtgCard("Basalt Monolith", "LEA", "", "")]
-    public class BasaltMonolith : Card
+    public class BasaltMonolith : CardSource
     {
-        public BasaltMonolith(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{3}");
+            var card = new Card(owner, new[] { CardType.Artifact }, null, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+        
+            card.Cost = ManaCost.Parse(card, "{3}");
 
             // {T}: Add {C}{C}{C}
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new ManaAmount(3, ManaColor.Colorless), "{T}: Add {C}{C}{C}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new ManaAmount(3, ManaColor.Colorless), "{T}: Add {C}{C}{C}"));
 
             // {3}: Untap Basalt Monolith
-            Abilities.Add(new BasaltMonolithUntapAbility(this));
-        }
+            card.Abilities.Add(new BasaltMonolithUntapAbility(card));
 
-        // Basalt Monolith doesn't untap during your untap step.
-        public override bool UntapsDuringUntapStep => false;
+            // Basalt monolith doesn't untap during your untap step
+            card.UntapsDuringUntapStep = () => false;
+
+            return card;
+        }
 
         public class BasaltMonolithUntapAbility : ActivatedAbility
         {

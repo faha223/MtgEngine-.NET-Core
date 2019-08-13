@@ -6,8 +6,12 @@ namespace MtgEngine.TestSet
     [MtgCard("Snow Covered Swamp", "TestSet", "", "")]
     public class SnowCoveredSwamp : Common.Cards.BasicSnowLands.SnowCoveredSwamp
     {
-        public SnowCoveredSwamp(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

@@ -6,16 +6,20 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Sorceries
 {
     [MtgCard("Armageddon", "LEA", "", "", Text = "Destroy all lands.")]
-    public class Armageddon : Card
+    public class Armageddon : CardSource
     {
-        public Armageddon(Player owner) : base(owner, new[] { CardType.Sorcery }, null, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{3}{W}");
-        }
+            var card = new Card(owner, new[] { CardType.Sorcery }, null, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card.Cost = ManaCost.Parse(card, "{3}{W}");
 
-        public override void OnResolve(Game game)
-        {
-            game.DestroyLands(c => true);
+            card.OnResolve = game =>
+            {
+                game.DestroyLands(c => true);
+            };
+
+            return card;
         }
     }
 }

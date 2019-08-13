@@ -4,11 +4,14 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Common.Cards.BasicLands
 {
     [MtgCard("Plains", "", "", "")]
-    public class Plains : BasicLandCard
+    public class Plains : BasicLandCardSource
     {
-        public Plains(Player owner) : base(owner, ManaColor.White, new[] { CardType.Land }, new[] { "Plains" }, false)
+        public override Card GetCard(Player owner)
         {
+            var card = GetBasicLandCard(owner, ManaColor.White, new[] { CardType.Land }, new[] { "Plains" }, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
+            return card;
         }
     }
 }

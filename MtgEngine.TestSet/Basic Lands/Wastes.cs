@@ -6,8 +6,12 @@ namespace MtgEngine.TestSet
     [MtgCard("Wastes", "TestSet", "", "")]
     public class Wastes : Common.Cards.BasicLands.Wastes
     {
-        public Wastes(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

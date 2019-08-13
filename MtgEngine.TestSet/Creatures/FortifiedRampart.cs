@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Fortified Rampart", "TestSet", "", "", "Defender", "The refuge's defenses allow new recruits to see lesser Eldrazi up close, steeling their stomachs for what's to come.")]
-    public class FortifiedRampart : Card
+    public class FortifiedRampart : CardSource
     {
-        public FortifiedRampart(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Wall" }, false, 0, 6, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}{W}");
-            StaticAbilities.Add(StaticAbility.Defender);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Wall" }, false, 0, 6, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{1}{W}");
+            card.StaticAbilities.Add(StaticAbility.Defender);
+
+            return card;
         }
     }
 }

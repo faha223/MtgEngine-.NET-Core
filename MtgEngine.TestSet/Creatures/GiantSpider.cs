@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Giant Spider", "TestSet", "", "", "Reach (This creature can block creatures with flying.)", "\"After everything I’ve survived, it’s hard to be frightened by anything anymore.\"\n-Vivien Reid")]
-    public class GiantSpider : Card
+    public class GiantSpider : CardSource
     {
-        public GiantSpider(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Spider" }, false, 2, 4, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{3}{G}");
-            StaticAbilities.Add(StaticAbility.Reach);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Spider" }, false, 2, 4, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{3}{G}");
+            card.StaticAbilities.Add(StaticAbility.Reach);
+
+            return card;
         }
     }
 }

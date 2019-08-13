@@ -9,50 +9,58 @@ namespace MtgEngine.Common.Cards
     /// <summary>
     /// Cards can, generally, be put on the stack. The exception to this rule is Land cards
     /// </summary>
-    public partial class Card : ITarget, IResolvable
+    public sealed partial class Card : ITarget, IResolvable
     {
         public bool UsesStack { get; }
 
-        protected List<StaticAbility> _staticAbilities { get; } = new List<StaticAbility>();
-        protected List<StaticAbility> _copiedCardStaticAbilities { get; set; }
+        private Dictionary<string, object> vars = new Dictionary<string, object>();
+        public void SetVar(string variable, object value)
+        {
+            if (vars.ContainsKey(variable))
+                vars.Remove(variable);
+            vars.Add(variable, value);
+        }
+
+        public T GetVar<T>(string variable)
+        {
+            if (vars.ContainsKey(variable) && vars[variable] is T)
+                return (T)vars[variable];
+
+            return default(T);
+        }
+
+        private List<StaticAbility> _staticAbilities { get; } = new List<StaticAbility>();
         public List<StaticAbility> StaticAbilities
         {
             get
             {
-                if (_copiedCardStaticAbilities != null)
-                    return _copiedCardStaticAbilities;
                 return _staticAbilities;
             }
         }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
 
-        protected Cost _cost { get; set; }
-        protected Cost _copiedCardCost { get; set; }
-        public virtual Cost Cost
+        private Cost _cost { get; set; }
+        public Cost Cost
         {
             get
             {
-                if(_copiedCardCost != null)
-                    return _copiedCardCost;
                 return _cost;
             }
-            protected set
+            set
             {
                 _cost = value;
             }
         }
 
-        protected CardType[] _types { get; }
-        public virtual CardType[] Types { get { return _types; } }
+        private CardType[] _types { get; }
+        public CardType[] Types { get { return _types; } }
 
         // This is virtual so that it can be overridden in token classes
-        protected ManaColor[] _copiedCardColorIdentity { get; set; }
-        public virtual ManaColor[] ColorIdentity {
+        public ManaColor[] ColorIdentity
+        {
             get
             {
-                if (_copiedCardColorIdentity != null)
-                    return _copiedCardColorIdentity;
                 if (StaticAbilities.Contains(StaticAbility.Devoid))
                     return null;
 
@@ -64,50 +72,38 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        protected string[] _subtypes { get; }
-        protected string[] _copiedCardSubTypes { get; set; }
-        public virtual string[] Subtypes
+        private string[] _subtypes { get; }
+        public string[] Subtypes
         {
             get
             {
-                if (_copiedCardSubTypes != null)
-                    return _copiedCardSubTypes;
                 return _subtypes;
             }
         }
 
-        protected bool _isBasic { get; }
-        protected bool? _copiedCardIsBasic { get; set; }
-        public virtual bool IsBasic
+        private bool _isBasic { get; }
+        public bool IsBasic
         {
             get
             {
-                if (_copiedCardIsBasic.HasValue)
-                    return _copiedCardIsBasic.Value;
                 return _isBasic;
             }
         }
 
-        protected bool _isLegendary { get; }
-        protected bool? _copiedCardIsLegendary { get; set; }
-        public virtual bool IsLegendary
+        private bool _isLegendary { get; }
+        public bool IsLegendary
         {
             get
             {
-                if (_copiedCardIsLegendary.HasValue)
-                    return _copiedCardIsLegendary.Value;
                 return _isLegendary;
             }
         }
 
-        protected bool _isSnow { get; }
-        protected bool? _copiedCardIsSnow { get; set; }
-        public virtual bool IsSnow
+        private bool _isSnow { get; }
+        public bool IsSnow
         {
             get
             {
-                if (_copiedCardIsSnow.HasValue)
-                    return _copiedCardIsSnow.Value;
                 return _isSnow;
             }
         }
@@ -133,17 +129,17 @@ namespace MtgEngine.Common.Cards
         }
 
         // Land Constructor
-        protected Card(Player owner, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) : this(owner, false, null, types, subtypes, isBasic, isLegendary, isSnow)
+        public Card(Player owner, CardType[] types, string[] subtypes, bool isBasic, bool isLegendary, bool isSnow) : this(owner, false, null, types, subtypes, isBasic, isLegendary, isSnow)
         {
         }
 
         // Spell Constructor
-        protected Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary) : this(owner, true, null, types, subtypes, false, isLegendary, false)
+        public Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary) : this(owner, true, null, types, subtypes, false, isLegendary, false)
         {
         }
 
         // Non-Land Permanent Constructor
-        protected Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary, bool isSnow) : this(owner, true, null, types, subtypes, false, isLegendary, isSnow)
+        public Card(Player owner, CardType[] types, string[] subtypes, bool isLegendary, bool isSnow) : this(owner, true, null, types, subtypes, false, isLegendary, isSnow)
         {
         }
 
@@ -154,23 +150,15 @@ namespace MtgEngine.Common.Cards
             _baseToughness = baseToughness;
         }
 
-        public virtual bool CanCast(Game game)
-        {
-            return true;
-        }
+        public Func<Game, bool> CanCast = (Game game) => { return true; };
 
-        public virtual void OnCast(Game game)
-        {
-
-        }
+        public Action<Game> OnCast = (game) => { };
 
         /// <summary>
         /// The method that is called as the spell resolves. If a spell is exiled after it resolves, exile it in this method
         /// </summary>
         /// <param name="game"></param>
-        public virtual void OnResolve(Game game)
-        {
-        }
+        public Action<Game> OnResolve = (game) => { };
 
         public void GiveControl(Player player)
         {

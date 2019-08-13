@@ -7,12 +7,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Savannah", "LEA", "", "", "({T}: Add {G} or {W})")]
-    public class Savannah : Card
+    public class Savannah : CardSource
     {
-        public Savannah(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Forest", "Plains" }, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {G}"));
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {W}"));
+            var card = new Card(owner, new[] { CardType.Land }, new[] { "Forest", "Plains" }, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {G}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {W}"));
+
+            return card;
         }
     }
 }

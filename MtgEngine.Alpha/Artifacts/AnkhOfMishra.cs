@@ -8,12 +8,17 @@ namespace MtgEngine.Alpha.Artifacts
 {
     // TODO: Add a continuous effect that subscribes to Enters the Battlefield events
     [MtgCard("Ankh of Mishra", "LEA", "", "", Text = "Whenever a land enters the battlefield, Ankh of Mishra deals 2 damage to that land's controller.")]
-    public class AnkhOfMishra : Card
+    public class AnkhOfMishra : CardSource
     {
-        public AnkhOfMishra(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{2}");
-            Abilities.Add(new AnkhOfMishraAbility(this));
+            var card = new Card(owner, new[] { CardType.Artifact }, null, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{2}");
+            card.Abilities.Add(new AnkhOfMishraAbility(card));
+
+            return card;
         }
 
         internal class AnkhOfMishraAbility : EventTriggeredAbility

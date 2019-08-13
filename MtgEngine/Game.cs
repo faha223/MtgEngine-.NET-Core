@@ -224,7 +224,7 @@ namespace MtgEngine
             ActivePlayer.Battlefield.ForEach(c =>
             {
                 c.HasSummoningSickness = false;
-                if(c.UntapsDuringUntapStep)
+                if(c.UntapsDuringUntapStep())
                     c.Untap();
             });
 

@@ -7,12 +7,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Lands
 {
     [MtgCard("Badlands", "LEA", "", "", "({T}: Add {B} or {R})")]
-    public class Badlands : Card
+    public class Badlands : CardSource
     {
-        public Badlands(Player owner) : base(owner, new[] { CardType.Land }, new[] { "Swamp", "Mountain" }, false, false, false)
+        public override Card GetCard(Player owner)
         {
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Black), "{T}: Add {B}"));
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {R}"));
+            var card = new Card(owner, new[] { CardType.Land }, new[] { "Swamp", "Mountain" }, false, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Black), "{T}: Add {B}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {R}"));
+
+            return card;
         }
     }
 }

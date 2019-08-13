@@ -8,18 +8,23 @@ using System.Linq;
 namespace MtgEngine.TestSet.Snow_Covered_Lands
 {
     [MtgCard("Dark Depths", "TestSet", "", "", "Dark Depths enters the battlefield with ten ice counters on it.\n{3}: Remove an ice counter from Dark Depths.\nWhen Dark Depths has no ice counters on it, sacrifice it.If you do, create Marit Lage, a legendary 20/20 black Avatar creature token with flying and indestructible.")]
-    public class DarkDepths : Card
+    public class DarkDepths : CardSource
     {
-        public DarkDepths(Player owner) : base(owner, new[] { CardType.Land }, null, false, true, true)
+        public override Card GetCard(Player owner)
         {
+            var card = new Card(owner, new[] { CardType.Land }, null, false, true, true);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
             // Dark Depths enters the battlefield with 10 ice counters on it
-            AddCounters(this, 10, CounterType.Ice);
+            card.AddCounters(card, 10, CounterType.Ice);
 
             // {3}: Remove an ice counter from Dark Depths
-            Abilities.Add(new DarkDepthsAbility(this));
+            card.Abilities.Add(new DarkDepthsAbility(card));
 
             // When Dark Depths has no ice counters on it, sacrifice it. If you do, create Marit Lage, a legendary 20/20 black Avatar creature token with flying and indestructible
-            Abilities.Add(new MaritLageAbility(this));
+            card.Abilities.Add(new MaritLageAbility(card));
+
+            return card;
         }
 
         public class DarkDepthsAbility : ActivatedAbility
@@ -60,7 +65,7 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
                 // If the player was unable to sacrifice the Dark Depths when
                 if (controller.Sacrifice(Source))
                 {
-                    game.PutPermanentOnBattlefield(new MaritLage(controller));
+                    game.PutPermanentOnBattlefield(new MaritLage().GetCard(controller));
                 }
             }
 
@@ -71,15 +76,20 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
         }
 
         [MtgCard("Marit Lage", "TestSet", "", "")]
-        public class MaritLage : Card
+        public class MaritLage : CardSource
         {
-            public MaritLage(Player owner) : base(owner, new[] { CardType.Creature, CardType.Token }, new[] { "Avatar" }, false, 20, 20, true, false)
+            public override Card GetCard(Player owner)
             {
-                StaticAbilities.Add(StaticAbility.Flying);
-                StaticAbilities.Add(StaticAbility.Indestructible);
-            }
+                var card = new Card(owner, new[] { CardType.Creature, CardType.Token }, new[] { "Avatar" }, false, 20, 20, true, false);
+                card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            public override ManaColor[] ColorIdentity => new[] { ManaColor.Black };
+                card.StaticAbilities.Add(StaticAbility.Flying);
+                card.StaticAbilities.Add(StaticAbility.Indestructible);
+
+                // TODO: Override Color Identity to Black
+
+                return card;
+            }
         }
     }
 }

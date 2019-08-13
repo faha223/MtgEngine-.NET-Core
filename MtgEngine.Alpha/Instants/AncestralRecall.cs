@@ -8,23 +8,28 @@ using System.Collections.Generic;
 namespace MtgEngine.Alpha.Instants
 {
     [MtgCard("Ancestral Recall", "LEA", "", "", Text = "Target player draws three cards.")]
-    public class AncestralRecall : Card
+    public class AncestralRecall : CardSource
     {
-        Player _target;
-
-        public AncestralRecall(Player owner) : base(owner, new[] { CardType.Instant }, null, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{U}");
-        }
+            var card = new Card(owner, new[] { CardType.Instant }, null, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-        public override void OnCast(Game game)
-        {
-            _target = Controller.ChooseTarget(this, new List<ITarget>(game.Players())) as Player;
-        }
+            card.Cost = ManaCost.Parse(card, "{U}");
 
-        public override void OnResolve(Game game)
-        {
-            _target.Draw(3);
+            card.OnCast = (game) =>
+            {
+                var _target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Players())) as Player;
+                card.SetVar("Target", _target);
+            };
+
+            card.OnResolve = (game) =>
+            {
+                var _target = card.GetVar<Player>("Target");
+                _target.Draw(3);
+            };
+
+            return card;
         }
     }
 }

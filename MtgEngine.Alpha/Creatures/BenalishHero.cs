@@ -6,14 +6,19 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Creatures
 {
     [MtgCard("Benalish Hero", "LEA", "", "", FlavorText = "Benalia has a complex caste system that changes with the lunar year. No matter what the season, the only caste that cannot be attained by either heredity or money is that of the hero.")]
-    public class BenalishHero : Card
+    public class BenalishHero : CardSource
     {
-        public BenalishHero(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Human", "Soldier" }, false, 1, 1, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{W}");
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Human", "Soldier" }, false, 1, 1, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{W}");
 
             // TODO
-            //StaticAbilities.Add(StaticAbility.Banding);
+            //card.StaticAbilities.Add(StaticAbility.Banding);
+
+            return card;
         }
     }
 }

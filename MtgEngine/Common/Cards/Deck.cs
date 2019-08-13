@@ -23,7 +23,7 @@ namespace MtgEngine.Common.Cards
 
                 for (int i = 0;i < quantity; i++)
                 {
-                    Add(ctor(owner));
+                    Add(ctor().GetCard(owner));
                 }
             }
         }

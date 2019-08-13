@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Brushstrider", "TestSet", "", "", "Vigilance", "Magistrate Ludy agreed to designate land for the brushstriders only after several broken windows and dozens of missing blini-cakes.")]
-    public class Brushstrider : Card
+    public class Brushstrider : CardSource
     {
-        public Brushstrider(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Beast" }, false, 3, 1, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}{G}");
-            StaticAbilities.Add(StaticAbility.Vigilance);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Beast" }, false, 3, 1, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{1}{G}");
+            card.StaticAbilities.Add(StaticAbility.Vigilance);
+
+            return card;
         }
     }
 }

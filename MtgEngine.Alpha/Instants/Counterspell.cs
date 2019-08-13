@@ -9,36 +9,40 @@ using System.Collections.Generic;
 namespace MtgEngine.Alpha.Instants
 {
     [MtgCard("Counterspell", "LEA", "", "", "Counter target spell")]
-    public class Counterspell : Card
+    public class Counterspell : CardSource
     {
-        Card target;
-
-        public Counterspell(Player owner) : base(owner, new[] { CardType.Instant }, null, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{U}{U}");
-        }
+            var card = new Card(owner, new[] { CardType.Instant }, null, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+        
+            card.Cost = ManaCost.Parse(card, "{U}{U}");
 
-        public override bool CanCast(Game game)
-        {
-            // Can't cast if there are no targets
-            var possibleTargets = game.CardsOnStack();
-            if (possibleTargets.Count == 0)
-                return false;
+            card.CanCast = game =>
+            {
+                var possibleTargets = game.CardsOnStack();
+                if (possibleTargets.Count == 0)
+                    return false;
 
-            return base.CanCast(game);
-        }
+                return true;
+            };
 
-        public override void OnCast(Game game)
-        {
-            var possibleTargets = game.CardsOnStack();
-            if (possibleTargets.Count == 0)
-                throw new InvalidOperationException("Counterspell can't be cast if there are no spells on the stack");
-            target = Controller.ChooseTarget(this, new List<ITarget>(possibleTargets)) as Card;
-        }
+            card.OnCast = game =>
+            {
+                var possibleTargets = game.CardsOnStack();
+                if (possibleTargets.Count == 0)
+                    throw new InvalidOperationException("Counterspell can't be cast if there are no spells on the stack");
+                var target = card.Controller.ChooseTarget(card, new List<ITarget>(possibleTargets)) as Card;
+                card.SetVar("Target", target);
+            };
 
-        public override void OnResolve(Game game)
-        {
-            game.Counter(target);
+            card.OnResolve = game =>
+            {
+                var target = card.GetVar<Card>("Target");
+                game.Counter(target);
+            };
+
+            return card;
         }
     }
 }

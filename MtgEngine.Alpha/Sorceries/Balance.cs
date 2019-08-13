@@ -7,20 +7,25 @@ using System.Linq;
 namespace MtgEngine.Alpha.Sorceries
 {
     [MtgCard("Balance", "LEA", "", "", Text = "Each player chooses a number of lands they control equal to the number of lands controlled by the player who controls the fewest, then sacrifices the rest. Players discard cards and sacrifice creatures the same way.")]
-    public class Balance : Card
+    public class Balance : CardSource
     {
-        public Balance(Player owner) : base(owner, new[] { CardType.Sorcery }, null, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}{W}");
-        }
+            var card = new Card(owner, new[] { CardType.Sorcery }, null, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-        public override void OnResolve(Game game)
-        {
-            balanceLands(game);
+            card.Cost = ManaCost.Parse(card, "{1}{W}");
 
-            balanceHands(game);
+            card.OnResolve = game =>
+            {
+                balanceLands(game);
 
-            balanceCreatures(game);
+                balanceHands(game);
+
+                balanceCreatures(game);
+            };
+
+            return card;
         }
 
         private void balanceLands(Game game)

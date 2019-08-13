@@ -7,15 +7,20 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Plague Myr", "TestSet", "", "", Text = "Infect (This creature deals damage to creatures in the form of -1/-1 counters and to players in the form of poison counters.){T}: Add {C}.", FlavorText = "They watch for a new master, one more sinister than the last.")]
-    public class PlagueMyr : Card
+    public class PlagueMyr : CardSource
     {
-        public PlagueMyr(Player owner) : base(owner, new[] { CardType.Artifact, CardType.Creature }, new[] { "Myr" }, false, 1, 1, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{2}");
+            var card = new Card(owner, new[] { CardType.Artifact, CardType.Creature }, new[] { "Myr" }, false, 1, 1, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+        
+            card.Cost = ManaCost.Parse(card, "{2}");
 
-            StaticAbilities.Add(StaticAbility.Infect);
+            card.StaticAbilities.Add(StaticAbility.Infect);
 
-            Abilities.Add(new ManaAbility(this, new TapCost(this), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}."));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}."));
+
+            return card;
         }
     }
 }

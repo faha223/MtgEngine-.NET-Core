@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Fencing Ace", "TestSet", "", "", "Double strike (This creature deals both first-strike and regular combat damage.)", "His prowess gives the guildless hope that they can hold out against tyranny.")]
-    public class FencingAce : Card
+    public class FencingAce : CardSource
     {
-        public FencingAce(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Human", "Soldier" }, false, 1, 1, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{1}{W}");
-            StaticAbilities.Add(StaticAbility.DoubleStrike);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Human", "Soldier" }, false, 1, 1, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+        
+            card.Cost = ManaCost.Parse(card, "{1}{W}");
+            card.StaticAbilities.Add(StaticAbility.DoubleStrike);
+
+            return card;
         }
     }
 }

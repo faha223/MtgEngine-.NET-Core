@@ -132,7 +132,7 @@ namespace MtgEngine
                 if (action.Card.Cost.Pay())
                 {
                     // Put the Card onto the stack
-                    action.Card.OnCast(this);
+                    action.Card.OnCast?.Invoke(this);
                     player.Hand.Remove(action.Card);
                     PushOntoStack(action.Card, Common.Enums.Zone.Hand);
                 }

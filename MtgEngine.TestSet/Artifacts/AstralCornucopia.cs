@@ -1,7 +1,6 @@
 ﻿using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
-using MtgEngine.Common.Counters;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Mana;
 using MtgEngine.Common.Players;
@@ -10,24 +9,26 @@ using System.Linq;
 namespace MtgEngine.TestSet
 {
     [MtgCard("Astral Cornucopia", "TestSet", "", "", "Astral Cornucopia enters the battlefield with X charge counters on it.\n{T}: Choose a color. Add one mana of that color for each charge counter on Astral Cornucopia.")]
-    public class AstralCornucopia : Card
+    public class AstralCornucopia : CardSource
     {
-        private int _x;
-
-        public AstralCornucopia(Player owner) : base(owner, new[] { CardType.Artifact }, null, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{X}{X}{X}");
+            var card = new Card(owner, new[] { CardType.Artifact }, null, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            // Subscribe to X event so that we know what the value for X was when this enters the battlefield
-            var mc = Cost as ManaCost;
-            mc.ValueforXChosen += (x => _x = x);
+            card.Cost = ManaCost.Parse(card, "{X}{X}{X}");
 
-            Abilities.Add(new AstralCornucopiaManaAbility(this));
-        }
+            var mc = card.Cost as ManaCost;
+            mc.ValueforXChosen += (x => card.SetVar("X", x));
 
-        public override void OnResolve(Game game)
-        {
-            AddCounters(this, _x, CounterType.Charge);
+            card.Abilities.Add(new AstralCornucopiaManaAbility(card));
+
+            card.OnResolve = (Game game) =>
+            {
+                card.AddCounters(card, card.GetVar<int>("X"), CounterType.Charge);
+            };
+
+            return card;
         }
 
         private class AstralCornucopiaManaAbility : ManaAbility

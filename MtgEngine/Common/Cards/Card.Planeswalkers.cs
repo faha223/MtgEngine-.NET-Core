@@ -4,7 +4,7 @@ using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Cards
 {
-    public partial class Card : ITarget
+    public sealed partial class Card : ITarget
     {
         public Card(Player owner, Cost cost, CardType[] types, string[] subtypes, int startingLoyalty) : this(owner, true, cost, types, subtypes, false, true, false)
         {

@@ -3,11 +3,15 @@ using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Cards.BasicLands
 {
-    public class Wastes : BasicLandCard
+    [MtgCard("Wastes", "", "", "")]
+    public class Wastes : BasicLandCardSource
     {
-        [MtgCard("Wastes", "", "", "")]
-        public Wastes(Player owner) : base(owner, ManaColor.Colorless, new[] { CardType.Land }, null, false)
+        public override Card GetCard(Player owner)
         {
+            var card = GetBasicLandCard(owner, ManaColor.Colorless, new[] { CardType.Land }, null, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

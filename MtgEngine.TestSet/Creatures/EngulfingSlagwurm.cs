@@ -3,20 +3,21 @@ using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MtgEngine.TestSet.Creatures
 {
     [MtgCard("Engulfing Slagwurm", "TestSet", "", "", "Whenever Engulfing Slagwurm blocks or becomes blocked by a creature, destroy that creature. You gain life equal to that creature’s toughness.", "Its teeth exist only for decoration.")]
-    public class EngulfingSlagwurm : Card
+    public class EngulfingSlagwurm : CardSource
     {
-        public EngulfingSlagwurm(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Wurm" }, false, 7, 7, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{5}{G}{G}");
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Wurm" }, false, 7, 7, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            Abilities.Add(new EngulfingSlagwurmAbility(this));
+            card.Cost = ManaCost.Parse(card, "{5}{G}{G}");
+            card.Abilities.Add(new EngulfingSlagwurmAbility(card));
+
+            return card;
         }
     }
 

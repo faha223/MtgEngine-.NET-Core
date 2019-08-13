@@ -6,12 +6,17 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Alpha.Creatures
 {
     [MtgCard("Air Elemental", "LEA", "", "", FlavorText = "These spirits of the air are winsome and wild, and cannot be truly contained. Only marginally intelligent, they often substitute whimsy for strategy, delighting in mischief and mayhem.")]
-    public class AirElemental : Card
+    public class AirElemental : CardSource
     {
-        public AirElemental(Player owner) : base(owner, new[] { CardType.Creature }, new[] { "Elemental" }, false, 4, 4, false, false)
+        public override Card GetCard(Player owner)
         {
-            Cost = ManaCost.Parse(this, "{3}{U}{U}");
-            StaticAbilities.Add(StaticAbility.Flying);
+            var card = new Card(owner, new[] { CardType.Creature }, new[] { "Elemental" }, false, 4, 4, false, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{3}{U}{U}");
+            card.StaticAbilities.Add(StaticAbility.Flying);
+
+            return card;
         }
     }
 }

@@ -6,17 +6,19 @@ namespace MtgEngine.Common.Cards
 {
     public partial class Card : ITarget, IResolvable
     {
-        public string CardId => MtgCardAttribute.GetAttribute(GetType())?.CardId;
+        public MtgCardAttribute _attrs { get; set; }
 
-        public virtual string Name => MtgCardAttribute.GetAttribute(GetType())?.Name;
+        public string CardId => _attrs?.CardId;
 
-        public virtual string Set => MtgCardAttribute.GetAttribute(GetType())?.SetName;
+        public string Name => _attrs?.Name;
 
-        public virtual string ImageUri => MtgCardAttribute.GetAttribute(GetType())?.ImageUri;
+        public string Set => _attrs?.SetName;
 
-        public virtual string Text => MtgCardAttribute.GetAttribute(GetType())?.Text;
+        public string ImageUri => _attrs?.ImageUri;
 
-        public virtual string FlavorText => MtgCardAttribute.GetAttribute(GetType())?.FlavorText;
+        public string Text => _attrs?.Text;
+
+        public string FlavorText => _attrs?.FlavorText;
 
         public bool IsACreature => Types.Contains(CardType.Creature);
 

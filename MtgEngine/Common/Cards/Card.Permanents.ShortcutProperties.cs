@@ -2,7 +2,7 @@
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : IDamageable
+    public sealed partial class Card : IDamageable
     {
         public bool HasFlying => StaticAbilities.Contains(StaticAbility.Flying);
 

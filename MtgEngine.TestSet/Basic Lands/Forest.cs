@@ -6,9 +6,12 @@ namespace MtgEngine.TestSet
     [MtgCard("Forest", "TestSet", "", "")]
     public class Forest : Common.Cards.BasicLands.Forest
     {
-        public Forest(Player owner) : base(owner)
+        public override Card GetCard(Player owner)
         {
+            var card = base.GetCard(owner);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
+            return card;
         }
     }
 }

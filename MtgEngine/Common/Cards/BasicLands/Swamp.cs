@@ -4,10 +4,14 @@ using MtgEngine.Common.Players;
 namespace MtgEngine.Common.Cards.BasicLands
 {
     [MtgCard("Swamp", "", "", "")]
-    public class Swamp : BasicLandCard
+    public class Swamp : BasicLandCardSource
     {
-        public Swamp(Player owner) : base(owner, ManaColor.Black, new[] { CardType.Land }, new[] { "Swamp" }, false)
+        public override Card GetCard(Player owner)
         {
+            var card = GetBasicLandCard(owner, ManaColor.Black, new[] { CardType.Land }, new[] { "Swamp" }, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            return card;
         }
     }
 }

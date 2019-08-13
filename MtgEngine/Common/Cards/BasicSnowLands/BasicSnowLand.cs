@@ -4,10 +4,11 @@ using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Cards.BasicSnowLands
 {
-    public class BasicSnowLand : BasicLandCard
+    public abstract class BasicSnowLandSource : BasicLandCardSource
     {
-        public BasicSnowLand(Player owner, ManaColor color, CardType[] types, string[] subtypes) : base(owner, color, types, subtypes, true)
+        public Card GetBasicSnowLand(Player owner, ManaColor color, CardType[] types, string[] subtypes) 
         {
+            return GetBasicLandCard(owner, color, types, subtypes, true);
         }
     }
 }

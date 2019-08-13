@@ -15,7 +15,7 @@ namespace MtgEngine.Common.Cards
             {
                 var sources = Assembly.LoadFile(dll)
                     .GetTypes()
-                    .Where(x => x.IsSubclassOf(typeof(Card)));
+                    .Where(x => x.IsSubclassOf(typeof(CardSource)));
                 foreach(var type in sources)
                 {
                     Cards.Add(type);

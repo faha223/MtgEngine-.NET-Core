@@ -3,16 +3,13 @@ using System.Linq;
 
 namespace MtgEngine.Common.Cards
 {
-    public abstract partial class Card : IDamageable
+    public sealed partial class Card : IDamageable
     {
-        protected int _basePower { get; }
-        protected int? _copiedCardBasePower { get; set; }
-        public virtual int BasePower
+        private int _basePower { get; }
+        public int BasePower
         {
             get
             {
-                if (_copiedCardBasePower.HasValue)
-                    return _copiedCardBasePower.Value;
                 return _basePower;
             }
         }
@@ -28,14 +25,11 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        protected int _baseToughness { get; }
-        protected int? _copiedCardBaseToughness { get; set; }
-        public virtual int BaseToughness
+        private int _baseToughness { get; }
+        public int BaseToughness
         {
             get
             {
-                if (_copiedCardBaseToughness.HasValue)
-                    return _copiedCardBaseToughness.Value;
                 return _baseToughness;
             }
         }
