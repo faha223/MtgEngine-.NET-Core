@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Players;
 
 namespace MtgEngine.Common.Abilities
 {
@@ -7,6 +8,14 @@ namespace MtgEngine.Common.Abilities
         public Card Source { get; private set; }
 
         public string Text { get; private set; }
+
+        public Player Controller
+        {
+            get
+            {
+                return Source.Controller;
+            }
+        }
 
         protected Ability(Card source, string text)
         {

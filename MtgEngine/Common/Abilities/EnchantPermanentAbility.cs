@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Enums;
 
 namespace MtgEngine.Common.Abilities
 {

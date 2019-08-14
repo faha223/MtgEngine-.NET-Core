@@ -1,6 +1,7 @@
 ﻿using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Damage;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
 using System;
 using System.Collections.Generic;
@@ -79,14 +80,31 @@ namespace MtgEngine.Common.Cards
                 
             }
         }
-            
-
+ 
         public void ResetDamage()
         {
             DamageAccumulated.Clear();
         }
 
-        private Func<bool> canAttackAsThoughItDidntHaveDefender = () => { return false; };
+        private bool CanAttackAsThoughItDidntHaveDefender
+        {
+            get
+            {
+                var result = false;
+                ApplyActiveEffects();
+                
+                if(Modifiers.Any(c => c.Property == nameof(CanAttackAsThoughItDidntHaveDefender)))
+                {
+                    foreach(BooleanModifier modifier in Modifiers.Where(c => c.Property == nameof(CanAttackAsThoughItDidntHaveDefender)))
+                    {
+                        result = modifier.Value;
+                    }
+                }
+
+                UnApplyActiveEffects();
+                return result;
+            }
+        }
 
         public bool CanAttack
         {
@@ -96,7 +114,7 @@ namespace MtgEngine.Common.Cards
                     return false;
                 if (IsTapped)
                     return false;
-                if (HasDefender && !canAttackAsThoughItDidntHaveDefender())
+                if (HasDefender && !CanAttackAsThoughItDidntHaveDefender)
                     return false;
                 if (IsTapped)
                     return false;

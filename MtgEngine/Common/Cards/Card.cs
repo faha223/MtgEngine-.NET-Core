@@ -31,6 +31,28 @@ namespace MtgEngine.Common.Cards
             return default(T);
         }
 
+        private void ApplyActiveEffects()
+        {
+            if (Controller.Game != null)
+            {
+                foreach (var effect in Controller.Game.ActiveEffects)
+                {
+                    effect.ModifyObject(Controller.Game, this);
+                }
+            }
+        }
+
+        private void UnApplyActiveEffects()
+        {
+            if (Controller.Game != null)
+            {
+                foreach (var effect in Controller.Game.ActiveEffects)
+                {
+                    effect.UnmodifyObject(Controller.Game, this);
+                }
+            }
+        }
+
         private List<StaticAbility> _staticAbilities { get; } = new List<StaticAbility>();
         public List<StaticAbility> StaticAbilities
         {
@@ -44,7 +66,8 @@ namespace MtgEngine.Common.Cards
             get
             {
                 var abilities = new List<StaticAbility>(StaticAbilities);
-                if(Modifiers.Any(c => c.Property == nameof(StaticAbilities)))
+                ApplyActiveEffects();
+                if (Modifiers.Any(c => c.Property == nameof(StaticAbilities)))
                 {
                     foreach (StaticAbilityModifier modifier in Modifiers.Where(c => c.Property == nameof(StaticAbilities)))
                     {
@@ -66,6 +89,7 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
+                UnApplyActiveEffects();
                 return abilities;
             }
         }
@@ -77,11 +101,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Cost)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Cost)) as CostModifier;
                     return modifier.Value;
                 }
+                UnApplyActiveEffects();
                 return _cost;
             }
             set
@@ -97,6 +123,7 @@ namespace MtgEngine.Common.Cards
             get
             {
                 var type = new List<CardType>(Types);
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Types)))
                 {
                     foreach (CardTypeModifier modifier in Modifiers.Where(c => c.Property == nameof(Types)))
@@ -119,6 +146,7 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
+                UnApplyActiveEffects();
                 return type.ToArray();
             }
         }
@@ -143,7 +171,8 @@ namespace MtgEngine.Common.Cards
             get
             {
                 var colors = new List<ManaColor>(ColorIdentity);
-                if(Modifiers.Any(c => c.Property == nameof(ColorIdentity)))
+                ApplyActiveEffects();
+                if (Modifiers.Any(c => c.Property == nameof(ColorIdentity)))
                 {
                     foreach(ColorModifier modifier in Modifiers.Where(c => c.Property == nameof(ColorIdentity)))
                     {
@@ -167,6 +196,7 @@ namespace MtgEngine.Common.Cards
                     if (colors.Count > 1 && colors.Contains(ManaColor.Colorless))
                         colors.Remove(ManaColor.Colorless);
                 }
+                UnApplyActiveEffects();
 
                 return colors.ToArray();
             }
@@ -185,7 +215,8 @@ namespace MtgEngine.Common.Cards
             get
             {
                 var subtypes = new List<string>(Subtypes);
-                if(Modifiers.Any(c => c.Property == nameof(Subtypes)))
+                ApplyActiveEffects();
+                if (Modifiers.Any(c => c.Property == nameof(Subtypes)))
                 {
                     foreach(StringModifier modifier in Modifiers.Where(c => c.Property == nameof(Subtypes)))
                     {
@@ -207,6 +238,7 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
+                UnApplyActiveEffects();
                 return subtypes.ToArray();
             }
         }
@@ -216,11 +248,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(IsBasic)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsBasic)) as BooleanModifier;
                     return modifier.Value;
                 }
+                UnApplyActiveEffects();
                 return _isBasic;
             }
         }
@@ -230,11 +264,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(IsLegendary)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsLegendary)) as BooleanModifier;
                     return modifier.Value;
                 }
+                UnApplyActiveEffects();
                 return _isLegendary;
             }
         }
@@ -244,11 +280,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                if(Modifiers.Any(c => c.Property == nameof(IsSnow)))
+                ApplyActiveEffects();
+                if (Modifiers.Any(c => c.Property == nameof(IsSnow)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsSnow)) as BooleanModifier;
                     return modifier.Value;
                 }
+                UnApplyActiveEffects();
                 return _isSnow;
             }
         }
@@ -334,15 +372,15 @@ namespace MtgEngine.Common.Cards
             BaseToughnessFunc = original.BaseToughnessFunc;
         }
 
-        public Func<Game, bool> CanCast = (Game game) => { return true; };
+        public Func<Game, bool> CanCast = game => { return true; };
 
-        public Action<Game> OnCast = (game) => { };
+        public Action<Game> OnCast = game => { };
 
         /// <summary>
         /// The method that is called as the spell resolves. If a spell is exiled after it resolves, exile it in this method
         /// </summary>
         /// <param name="game"></param>
-        public Action<Game> OnResolve = (game) => { };
+        public Action<Game> OnResolve = game => { };
 
         public void GiveControl(Player player)
         {

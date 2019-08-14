@@ -8,6 +8,8 @@ namespace MtgEngine
 {
     public partial class Game
     {
+        public List<Effect> ActiveEffects { get; } = new List<Effect>();
+
         /// <summary>
         /// This method removes a spell from the stack and puts it in its owner's graveyard. If the given spell is not on the stack, then this effect does nothing.
         /// </summary>

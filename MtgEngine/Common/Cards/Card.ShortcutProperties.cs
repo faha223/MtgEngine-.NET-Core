@@ -19,11 +19,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Name)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Name));
                     return (modifier as StringModifier).Value;
                 }
+                UnApplyActiveEffects();
                 return PrintedName;
             }
         }
@@ -33,11 +35,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Set)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Set));
                     return (modifier as StringModifier).Value;
                 }
+                UnApplyActiveEffects();
                 return PrintedSet;
             }
         }
@@ -47,11 +51,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(ImageUri)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(ImageUri));
                     return (modifier as StringModifier).Value;
                 }
+                UnApplyActiveEffects();
                 return PrintedImageUri;
             }
         }
@@ -61,11 +67,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Text)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Text));
                     return (modifier as StringModifier).Value;
                 }
+                UnApplyActiveEffects();
                 return PrintedText;
             }
         }
@@ -75,11 +83,13 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(FlavorText)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(FlavorText));
                     return (modifier as StringModifier).Value;
                 }
+                UnApplyActiveEffects();
                 return PrintedFlavorText;
             }
         }

@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
+using MtgEngine.Common.Effects;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Exceptions;
 using MtgEngine.Common.Players;
-using MtgEngine.Common.Players.Actions;
-using MtgEngine.Common.Utilities;
 
 namespace MtgEngine
 {
@@ -337,8 +336,32 @@ namespace MtgEngine
         /// </summary>
         private void CheckStateBasedActions()
         {
+            // Remove any effects that come from permanents that have left the battlefield
+            foreach(ContinuousEffect effect in new List<Effect>(ActiveEffects))
+            {
+                if(effect.Source is Card)
+                {
+                    var card = effect.Source as Card;
+                    if(card.IsAPermanent)
+                    {
+                        if (!Battlefield.Contains(card))
+                            ActiveEffects.Remove(effect);
+                    }
+                }
+            }
+
+            // Add any effects from permanents that are on the battlefield
+            foreach (var permanent in Battlefield)
+            {
+                foreach (ContinuousEffect effect in permanent.Effects)
+                {
+                    if (!ActiveEffects.Contains(effect))
+                        ActiveEffects.Add(effect);
+                }
+            }
+
             // Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
-            foreach(var player in _players)
+            foreach (var player in _players)
             {
                 var deadCreatures = player.Battlefield.Creatures.Where(c => c.IsDead).ToList();
                 foreach(var creature in deadCreatures)

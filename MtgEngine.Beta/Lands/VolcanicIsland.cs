@@ -4,18 +4,18 @@ using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 
-namespace MtgEngine.Alpha.Lands
+namespace MtgEngine.Beta.Lands
 {
-    [MtgCard("Underground Sea", "LEA", "", "", "({T}: Add {U} or {B})")]
-    public class UndergroundSea : CardSource
+    [MtgCard("Volcanic Island", "LEB", "", "", "({T}: Add {U} or {R})")]
+    public class VolcanicIsland : CardSource
     {
         public override Card GetCard(Player owner)
         {
-            var card = new Card(owner, new[] { CardType.Land }, new[] { "Island", "Swamp" }, false, false, false);
+            var card = new Card(owner, new[] { CardType.Land }, new[] { "Island", "Mountain" }, false, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {U}"));
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Black), "{T}: Add {B}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {R}"));
 
             return card;
         }

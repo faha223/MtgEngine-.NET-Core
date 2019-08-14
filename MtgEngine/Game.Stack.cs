@@ -1,6 +1,7 @@
 ﻿using MtgEngine.Common;
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
+using MtgEngine.Common.Effects;
 using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Utilities;

@@ -2,6 +2,7 @@
 using MtgEngine.Common.Abilities;
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
+using MtgEngine.Common.Effects;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
@@ -19,49 +20,55 @@ namespace MtgEngine.TestSet.Enchantments
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{1}{W}");
-            card.Abilities.Add(new DarksteelMutationAbility(card));
-
-            card.OnCast = (game) =>
+            
+            card.OnCast = game =>
             {
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Creatures.Where(c => c.CanBeTargetedBy(card))));
-                card.SetVar("Target", target);
+                var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Creatures.Where(c => c.CanBeTargetedBy(card)))) as Card;
+                card.Effects.Add(new DarksteelMutationEffect(card, target));
             };
 
             return card;
         }
     }
 
-    public class DarksteelMutationAbility : EnchantPermanentAbility
+    public class DarksteelMutationEffect : ContinuousEffect
     {
-        public DarksteelMutationAbility(Card source) : base(source, "Enchant Creature\nnchanted creature is an Insect artifact creature with base power and toughness 0/1 and has indestructible, and it loses all other abilities, card types, and creature types.")
-        {
-        }
+        private Card target;
+        private List<Modifier> modifiers = new List<Modifier>();
 
-        public override Ability Copy(Card newSource)
+        public DarksteelMutationEffect(IResolvable source, Card target) : base(source)
         {
-            return new DarksteelMutationAbility(newSource);
-        }
+            this.target = target;
 
-        public override void Enchant(Card target)
-        {
             // Enchanted Creature is an Insect Artifact Creature
-            target.Modifiers.Add(new CardTypeModifier(this, nameof(Card.Types), ModifierMode.Override, CardType.Artifact));
-            target.Modifiers.Add(new CardTypeModifier(this, nameof(Card.Types), ModifierMode.Add, CardType.Creature));
-            target.Modifiers.Add(new StringModifier(this, nameof(Card.Subtypes), "Insect"));
+            modifiers.Add(new CardTypeModifier(this, nameof(Card.Types), ModifierMode.Override, CardType.Artifact));
+            modifiers.Add(new CardTypeModifier(this, nameof(Card.Types), ModifierMode.Add, CardType.Creature));
+            modifiers.Add(new StringModifier(this, nameof(Card.Subtypes), "Insect"));
 
             // With base power and toughness 0/1
-            target.Modifiers.Add(new PowerToughnessModifier(this, nameof(Card.BasePowerFunc), (game, card) => { return 0; }));
-            target.Modifiers.Add(new PowerToughnessModifier(this, nameof(Card.BaseToughnessFunc), (game, card) => { return 1; }));
+            modifiers.Add(new PowerToughnessModifier(this, nameof(Card.BasePowerFunc), (game, card) => { return 0; }));
+            modifiers.Add(new PowerToughnessModifier(this, nameof(Card.BaseToughnessFunc), (game, card) => { return 1; }));
 
             // With indestructible and loses all other abilities
-            target.Modifiers.Add(new AbilityModifier(this, nameof(Card.Abilities), ModifierMode.Override, null));
-            target.Modifiers.Add(new StaticAbilityModifier(this, nameof(Card.StaticAbilities), ModifierMode.Override, null));
-            target.Modifiers.Add(new StaticAbilityModifier(this, nameof(Card.StaticAbilities), ModifierMode.Add, StaticAbility.Indestructible));
+            modifiers.Add(new AbilityModifier(this, nameof(Card.Abilities), ModifierMode.Override, null));
+            modifiers.Add(new StaticAbilityModifier(this, nameof(Card.StaticAbilities), ModifierMode.Override, null));
+            modifiers.Add(new StaticAbilityModifier(this, nameof(Card.StaticAbilities), ModifierMode.Add, StaticAbility.Indestructible));
         }
 
-        public override void Disenchant(Card target)
+        public override void ModifyObject(Game game, IResolvable resolvable)
         {
-            target.Modifiers.RemoveAll(c => c.Source == this);
+            if(resolvable == target)
+            {
+                modifiers.ForEach(modifier => target.Modifiers.Add(modifier));
+            }
+        }
+
+        public override void UnmodifyObject(Game game, IResolvable resolvable)
+        {
+            if(resolvable == target)
+            {
+                modifiers.ForEach(modifier => target.Modifiers.Remove(modifier));
+            }
         }
     }
 }

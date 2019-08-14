@@ -13,6 +13,7 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 var basePower = BasePowerFunc(Controller.Game, this);
                 if(Modifiers.Any(c => c.Property == nameof(BasePowerFunc)))
                 {
@@ -20,10 +21,21 @@ namespace MtgEngine.Common.Cards
                     basePower = modifier.Value(Controller.Game, this);
                 }
 
-                return basePower
+                var power = basePower
                     + Counters.Count(c => c == CounterType.Plus1Plus1)
                     + (2 * Counters.Count(c => c == CounterType.Plus2Plus0))
                     - Counters.Count(c => c == CounterType.Minus1Minus1);
+
+                if(Modifiers.Any(c => c.Property == nameof(Power)))
+                {
+                    foreach(IntModifier modifier in Modifiers.Where(c => c.Property == nameof(Power)))
+                    {
+                        power += modifier.Value;
+                    }
+                }
+                UnApplyActiveEffects();
+
+                return power;
             }
         }
 
@@ -33,6 +45,7 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
+                ApplyActiveEffects();
                 var baseToughness = BaseToughnessFunc(Controller.Game, this);
                 if(Modifiers.Any(c => c.Property == nameof(BaseToughnessFunc)))
                 {
@@ -40,10 +53,21 @@ namespace MtgEngine.Common.Cards
                     baseToughness = modifier.Value(Controller.Game, this);
                 }
 
-                return baseToughness
+                var toughness = baseToughness
                     + Counters.Count(c => c == CounterType.Plus1Plus1)
                     + (2 * Counters.Count(c => c == CounterType.Plus0Plus2))
                     - Counters.Count(c => c == CounterType.Minus1Minus1);
+
+                if (Modifiers.Any(c => c.Property == nameof(Toughness)))
+                {
+                    foreach (IntModifier modifier in Modifiers.Where(c => c.Property == nameof(Toughness)))
+                    {
+                        toughness += modifier.Value;
+                    }
+                }
+                UnApplyActiveEffects();
+
+                return toughness;
             }
         }
 

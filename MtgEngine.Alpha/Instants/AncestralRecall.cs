@@ -17,13 +17,13 @@ namespace MtgEngine.Alpha.Instants
 
             card.Cost = ManaCost.Parse(card, "{U}");
 
-            card.OnCast = (game) =>
+            card.OnCast = game =>
             {
                 var _target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Players())) as Player;
                 card.SetVar("Target", _target);
             };
 
-            card.OnResolve = (game) =>
+            card.OnResolve = game =>
             {
                 var _target = card.GetVar<Player>("Target");
                 _target.Draw(3);

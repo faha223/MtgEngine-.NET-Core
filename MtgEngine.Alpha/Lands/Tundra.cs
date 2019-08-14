@@ -14,8 +14,8 @@ namespace MtgEngine.Alpha.Lands
             var card = new Card(owner, new[] { CardType.Land }, new[] { "Plains", "Island" }, false, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
         
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {W}"));
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {U}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.White), "{T}: Add {W}"));
+            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {U}"));
 
             return card;
         }
