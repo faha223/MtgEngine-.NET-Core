@@ -1,4 +1,5 @@
 ﻿using MtgEngine.Common.Cards;
+using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
@@ -35,6 +36,9 @@ namespace MtgEngine.TestSet.Creatures
 
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Lhurgoyf" }, false, basePowerFunc, baseToughnessFunc, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
+
+            card.Cost = ManaCost.Parse(card, "{1}{G}");
+
             return card;
         }
     }

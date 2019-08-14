@@ -140,5 +140,65 @@ namespace MtgEngine.Common.Costs
 
             return _manaAmounts.OrderBy(c => colorPriority.IndexOf(c.Color)).ToArray();
         }
+
+        /// <summary>
+        /// Returns the color identity computed based on the mana cost
+        /// </summary>
+        public ManaColor[] Colors
+        {
+            get
+            {
+                List<ManaColor> colors = new List<ManaColor>(5);
+                if (_manaAmounts.Any(c =>   c.Color == ManaColor.White || 
+                                            c.Color == ManaColor.TwoOrWhite || 
+                                            c.Color == ManaColor.PhyrexianWhite ||
+                                            c.Color == ManaColor.WhiteBlue || 
+                                            c.Color == ManaColor.WhiteBlack || 
+                                            c.Color == ManaColor.RedWhite || 
+                                            c.Color == ManaColor.GreenWhite))
+                    colors.Add(ManaColor.White);
+
+                if (_manaAmounts.Any(c => c.Color == ManaColor.Blue ||
+                                            c.Color == ManaColor.TwoOrBlue ||
+                                            c.Color == ManaColor.PhyrexianBlue ||
+                                            c.Color == ManaColor.WhiteBlue ||
+                                            c.Color == ManaColor.BlueBlack ||
+                                            c.Color == ManaColor.BlueRed ||
+                                            c.Color == ManaColor.GreenBlue))
+                    colors.Add(ManaColor.Blue);
+
+                if (_manaAmounts.Any(c => c.Color == ManaColor.Black ||
+                                            c.Color == ManaColor.TwoOrBlack ||
+                                            c.Color == ManaColor.PhyrexianBlack ||
+                                            c.Color == ManaColor.WhiteBlack ||
+                                            c.Color == ManaColor.BlueBlack ||
+                                            c.Color == ManaColor.BlackRed ||
+                                            c.Color == ManaColor.BlackGreen))
+                    colors.Add(ManaColor.Black);
+
+                if (_manaAmounts.Any(c => c.Color == ManaColor.Red ||
+                                            c.Color == ManaColor.TwoOrRed ||
+                                            c.Color == ManaColor.PhyrexianRed ||
+                                            c.Color == ManaColor.RedWhite ||
+                                            c.Color == ManaColor.BlueRed ||
+                                            c.Color == ManaColor.BlackRed ||
+                                            c.Color == ManaColor.RedGreen))
+                    colors.Add(ManaColor.Red);
+
+                if (_manaAmounts.Any(c => c.Color == ManaColor.Green ||
+                                            c.Color == ManaColor.TwoOrGreen ||
+                                            c.Color == ManaColor.PhyrexianGreen ||
+                                            c.Color == ManaColor.GreenWhite ||
+                                            c.Color == ManaColor.BlackGreen ||
+                                            c.Color == ManaColor.RedGreen ||
+                                            c.Color == ManaColor.GreenBlue))
+                    colors.Add(ManaColor.Green);
+
+                if (colors.Count == 0)
+                    colors.Add(ManaColor.Colorless);
+
+                return colors.ToArray();
+            }
+        }
     }
 }

@@ -131,7 +131,7 @@ namespace MtgEngine.Common.Cards
             // Creatures with Fear can only be blocked by artifacts and black creatures
             if (permanent.HasFear)
             {
-                if (!IsAnArtifact || ColorIdentity == null || ColorIdentity.Contains(ManaColor.Black))
+                if (!IsAnArtifact || ColorIdentityAfterModifiersApplied == null || ColorIdentityAfterModifiersApplied.Contains(ManaColor.Black))
                     return false;
             }
 

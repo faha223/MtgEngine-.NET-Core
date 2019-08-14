@@ -129,13 +129,46 @@ namespace MtgEngine.Common.Cards
             get
             {
                 if (StaticAbilities.Contains(StaticAbility.Devoid))
-                    return null;
+                    return new[] { ManaColor.Colorless };
 
-                // TODO: Parse Mana Symbols from Text, and combine with mana symbols in ManaCost, then 
-                // distill down to single mana colors (no hybrids), then distinct, sort, return as array;
+                if (Cost is ManaCost)
+                    return (Cost as ManaCost).Colors;
 
-                // Requires: ManaParser
-                return null;
+                return new[] { ManaColor.Colorless };
+            }
+        }
+
+        public ManaColor[] ColorIdentityAfterModifiersApplied
+        {
+            get
+            {
+                var colors = new List<ManaColor>(ColorIdentity);
+                if(Modifiers.Any(c => c.Property == nameof(ColorIdentity)))
+                {
+                    foreach(ColorModifier modifier in Modifiers.Where(c => c.Property == nameof(ColorIdentity)))
+                    {
+                        if(modifier.Mode == ModifierMode.Add)
+                        {
+                            if (!colors.Contains(modifier.Value))
+                                colors.Add(modifier.Value);
+                        }
+                        else if(modifier.Mode == ModifierMode.Remove)
+                        {
+                            if (colors.Contains(modifier.Value))
+                                colors.Remove(modifier.Value);
+                        }
+                        else if(modifier.Mode == ModifierMode.Override)
+                        {
+                            colors.Clear();
+                            colors.Add(modifier.Value);
+                        }
+                    }
+
+                    if (colors.Count > 1 && colors.Contains(ManaColor.Colorless))
+                        colors.Remove(ManaColor.Colorless);
+                }
+
+                return colors.ToArray();
             }
         }
 

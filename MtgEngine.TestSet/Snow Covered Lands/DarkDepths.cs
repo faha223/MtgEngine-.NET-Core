@@ -2,6 +2,7 @@
 using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
 using System.Linq;
 
@@ -86,7 +87,8 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
                 card.StaticAbilities.Add(StaticAbility.Flying);
                 card.StaticAbilities.Add(StaticAbility.Indestructible);
 
-                // TODO: Override Color Identity to Black
+                // Override Color Identity to Black
+                card.Modifiers.Add(new ColorModifier(card, nameof(Card.ColorIdentity), ModifierMode.Override, ManaColor.Black));
 
                 return card;
             }
