@@ -339,6 +339,11 @@ namespace MtgEngine
             // Remove any effects that come from permanents that have left the battlefield
             foreach(ContinuousEffect effect in new List<Effect>(ActiveEffects))
             {
+                foreach(var card in Battlefield)
+                {
+                    effect.UnmodifyObject(this, card);
+                }
+
                 if(effect.Source is Card)
                 {
                     var card = effect.Source as Card;
@@ -357,6 +362,18 @@ namespace MtgEngine
                 {
                     if (!ActiveEffects.Contains(effect))
                         ActiveEffects.Add(effect);
+                }
+            }
+
+            // Iterate over each active effect once for each active effect. This is likely overkill, but there's not a better way to make sure all interactions are applied.
+            for (int i = 0; i < ActiveEffects.Count; i++)
+            {
+                foreach (var effect in ActiveEffects)
+                {
+                    foreach (var card in Battlefield)
+                    {
+                        effect.ModifyObject(this, card);
+                    }
                 }
             }
 
@@ -491,7 +508,7 @@ namespace MtgEngine
             {
                 foreach (var permanent in player.Battlefield)
                 {
-                    foreach (StateTriggeredAbility ability in permanent.AbilitiesAfterModifiersApplied.Where(c => c is StateTriggeredAbility))
+                    foreach (StateTriggeredAbility ability in permanent.Abilities.Where(c => c is StateTriggeredAbility))
                     {
                         if (ability.CheckState(this))
                         {

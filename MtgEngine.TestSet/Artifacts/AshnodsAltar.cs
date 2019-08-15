@@ -15,7 +15,7 @@ namespace MtgEngine.TestSet.Artifacts
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{3}");
-            card.Abilities.Add(new ManaAbility(card, new SacrificeCreatureCost(card), new Common.Mana.ManaAmount(2, ManaColor.Colorless), "Sacrifice a Creature: Add {C}{C}."));
+            card.AddAbility(new ManaAbility(card, new SacrificeCreatureCost(card), new Common.Mana.ManaAmount(2, ManaColor.Colorless), "Sacrifice a Creature: Add {C}{C}."));
 
             return card;
         }

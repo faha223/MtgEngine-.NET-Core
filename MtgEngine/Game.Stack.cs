@@ -223,7 +223,7 @@ namespace MtgEngine
             card.CountersRemoved += permanent_CountersRemoved;
             card.TookDamage += creature_tookDamage;
 
-            foreach (EventTriggeredAbility ability in card.AbilitiesAfterModifiersApplied.Where(c => c is EventTriggeredAbility))
+            foreach (EventTriggeredAbility ability in card.Abilities.Where(c => c is EventTriggeredAbility))
             {
                 PlayerTookDamage += ability.PlayerTookDamage;
                 CreatureTookDamage += ability.CreatureTookDamage;
@@ -241,7 +241,7 @@ namespace MtgEngine
             card.CountersCreated -= permanent_CountersCreated;
             card.CountersRemoved -= permanent_CountersRemoved;
 
-            foreach (EventTriggeredAbility ability in card.AbilitiesAfterModifiersApplied.Where(c => c is EventTriggeredAbility))
+            foreach (EventTriggeredAbility ability in card.Abilities.Where(c => c is EventTriggeredAbility))
             {
                 PlayerTookDamage -= ability.PlayerTookDamage;
                 CreatureTookDamage -= ability.CreatureTookDamage;

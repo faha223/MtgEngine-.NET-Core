@@ -26,7 +26,7 @@ namespace MtgEngine.TestSet.Enchantments
             card.OnCast = (game) =>
             {
                 var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Where(c => (c.IsACreature || c.IsALand || c.IsAPlaneswalker) && c.CanBeTargetedBy(card)))) as Card;
-                card.Effects.Add(new ImprisonedInTheMoonEffect(card, target));
+                card.AddEffect(new ImprisonedInTheMoonEffect(card, target));
             };
 
             return card;
@@ -58,7 +58,11 @@ namespace MtgEngine.TestSet.Enchantments
         {
             if(resolvable == Target)
             {
-                modifiers.ForEach(modifier => Target.Modifiers.Add(modifier));
+                modifiers.ForEach(modifier =>
+                {
+                    if(!Target.Modifiers.Contains(modifier))
+                        Target.Modifiers.Add(modifier);
+                });
             }
         }
 
@@ -66,7 +70,11 @@ namespace MtgEngine.TestSet.Enchantments
         {
             if(resolvable == Target)
             {
-                modifiers.ForEach(modifier => Target.Modifiers.Remove(modifier));
+                modifiers.ForEach(modifier =>
+                {
+                    if(Target.Modifiers.Contains(modifier))
+                        Target.Modifiers.Remove(modifier);
+                });
             }
         }
     }

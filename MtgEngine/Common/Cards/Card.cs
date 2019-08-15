@@ -58,15 +58,7 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                return _staticAbilities;
-            }
-        }
-        public List<StaticAbility> StaticAbilitiesAfterModifiersApplied
-        {
-            get
-            {
-                var abilities = new List<StaticAbility>(StaticAbilities);
-                ApplyActiveEffects();
+                var abilities = new List<StaticAbility>(_staticAbilities);
                 if (Modifiers.Any(c => c.Property == nameof(StaticAbilities)))
                 {
                     foreach (StaticAbilityModifier modifier in Modifiers.Where(c => c.Property == nameof(StaticAbilities)))
@@ -89,7 +81,6 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                UnApplyActiveEffects();
                 return abilities;
             }
         }
@@ -101,13 +92,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Cost)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Cost)) as CostModifier;
                     return modifier.Value;
                 }
-                UnApplyActiveEffects();
                 return _cost;
             }
             set
@@ -117,13 +106,11 @@ namespace MtgEngine.Common.Cards
         }
 
         private CardType[] _types { get; }
-        public CardType[] Types { get { return _types; } }
-        public CardType[] TypesAfterModifiersApplied
+        public CardType[] Types
         {
             get
             {
-                var type = new List<CardType>(Types);
-                ApplyActiveEffects();
+                var type = new List<CardType>(_types);
                 if (Modifiers.Any(c => c.Property == nameof(Types)))
                 {
                     foreach (CardTypeModifier modifier in Modifiers.Where(c => c.Property == nameof(Types)))
@@ -146,13 +133,12 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                UnApplyActiveEffects();
                 return type.ToArray();
             }
         }
 
         // This is virtual so that it can be overridden in token classes
-        public ManaColor[] ColorIdentity
+        private ManaColor[] _colorIdentity
         {
             get
             {
@@ -166,12 +152,11 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        public ManaColor[] ColorIdentityAfterModifiersApplied
+        public ManaColor[] ColorIdentity
         {
             get
             {
-                var colors = new List<ManaColor>(ColorIdentity);
-                ApplyActiveEffects();
+                var colors = new List<ManaColor>(_colorIdentity);
                 if (Modifiers.Any(c => c.Property == nameof(ColorIdentity)))
                 {
                     foreach(ColorModifier modifier in Modifiers.Where(c => c.Property == nameof(ColorIdentity)))
@@ -196,7 +181,6 @@ namespace MtgEngine.Common.Cards
                     if (colors.Count > 1 && colors.Contains(ManaColor.Colorless))
                         colors.Remove(ManaColor.Colorless);
                 }
-                UnApplyActiveEffects();
 
                 return colors.ToArray();
             }
@@ -207,15 +191,7 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                return _subtypes;
-            }
-        }
-        public string[] SubtypesAfterModifiersApplied
-        {
-            get
-            {
-                var subtypes = new List<string>(Subtypes);
-                ApplyActiveEffects();
+                var subtypes = new List<string>(_subtypes);
                 if (Modifiers.Any(c => c.Property == nameof(Subtypes)))
                 {
                     foreach(StringModifier modifier in Modifiers.Where(c => c.Property == nameof(Subtypes)))
@@ -238,7 +214,7 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                UnApplyActiveEffects();
+
                 return subtypes.ToArray();
             }
         }
@@ -248,13 +224,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(IsBasic)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsBasic)) as BooleanModifier;
                     return modifier.Value;
                 }
-                UnApplyActiveEffects();
                 return _isBasic;
             }
         }
@@ -264,13 +238,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(IsLegendary)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsLegendary)) as BooleanModifier;
                     return modifier.Value;
                 }
-                UnApplyActiveEffects();
                 return _isLegendary;
             }
         }
@@ -280,13 +252,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(IsSnow)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(IsSnow)) as BooleanModifier;
                     return modifier.Value;
                 }
-                UnApplyActiveEffects();
                 return _isSnow;
             }
         }

@@ -15,7 +15,7 @@ namespace MtgEngine.Common.Cards.BasicLands
             // Basic Lands tap for 1 mana of their specific color
             var cost = new TapCost(card);
             var manaGenerated = new ManaAmount(1, color);
-            card.Abilities.Add(new ManaAbility(card, cost, manaGenerated, $"{cost}: Add {manaGenerated}"));
+            card.AddAbility(new ManaAbility(card, cost, manaGenerated, $"{cost}: Add {manaGenerated}"));
 
             return card;
         }

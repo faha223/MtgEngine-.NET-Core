@@ -91,7 +91,6 @@ namespace MtgEngine.Common.Cards
             get
             {
                 var result = false;
-                ApplyActiveEffects();
                 
                 if(Modifiers.Any(c => c.Property == nameof(CanAttackAsThoughItDidntHaveDefender)))
                 {
@@ -101,7 +100,6 @@ namespace MtgEngine.Common.Cards
                     }
                 }
 
-                UnApplyActiveEffects();
                 return result;
             }
         }
@@ -149,7 +147,7 @@ namespace MtgEngine.Common.Cards
             // Creatures with Fear can only be blocked by artifacts and black creatures
             if (permanent.HasFear)
             {
-                if (!IsAnArtifact || ColorIdentityAfterModifiersApplied == null || ColorIdentityAfterModifiersApplied.Contains(ManaColor.Black))
+                if (!IsAnArtifact || ColorIdentity == null || ColorIdentity.Contains(ManaColor.Black))
                     return false;
             }
 
@@ -193,35 +191,35 @@ namespace MtgEngine.Common.Cards
             // Creatures with Plainswalk can't be blocked if we control a Plains
             if (permanent.HasPlainswalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Plains")))
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Plains")))
                     return false;
             }
 
             // Creatures with Islandwalk can't be blocked if we control a Island
             if (permanent.HasIslandwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Island")))
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Island")))
                     return false;
             }
 
             // Creatures with Swampwalk can't be blocked if we control a Swamp
             if (permanent.HasSwampwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Swamp")))
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Swamp")))
                     return false;
             }
 
             // Creatures with Mountainwalk can't be blocked if we control a Mountain
             if (permanent.HasMountainwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Mountain")))
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Mountain")))
                     return false;
             }
 
             // Creatures with Forestwalk can't be blocked if we control a Forest
             if (permanent.HasForestwalk)
             {
-                if (Controller.Battlefield.Lands.Any(c => c.SubtypesAfterModifiersApplied.Contains("Forest")))
+                if (Controller.Battlefield.Lands.Any(c => c.Subtypes.Contains("Forest")))
                     return false;
             }
 

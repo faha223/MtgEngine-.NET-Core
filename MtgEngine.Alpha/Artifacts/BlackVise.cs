@@ -20,7 +20,7 @@ namespace MtgEngine.Alpha.Artifacts
 
             card.Cost = ManaCost.Parse(card, "{1}");
 
-            card.Abilities.Add(new BlackViseAbility(card));
+            card.AddAbility(new BlackViseAbility(card));
 
             card.OnResolve = (Game game) =>
             {

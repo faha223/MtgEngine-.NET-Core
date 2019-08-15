@@ -15,11 +15,11 @@ namespace MtgEngine.Alpha.Artifacts
             var card = new Card(owner, new[] { CardType.Artifact }, null, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            card.Abilities.Add(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.White), "{T}, Sacrifice Black Lotus: Add {W}{W}{W}"));
-            card.Abilities.Add(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Blue), "{T}, Sacrifice Black Lotus: Add {U}{U}{U}"));
-            card.Abilities.Add(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Black), "{T}, Sacrifice Black Lotus: Add {B}{B}{B}"));
-            card.Abilities.Add(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Red), "{T}, Sacrifice Black Lotus: Add {R}{R}{R}"));
-            card.Abilities.Add(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Green), "{T}, Sacrifice Black Lotus: Add {G}{G}{G}"));
+            card.AddAbility(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.White), "{T}, Sacrifice Black Lotus: Add {W}{W}{W}"));
+            card.AddAbility(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Blue), "{T}, Sacrifice Black Lotus: Add {U}{U}{U}"));
+            card.AddAbility(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Black), "{T}, Sacrifice Black Lotus: Add {B}{B}{B}"));
+            card.AddAbility(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Red), "{T}, Sacrifice Black Lotus: Add {R}{R}{R}"));
+            card.AddAbility(new ManaAbility(card, new AggregateCost(card, new TapCost(card), new SacrificeSourceCost(card)), new ManaAmount(3, ManaColor.Green), "{T}, Sacrifice Black Lotus: Add {G}{G}{G}"));
 
             return card;
         }

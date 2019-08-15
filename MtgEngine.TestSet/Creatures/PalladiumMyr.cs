@@ -16,7 +16,7 @@ namespace MtgEngine.TestSet.Creatures
 
             card.Cost = ManaCost.Parse(card, "{3}");
 
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(2, ManaColor.Colorless), "{T}: Add {C}{C}."));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(2, ManaColor.Colorless), "{T}: Add {C}{C}."));
 
             return card;
         }

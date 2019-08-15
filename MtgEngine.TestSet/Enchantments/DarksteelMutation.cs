@@ -24,7 +24,7 @@ namespace MtgEngine.TestSet.Enchantments
             card.OnCast = game =>
             {
                 var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Creatures.Where(c => c.CanBeTargetedBy(card)))) as Card;
-                card.Effects.Add(new DarksteelMutationEffect(card, target));
+                card.AddEffect(new DarksteelMutationEffect(card, target));
             };
 
             return card;

@@ -18,8 +18,8 @@ namespace MtgEngine.TestSet.Lands
             var card = new Card(owner, new[] { CardType.Land }, null, false, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}"));
-            card.Abilities.Add(new CopyAbility(card));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}"));
+            card.AddAbility(new CopyAbility(card));
 
             return card;
         }

@@ -16,7 +16,7 @@ namespace MtgEngine.Alpha.Artifacts
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{2}");
-            card.Abilities.Add(new AnkhOfMishraAbility(card));
+            card.AddAbility(new AnkhOfMishraAbility(card));
 
             return card;
         }

@@ -14,8 +14,8 @@ namespace MtgEngine.Alpha.Lands
             var card = new Card(owner, new[] { CardType.Land }, new[] { "Swamp", "Forest" }, false, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Black), "{T}: Add {B}"));
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Green), "{T}: Add {G}"));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Black), "{T}: Add {B}"));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Green), "{T}: Add {G}"));
 
             return card;
         }

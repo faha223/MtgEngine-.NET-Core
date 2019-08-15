@@ -18,7 +18,7 @@ namespace MtgEngine.TestSet.Enchantments
 
             card.Cost = ManaCost.Parse(card, "{1}{W}{W}");
 
-            card.Effects.Add(new GloriousAnthemEffect(card));
+            card.AddEffect(new GloriousAnthemEffect(card));
 
             return card;
         }
@@ -40,10 +40,14 @@ namespace MtgEngine.TestSet.Enchantments
             if(resolvable != null && resolvable is Card)
             {
                 var card = resolvable as Card;
-                if(card.Controller == Source.Controller)
+
+                // This enchantment only applies power and toughness modifiers, and only creatures can meaningfully have power and toughness, so no need to check for that.
+                if(card.IsACreature && card.Controller == Source.Controller)
                 {
-                    card.Modifiers.Add(powerModifier);
-                    card.Modifiers.Add(toughnessModifier);
+                    if(!card.Modifiers.Contains(powerModifier))
+                        card.Modifiers.Add(powerModifier);
+                    if(!card.Modifiers.Contains(toughnessModifier))
+                        card.Modifiers.Add(toughnessModifier);
                 }
             }
         }

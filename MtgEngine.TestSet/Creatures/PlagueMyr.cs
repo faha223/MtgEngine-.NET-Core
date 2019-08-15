@@ -18,7 +18,7 @@ namespace MtgEngine.TestSet.Creatures
 
             card.StaticAbilities.Add(StaticAbility.Infect);
 
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}."));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}."));
 
             return card;
         }

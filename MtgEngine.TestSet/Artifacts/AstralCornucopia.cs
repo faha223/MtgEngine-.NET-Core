@@ -21,7 +21,7 @@ namespace MtgEngine.TestSet
             var mc = card.Cost as ManaCost;
             mc.ValueforXChosen += (x => card.SetVar("X", x));
 
-            card.Abilities.Add(new AstralCornucopiaManaAbility(card));
+            card.AddAbility(new AstralCornucopiaManaAbility(card));
 
             card.OnResolve = (Game game) =>
             {

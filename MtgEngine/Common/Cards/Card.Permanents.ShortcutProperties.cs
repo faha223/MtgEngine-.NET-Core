@@ -4,52 +4,52 @@ namespace MtgEngine.Common.Cards
 {
     public sealed partial class Card : IDamageable
     {
-        public bool HasFlying => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Flying);
+        public bool HasFlying => StaticAbilities.Contains(StaticAbility.Flying);
 
-        public bool HasReach => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Reach);
+        public bool HasReach => StaticAbilities.Contains(StaticAbility.Reach);
 
-        public bool HasHaste => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Haste);
+        public bool HasHaste => StaticAbilities.Contains(StaticAbility.Haste);
 
-        public bool HasDefender => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Defender);
+        public bool HasDefender => StaticAbilities.Contains(StaticAbility.Defender);
 
-        public bool HasIndestructible => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Indestructible);
+        public bool HasIndestructible => StaticAbilities.Contains(StaticAbility.Indestructible);
 
-        public bool HasFear => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Fear);
+        public bool HasFear => StaticAbilities.Contains(StaticAbility.Fear);
 
-        public bool HasFirstStrike => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.FirstStrike);
+        public bool HasFirstStrike => StaticAbilities.Contains(StaticAbility.FirstStrike);
 
-        public bool HasDeathtouch => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Deathtouch);
+        public bool HasDeathtouch => StaticAbilities.Contains(StaticAbility.Deathtouch);
 
-        public bool HasDoubleStrike => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.DoubleStrike);
+        public bool HasDoubleStrike => StaticAbilities.Contains(StaticAbility.DoubleStrike);
 
-        public bool HasVigilance => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Vigilance);
+        public bool HasVigilance => StaticAbilities.Contains(StaticAbility.Vigilance);
 
-        public bool HasUnblockable => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Unblockable);
+        public bool HasUnblockable => StaticAbilities.Contains(StaticAbility.Unblockable);
 
-        public bool HasDevoid => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Devoid);
+        public bool HasDevoid => StaticAbilities.Contains(StaticAbility.Devoid);
 
-        public bool HasShadow => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Shadow);
+        public bool HasShadow => StaticAbilities.Contains(StaticAbility.Shadow);
 
-        public bool HasHorsemanship => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Horsemanship);
+        public bool HasHorsemanship => StaticAbilities.Contains(StaticAbility.Horsemanship);
 
-        public bool HasPlainswalk => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Plainswalk);
+        public bool HasPlainswalk => StaticAbilities.Contains(StaticAbility.Plainswalk);
 
-        public bool HasIslandwalk => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Islandwalk);
+        public bool HasIslandwalk => StaticAbilities.Contains(StaticAbility.Islandwalk);
 
-        public bool HasSwampwalk => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Swampwalk);
+        public bool HasSwampwalk => StaticAbilities.Contains(StaticAbility.Swampwalk);
 
-        public bool HasMountainwalk => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Mountainwalk);
+        public bool HasMountainwalk => StaticAbilities.Contains(StaticAbility.Mountainwalk);
 
-        public bool HasForestwalk => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Forestwalk);
+        public bool HasForestwalk => StaticAbilities.Contains(StaticAbility.Forestwalk);
 
-        public bool HasFlash => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Flash);
+        public bool HasFlash => StaticAbilities.Contains(StaticAbility.Flash);
 
-        public bool HasShroud => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Shroud);
+        public bool HasShroud => StaticAbilities.Contains(StaticAbility.Shroud);
 
-        public bool HasHexproof => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Hexproof);
+        public bool HasHexproof => StaticAbilities.Contains(StaticAbility.Hexproof);
 
-        public bool HasTrample => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Trample);
+        public bool HasTrample => StaticAbilities.Contains(StaticAbility.Trample);
 
-        public bool HasInfect => StaticAbilitiesAfterModifiersApplied.Contains(StaticAbility.Infect);
+        public bool HasInfect => StaticAbilities.Contains(StaticAbility.Infect);
     }
 }

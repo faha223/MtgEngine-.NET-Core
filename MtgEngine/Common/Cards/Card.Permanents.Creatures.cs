@@ -13,7 +13,6 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 var basePower = BasePowerFunc(Controller.Game, this);
                 if(Modifiers.Any(c => c.Property == nameof(BasePowerFunc)))
                 {
@@ -33,7 +32,6 @@ namespace MtgEngine.Common.Cards
                         power += modifier.Value;
                     }
                 }
-                UnApplyActiveEffects();
 
                 return power;
             }
@@ -45,7 +43,6 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 var baseToughness = BaseToughnessFunc(Controller.Game, this);
                 if(Modifiers.Any(c => c.Property == nameof(BaseToughnessFunc)))
                 {
@@ -65,7 +62,6 @@ namespace MtgEngine.Common.Cards
                         toughness += modifier.Value;
                     }
                 }
-                UnApplyActiveEffects();
 
                 return toughness;
             }

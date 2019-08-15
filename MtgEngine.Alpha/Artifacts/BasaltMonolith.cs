@@ -18,10 +18,10 @@ namespace MtgEngine.Alpha.Artifacts
             card.Cost = ManaCost.Parse(card, "{3}");
 
             // {T}: Add {C}{C}{C}
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new ManaAmount(3, ManaColor.Colorless), "{T}: Add {C}{C}{C}"));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new ManaAmount(3, ManaColor.Colorless), "{T}: Add {C}{C}{C}"));
 
             // {3}: Untap Basalt Monolith
-            card.Abilities.Add(new BasaltMonolithUntapAbility(card));
+            card.AddAbility(new BasaltMonolithUntapAbility(card));
 
             // Basalt monolith doesn't untap during your untap step
             card.UntapsDuringUntapStep = () => false;

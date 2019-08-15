@@ -14,8 +14,8 @@ namespace MtgEngine.Beta.Lands
             var card = new Card(owner, new[] { CardType.Land }, new[] { "Mountain", "Plains" }, false, false, false);
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {R}"));
-            card.Abilities.Add(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.White), "{T}: Add {W}"));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Red), "{T}: Add {R}"));
+            card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.White), "{T}: Add {W}"));
 
             return card;
         }

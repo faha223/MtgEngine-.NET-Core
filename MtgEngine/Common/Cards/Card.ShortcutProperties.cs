@@ -19,13 +19,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Name)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Name));
                     return (modifier as StringModifier).Value;
                 }
-                UnApplyActiveEffects();
                 return PrintedName;
             }
         }
@@ -35,13 +33,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Set)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Set));
                     return (modifier as StringModifier).Value;
                 }
-                UnApplyActiveEffects();
                 return PrintedSet;
             }
         }
@@ -51,13 +47,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(ImageUri)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(ImageUri));
                     return (modifier as StringModifier).Value;
                 }
-                UnApplyActiveEffects();
                 return PrintedImageUri;
             }
         }
@@ -67,13 +61,11 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(Text)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(Text));
                     return (modifier as StringModifier).Value;
                 }
-                UnApplyActiveEffects();
                 return PrintedText;
             }
         }
@@ -83,34 +75,32 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                ApplyActiveEffects();
                 if (Modifiers.Any(c => c.Property == nameof(FlavorText)))
                 {
                     var modifier = Modifiers.Last(c => c.Property == nameof(FlavorText));
                     return (modifier as StringModifier).Value;
                 }
-                UnApplyActiveEffects();
                 return PrintedFlavorText;
             }
         }
 
-        public bool IsACreature => TypesAfterModifiersApplied.Contains(CardType.Creature);
+        public bool IsACreature => Types.Contains(CardType.Creature);
 
-        public bool IsAnArtifact => TypesAfterModifiersApplied.Contains(CardType.Artifact);
+        public bool IsAnArtifact => Types.Contains(CardType.Artifact);
 
-        public bool IsALand => TypesAfterModifiersApplied.Contains(CardType.Land);
+        public bool IsALand => Types.Contains(CardType.Land);
 
-        public bool IsAnEnchantment => TypesAfterModifiersApplied.Contains(CardType.Enchantment);
+        public bool IsAnEnchantment => Types.Contains(CardType.Enchantment);
 
-        public bool IsAnInstant => TypesAfterModifiersApplied.Contains(CardType.Instant);
+        public bool IsAnInstant => Types.Contains(CardType.Instant);
 
-        public bool IsASorcery => TypesAfterModifiersApplied.Contains(CardType.Instant);
+        public bool IsASorcery => Types.Contains(CardType.Instant);
 
-        public bool IsAPlaneswalker => TypesAfterModifiersApplied.Contains(CardType.Planeswalker);
+        public bool IsAPlaneswalker => Types.Contains(CardType.Planeswalker);
 
-        public bool IsATribal => TypesAfterModifiersApplied.Contains(CardType.Tribal);
+        public bool IsATribal => Types.Contains(CardType.Tribal);
 
-        public bool IsAToken => TypesAfterModifiersApplied.Contains(CardType.Token);
+        public bool IsAToken => Types.Contains(CardType.Token);
 
         public bool IsAPermanent => IsAnArtifact || IsACreature || IsAnEnchantment || IsALand || IsAPlaneswalker;
 

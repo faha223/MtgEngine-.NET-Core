@@ -3,6 +3,7 @@ using MtgEngine.Common.Enums;
 using MtgEngine.Common.Modifiers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MtgEngine.Common.Cards
@@ -10,20 +11,17 @@ namespace MtgEngine.Common.Cards
     public sealed partial class Card : IDamageable
     {
         private List<Effect> _effects { get; } = new List<Effect>();
-        public List<Effect> Effects
+
+        public void AddEffect(Effect effect)
         {
-            get
-            {
-                return _effects;
-            }
+            _effects.Add(effect);
         }
 
-        public List<Effect> EffectsAfterModifiersApplied
+        public ReadOnlyCollection<Effect> Effects
         {
             get
             {
-                var effects = new List<Effect>(Effects);
-                ApplyActiveEffects();
+                var effects = new List<Effect>(_effects);
                 if(Modifiers.Any(c => c.Property == nameof(Effects)))
                 {
                     foreach(EffectModifier modifier in Modifiers.Where(c => c.Property == nameof(Effects)))
@@ -46,27 +44,23 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                UnApplyActiveEffects();
 
-                return effects;
+                return effects.AsReadOnly();
             }
         }
 
         private List<Ability> _abilities { get; } = new List<Ability>();
-        public List<Ability> Abilities
+        
+        public void AddAbility(Ability ability)
         {
-            get
-            {
-                return _abilities;
-            }
+            _abilities.Add(ability);
         }
 
-        public List<Ability> AbilitiesAfterModifiersApplied
+        public ReadOnlyCollection<Ability> Abilities
         {
             get
             {
-                var abilities = new List<Ability>(Abilities);
-                ApplyActiveEffects();
+                var abilities = new List<Ability>(_abilities);
                 if(Modifiers.Any(c => c.Property == nameof(Abilities)))
                 {
                     foreach(AbilityModifier modifier in Modifiers.Where(c => c.Property == nameof(Abilities)))
@@ -87,8 +81,7 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                UnApplyActiveEffects();
-                return abilities;
+                return abilities.AsReadOnly();
             }
         }
 

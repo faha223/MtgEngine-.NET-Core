@@ -20,10 +20,10 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
             card.AddCounters(card, 10, CounterType.Ice);
 
             // {3}: Remove an ice counter from Dark Depths
-            card.Abilities.Add(new DarkDepthsAbility(card));
+            card.AddAbility(new DarkDepthsAbility(card));
 
             // When Dark Depths has no ice counters on it, sacrifice it. If you do, create Marit Lage, a legendary 20/20 black Avatar creature token with flying and indestructible
-            card.Abilities.Add(new MaritLageAbility(card));
+            card.AddAbility(new MaritLageAbility(card));
 
             return card;
         }

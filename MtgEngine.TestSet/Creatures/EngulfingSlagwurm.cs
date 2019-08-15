@@ -15,7 +15,7 @@ namespace MtgEngine.TestSet.Creatures
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{5}{G}{G}");
-            card.Abilities.Add(new EngulfingSlagwurmAbility(card));
+            card.AddAbility(new EngulfingSlagwurmAbility(card));
 
             return card;
         }
