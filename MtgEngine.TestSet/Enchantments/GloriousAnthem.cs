@@ -40,7 +40,7 @@ namespace MtgEngine.TestSet.Enchantments
             if(resolvable != null && resolvable is Card)
             {
                 var card = resolvable as Card;
-                if(card.IsACreature && card.Controller == Source.Controller)
+                if(card.Controller == Source.Controller)
                 {
                     card.Modifiers.Add(powerModifier);
                     card.Modifiers.Add(toughnessModifier);

@@ -363,13 +363,15 @@ namespace MtgEngine
             // Kill any creatures that have 0 toughness, or have sustained enough damage to be destroyed and don't have indestructible
             foreach (var player in _players)
             {
-                var deadCreatures = player.Battlefield.Creatures.Where(c => c.IsDead).ToList();
+                var creatures = player.Battlefield.Creatures.ToList();
+                var deadCreatures = creatures.Where(c => c.IsDead).ToList();
                 foreach(var creature in deadCreatures)
                 {
                     MoveFromBattlefieldToGraveyard(creature);
                 }
 
-                var deadPlaneswalkers = player.Battlefield.Planeswalkers.Where(c => c.IsDead).ToList();
+                var planeswalkers = player.Battlefield.Planeswalkers.ToList();
+                var deadPlaneswalkers = planeswalkers.Where(c => c.IsDead).ToList();
                 foreach(var planeswalker in deadPlaneswalkers)
                 {
                     MoveFromBattlefieldToGraveyard(planeswalker);
