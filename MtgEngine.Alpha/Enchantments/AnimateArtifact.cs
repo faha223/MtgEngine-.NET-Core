@@ -21,10 +21,10 @@ namespace MtgEngine.Alpha.Enchantments
 
             card.Cost = ManaCost.Parse(card, "{3}{U}");
 
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Where(_c => _c.IsAnArtifact))) as Card;
-                card.AddEffect(new AnimateArtifactEffect(card, target));
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.Battlefield.Where(_c => _c.IsAnArtifact && _c.CanBeTargetedBy(c)))) as Card;
+                c.AddEffect(new AnimateArtifactEffect(c, target));
             };
 
             return card;

@@ -27,19 +27,19 @@ namespace MtgEngine.Alpha.Instants
                 return true;
             };
 
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var possibleTargets = game.CardsOnStack();
+                var possibleTargets = g.CardsOnStack();
                 if (possibleTargets.Count == 0)
                     throw new InvalidOperationException("Counterspell can't be cast if there are no spells on the stack");
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(possibleTargets)) as Card;
-                card.SetVar("Target", target);
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(possibleTargets)) as Card;
+                c.SetVar("Target", target);
             };
 
-            card.OnResolve = game =>
+            card.OnResolve = (g, c) =>
             {
-                var target = card.GetVar<Card>("Target");
-                game.Counter(target);
+                var target = c.GetVar<Card>("Target");
+                g.Counter(target);
             };
 
             return card;

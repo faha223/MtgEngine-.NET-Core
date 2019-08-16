@@ -37,6 +37,7 @@ namespace MtgEngine.Common.Costs
             if(_source is Card)
             {
                 var target = (_source as Card).Controller.SelectTarget(_targetSelectionMessage, _targetSelector);
+                target.Tap();
                 return true;
             }
             return false;

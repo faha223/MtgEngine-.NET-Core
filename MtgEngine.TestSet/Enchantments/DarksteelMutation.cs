@@ -21,10 +21,10 @@ namespace MtgEngine.TestSet.Enchantments
 
             card.Cost = ManaCost.Parse(card, "{1}{W}");
             
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Creatures.Where(c => c.CanBeTargetedBy(card)))) as Card;
-                card.AddEffect(new DarksteelMutationEffect(card, target));
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.Battlefield.Creatures.Where(_c => _c.CanBeTargetedBy(c)))) as Card;
+                c.AddEffect(new DarksteelMutationEffect(c, target));
             };
 
             return card;

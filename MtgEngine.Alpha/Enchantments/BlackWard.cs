@@ -1,7 +1,12 @@
-﻿using MtgEngine.Common.Cards;
+﻿using MtgEngine.Common;
+using MtgEngine.Common.Cards;
 using MtgEngine.Common.Costs;
+using MtgEngine.Common.Effects;
 using MtgEngine.Common.Enums;
+using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MtgEngine.Alpha.Enchantments
 { 
@@ -17,19 +22,46 @@ namespace MtgEngine.Alpha.Enchantments
 
             card.Cost = ManaCost.Parse(card, "{W}");
 
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.SelectTarget("Enchant Creature", (c) => c.IsACreature);
-                card.SetVar("Target", target);
-            };
-
-            card.OnResolve = Game =>
-            {
-                var target = card.GetVar<Card>("Target");
-                // TODO: Attach Aura to Target
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.Battlefield.Creatures.Where(_c => _c.CanBeTargetedBy(c)))) as Card;
+                c.SetVar("Target", target);
+                c.AddEffect(new BlackWardEffect(c, target));
             };
 
             return card;
+        }
+    }
+
+    public class BlackWardEffect : ContinuousEffect
+    {
+        private Card target;
+        private Modifier modifier;
+
+        public BlackWardEffect(IResolvable source, Card target) : base(source)
+        {
+            this.target = target;
+
+            modifier = new StaticAbilityModifier(source, nameof(Card.StaticAbilities), ModifierMode.Add, null);// StaticAbility.ProtectionFromBlack);
+        }
+
+        public override void ModifyObject(Game game, IResolvable resolvable)
+        {
+            if(resolvable == target)
+            {
+                var card = resolvable as Card;
+                card.Modifiers.Add(modifier);
+            }
+        }
+
+        public override void UnmodifyObject(Game game, IResolvable resolvable)
+        {
+            if(resolvable is Card)
+            {
+                var card = resolvable as Card;
+                if (card.Modifiers.Contains(modifier))
+                    card.Modifiers.Remove(modifier);
+            }
         }
     }
 }

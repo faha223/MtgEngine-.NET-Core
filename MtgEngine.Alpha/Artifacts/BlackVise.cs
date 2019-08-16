@@ -22,10 +22,10 @@ namespace MtgEngine.Alpha.Artifacts
 
             card.AddAbility(new BlackViseAbility(card));
 
-            card.OnResolve = (Game game) =>
+            card.OnResolve = (g, c) =>
             {
-                var chosenPlayer = card.Controller.ChoosePlayer("As Black Vise enters the battlefield, choose an opponent.", game.Players().Except(new[] { card.Controller }));
-                card.SetVar("Chosen Player", chosenPlayer);
+                var chosenPlayer = c.Controller.ChoosePlayer("As Black Vise enters the battlefield, choose an opponent.", g.Players().Except(new[] { c.Controller }));
+                c.SetVar("Chosen Player", chosenPlayer);
             };
 
             return card;

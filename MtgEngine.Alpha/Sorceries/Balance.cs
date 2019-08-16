@@ -16,13 +16,13 @@ namespace MtgEngine.Alpha.Sorceries
 
             card.Cost = ManaCost.Parse(card, "{1}{W}");
 
-            card.OnResolve = game =>
+            card.OnResolve = (g, c) =>
             {
-                balanceLands(game);
+                balanceLands(g);
 
-                balanceHands(game);
+                balanceHands(g);
 
-                balanceCreatures(game);
+                balanceCreatures(g);
             };
 
             return card;

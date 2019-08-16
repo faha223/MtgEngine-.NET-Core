@@ -14,9 +14,9 @@ namespace MtgEngine.Alpha.Sorceries
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
             card.Cost = ManaCost.Parse(card, "{3}{W}");
 
-            card.OnResolve = game =>
+            card.OnResolve = (g, c) =>
             {
-                game.DestroyLands(c => true);
+                g.DestroyLands(_c => true);
             };
 
             return card;

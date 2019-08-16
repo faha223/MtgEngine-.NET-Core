@@ -133,7 +133,7 @@ namespace MtgEngine
                 if (action.Card.Cost.Pay())
                 {
                     // Put the Card onto the stack
-                    action.Card.OnCast?.Invoke(this);
+                    action.Card.OnCast?.Invoke(this, action.Card);
                     player.Hand.Remove(action.Card);
                     PushOntoStack(action.Card, Common.Enums.Zone.Hand);
                 }
@@ -265,7 +265,7 @@ namespace MtgEngine
                 if (obj is Card)
                 {
                     var card = obj as Card;
-                    card.OnResolve(this);
+                    card.OnResolve?.Invoke(this, card);
 
                     if (card.IsAPermanent)
                         PutPermanentOnBattlefield(card);

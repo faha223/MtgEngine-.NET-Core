@@ -23,10 +23,10 @@ namespace MtgEngine.TestSet.Enchantments
 
             card.Cost = ManaCost.Parse(card, "{2}{U}");
 
-            card.OnCast = (game) =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(game.Battlefield.Where(c => (c.IsACreature || c.IsALand || c.IsAPlaneswalker) && c.CanBeTargetedBy(card)))) as Card;
-                card.AddEffect(new ImprisonedInTheMoonEffect(card, target));
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.Battlefield.Where(_c => (_c.IsACreature || _c.IsALand || _c.IsAPlaneswalker) && _c.CanBeTargetedBy(c)))) as Card;
+                c.AddEffect(new ImprisonedInTheMoonEffect(c, target));
             };
 
             return card;

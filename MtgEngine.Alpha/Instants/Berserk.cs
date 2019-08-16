@@ -22,10 +22,10 @@ namespace MtgEngine.Alpha.Instants
 
             // TODO: At the beginning of the next end step, destroy that creature if it attacked this turn.
 
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.ChooseTarget(card, game.Battlefield.Creatures.AsEnumerable<ITarget>().ToList()) as Card;
-                card.SetVar("Target", target);
+                var target = c.Controller.ChooseTarget(c, g.Battlefield.Creatures.AsEnumerable<ITarget>().ToList()) as Card;
+                c.SetVar("Target", target);
             };
 
             card.CanCast = game =>

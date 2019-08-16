@@ -210,7 +210,7 @@ namespace MtgEngineTest
 
         public override Card SelectTarget(string message, Func<Card, bool> targetSelector)
         {
-            // TODO: Print a list of possible targets to the console and allow the user to select one, or none;
+            // Print a list of possible targets to the console and allow the user to select one, or none;
             var possibleTargets = Battlefield.Where(c => targetSelector(c)).ToList();
             int i = 0;
             int? selection = null;

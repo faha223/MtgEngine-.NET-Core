@@ -29,16 +29,16 @@ namespace MtgEngine.Alpha.Enchantments
 
             // Enchanted creature gets - 1 / -0.
 
-            card.OnCast = game =>
+            card.OnCast = (g, c) =>
             {
-                var target = card.Controller.ChooseTarget(card, new List<ITarget>(card.Controller.Graveyard.Where(_c => _c.IsACreature))) as Card;
-                card.SetVar("Target", target);
-                card.AddEffect(new AnimateDeadEffect(card, target));
+                var target = c.Controller.ChooseTarget(c, new List<ITarget>(c.Controller.Graveyard.Where(_c => _c.IsACreature && _c.CanBeTargetedBy(c)))) as Card;
+                c.SetVar("Target", target);
+                c.AddEffect(new AnimateDeadEffect(c, target));
             };
 
-            card.OnResolve = game =>
+            card.OnResolve = (g, c) =>
             {
-                var target = card.GetVar<Card>("Target");
+                var target = c.GetVar<Card>("Target");
                 // TODO: Move creature card from graveyard to battlefield
             };
 

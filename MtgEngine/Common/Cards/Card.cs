@@ -344,13 +344,13 @@ namespace MtgEngine.Common.Cards
 
         public Func<Game, bool> CanCast = game => { return true; };
 
-        public Action<Game> OnCast = game => { };
+        public Action<Game, Card> OnCast;
 
         /// <summary>
         /// The method that is called as the spell resolves. If a spell is exiled after it resolves, exile it in this method
         /// </summary>
         /// <param name="game"></param>
-        public Action<Game> OnResolve = game => { };
+        public Action<Game, Card> OnResolve;
 
         public void GiveControl(Player player)
         {

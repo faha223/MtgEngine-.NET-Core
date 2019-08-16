@@ -23,9 +23,9 @@ namespace MtgEngine.TestSet
 
             card.AddAbility(new AstralCornucopiaManaAbility(card));
 
-            card.OnResolve = (Game game) =>
+            card.OnResolve = (g, c) =>
             {
-                card.AddCounters(card, card.GetVar<int>("X"), CounterType.Charge);
+                c.AddCounters(c, c.GetVar<int>("X"), CounterType.Charge);
             };
 
             return card;
