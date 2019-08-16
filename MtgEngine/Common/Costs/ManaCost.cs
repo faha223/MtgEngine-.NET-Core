@@ -17,6 +17,14 @@ namespace MtgEngine.Common.Costs
         public delegate void IntegerEvent(int X);
         public event IntegerEvent ValueforXChosen;
 
+        public int ConvertedManaCost
+        {
+            get
+            {
+                return _manaAmounts.Sum(c => c.Color == ManaColor.GenericX ? 0 : c.Amount);
+            }
+        }
+
         private ManaCost(IResolvable source, params ManaAmount[] manaAmounts) : base(source)
         {
             _manaAmounts = manaAmounts;
