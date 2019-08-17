@@ -261,6 +261,25 @@ namespace MtgEngine.Common.Cards
             }
         }
 
+        private bool _canBeCountered { get; set; } = true;
+        public bool CanBeCountered
+        {
+            get
+            {
+                if(Modifiers.Any(c => c.Property == nameof(CanBeCountered)))
+                {
+                    var modifier = Modifiers.Last(c => c.Property == nameof(CanBeCountered)) as BooleanModifier;
+                    return modifier.Value;
+                }
+                return _canBeCountered;
+            }
+        }
+
+        public void SetCanBeCountered(bool canBeCountered)
+        {
+            _canBeCountered = canBeCountered;
+        }
+
         public Player Controller { get; private set; }
 
         public Player Owner { get; }
@@ -342,7 +361,7 @@ namespace MtgEngine.Common.Cards
             BaseToughnessFunc = original.BaseToughnessFunc;
         }
 
-        public Func<Game, bool> CanCast = game => { return true; };
+        public Func<Game, Card, bool> CanCast = (game, card) => { return true; };
 
         public Action<Game, Card> OnCast;
 

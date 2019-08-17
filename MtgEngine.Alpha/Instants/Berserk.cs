@@ -28,10 +28,22 @@ namespace MtgEngine.Alpha.Instants
                 c.SetVar("Target", target);
             };
 
-            card.CanCast = game =>
+            card.CanCast = (g, c) =>
             {
-                // TODO: Cast this spell only before the combat damage step
-                return true;
+                // Cast this spell only before the combat damage step.
+                switch (g.CurrentStep)
+                {
+                    case Phases.Untap:
+                    case Phases.Upkeep:
+                    case Phases.Draw:
+                    case Phases.PrecombatMainPhase:
+                    case Phases.StartOfCombat:
+                    case Phases.DeclareAttackers:
+                    case Phases.DeclareBlockers:
+                        return true;
+                    default:
+                        return false;
+                }
             };
 
             return card;

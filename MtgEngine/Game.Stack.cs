@@ -226,6 +226,7 @@ namespace MtgEngine
             foreach (EventTriggeredAbility ability in card.Abilities.Where(c => c is EventTriggeredAbility))
             {
                 PlayerTookDamage += ability.PlayerTookDamage;
+                PlayerLostLife += ability.PlayerLostLife;
                 CreatureTookDamage += ability.CreatureTookDamage;
                 CardHasChangedZones += ability.CardHasChangedZones;
                 CountersAddedToPermanent += ability.PermanentGotCounter;

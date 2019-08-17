@@ -10,6 +10,8 @@ using System.Linq;
 
 namespace MtgEngine.Alpha.Enchantments
 { 
+    // TODO: Finish when ProtectionFromBlack has been implemented
+
     [MtgCard("Black Ward", "LEA", "", "", Text= "Enchant creature\n\nEnchanted creature has protection from black.This effect doesn’t remove Black Ward.")]
     public class BlackWard : CardSource
     {

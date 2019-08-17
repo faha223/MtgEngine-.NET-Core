@@ -22,6 +22,10 @@ namespace MtgEngine.Common.Abilities
         {
         }
 
+        public virtual void PlayerLostLife(Game game, Player player, IResolvable source, int lifeLost)
+        {
+        }
+
         public virtual void CreatureTookDamage(Game game, Card creature, Card source, int damageReceived)
         {
         }

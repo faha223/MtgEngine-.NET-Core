@@ -17,6 +17,21 @@ namespace MtgEngine
         private List<Player> _players { get; } = new List<Player>();
         private List<Player> _losingPlayers { get; } = new List<Player>();
 
+        private string _currentStep { get; set; } = string.Empty;
+        public string CurrentStep { get
+            {
+                return _currentStep;
+            }
+            private set
+            {
+                if (_currentStep != value)
+                {
+                    _currentStep = value;
+                    CurrentStepHasChanged?.Invoke(this, _currentStep);
+                }
+            }
+        }
+
         public Player ActivePlayer { get; private set; }
 
         private Player _nextPlayer
@@ -81,12 +96,15 @@ namespace MtgEngine
             {
                 player.Game = this;
                 player.TookDamage += player_tookDamage;
+                player.LostLife += player_lostLife;
                 player.CountersCreated += player_CountersCreated;
                 player.CountersRemoved += player_CountersRemoved;
                 
                 CurrentStepHasChanged += player.GameStepChanged;
                 CardHasChangedZones += player.CardHasChangedZones;
                 AbilityHasEnteredStack += player.AbilityHasEnteredStack;
+                PlayerTookDamage += player.PlayerTookDamage;
+                PlayerLostLife += player.PlayerLostLife;
                 PlayerWonTheGame += player.PlayerWonTheGame;
                 PlayerLostTheGame += player.PlayerLostTheGame;
                 GameEndedInDraw += player.GameEndedInDraw;
@@ -112,6 +130,11 @@ namespace MtgEngine
         private void player_tookDamage(IDamageable player, Card source, int amount)
         {
             PlayerTookDamage?.Invoke(this, (Player)player, source, amount);
+        }
+
+        private void player_lostLife(IDamageable player, IResolvable source, int amount)
+        {
+            PlayerLostLife?.Invoke(this, (Player)player, source, amount);
         }
 
         private void creature_tookDamage(IDamageable creature, Card source, int amount)
@@ -219,7 +242,7 @@ namespace MtgEngine
 
         private void UntapStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Untap Step");
+            CurrentStep = Phases.Untap;
             ActivePlayer.Battlefield.ForEach(c =>
             {
                 c.HasSummoningSickness = false;
@@ -232,7 +255,7 @@ namespace MtgEngine
 
         private void UpkeepStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Upkeep Step");
+            CurrentStep = Phases.Upkeep;
 
             // TODO: Add Upkeep Triggers to the stack in ApNap order according to their controllers
             CheckForTriggeredAbilities();
@@ -244,7 +267,7 @@ namespace MtgEngine
 
         private void DrawStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Draw Step");
+            CurrentStep = Phases.Draw;
             // TODO: Add Beginning of Draw Step Triggers to the Stack
 
             ActivePlayer.Draw(1);
@@ -260,7 +283,7 @@ namespace MtgEngine
 
         private void MainPhase(bool beforeCombat)
         {
-            CurrentStepHasChanged?.Invoke(this, $"{(beforeCombat ? "Precombat" : "Postcombat")} Main Phase");
+            CurrentStep = beforeCombat ? Phases.PrecombatMainPhase : Phases.PostcombatMainPhase;
 
             // CheckStateBasedActiont to add Beginning of Main Phase Triggers to the stack
             CheckStateBasedActions();
@@ -303,7 +326,7 @@ namespace MtgEngine
 
         private void EndStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "End Step");
+            CurrentStep = Phases.EndStep;
             
             CheckForTriggeredAbilities();
             ApNapLoop(false);
@@ -313,7 +336,7 @@ namespace MtgEngine
 
         private void CleanupStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Cleanup Step");
+            CurrentStep = Phases.CleanupStep;
             
             ActivePlayer.DiscardToHandSize();
 

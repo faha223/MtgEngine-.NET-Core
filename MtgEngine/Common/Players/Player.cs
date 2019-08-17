@@ -79,8 +79,8 @@ namespace MtgEngine.Common.Players
 
         public void LoseLife(int amount, Card source)
         {
-            LostLife?.Invoke(this, source, amount);
             LifeTotal -= amount;
+            LostLife?.Invoke(this, source, amount);
         }
 
         public void GainLife(int amount)
@@ -225,7 +225,11 @@ namespace MtgEngine.Common.Players
         {
         }
 
-        public virtual void PlayerTookDamage(Game game, Player player, int damageDealt)
+        public virtual void PlayerTookDamage(Game game, Player player, Card source, int damageDealt)
+        {
+        }
+
+        public virtual void PlayerLostLife(Game game, Player player, IResolvable source, int lifeLost)
         {
         }
 
@@ -259,7 +263,7 @@ namespace MtgEngine.Common.Players
 
         protected bool canPlayCardThisTurn(Card card, Game game, bool canPlaySorcerySpeedSpells)
         {
-            bool canPlayCard = card.CanCast(game);
+            bool canPlayCard = card.CanCast(game, card);
             canPlayCard &= (canPlaySorcerySpeedSpells || card.IsAnInstant || card.StaticAbilities.Contains(StaticAbility.Flash));
             canPlayCard &= (!card.IsALand || LandsPlayedThisTurn < MaxLandsPlayedThisTurn);
 

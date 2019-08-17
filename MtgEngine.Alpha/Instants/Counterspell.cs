@@ -5,6 +5,7 @@ using MtgEngine.Common.Enums;
 using MtgEngine.Common.Players;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MtgEngine.Alpha.Instants
 {
@@ -18,9 +19,9 @@ namespace MtgEngine.Alpha.Instants
         
             card.Cost = ManaCost.Parse(card, "{U}{U}");
 
-            card.CanCast = game =>
+            card.CanCast = (g, c) =>
             {
-                var possibleTargets = game.CardsOnStack();
+                var possibleTargets = g.CardsOnStack().Where(_c => _c.CanBeCountered).ToList();
                 if (possibleTargets.Count == 0)
                     return false;
 

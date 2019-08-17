@@ -22,8 +22,11 @@ namespace MtgEngine
         delegate void CreatureTookDamageEvent(Game game, Card creature, Card source, int DamageTaken);
         private event CreatureTookDamageEvent CreatureTookDamage;
 
-        delegate void PlayertookDamageEvent(Game game, Player player, Card source, int DamageTaken);
-        private event PlayertookDamageEvent PlayerTookDamage;
+        delegate void PlayerTookDamageEvent(Game game, Player player, Card source, int DamageTaken);
+        private event PlayerTookDamageEvent PlayerTookDamage;
+
+        delegate void PlayerLostLifeEvent(Game game, Player player, IResolvable source, int lifeLost);
+        private event PlayerLostLifeEvent PlayerLostLife;
 
         #endregion Combat Events
 
@@ -32,7 +35,7 @@ namespace MtgEngine
         /// </summary>
         private void BeginningOfCombatStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Beginning of Combat");
+            CurrentStep = Phases.StartOfCombat;
 
             CheckForTriggeredAbilities();
 
@@ -46,7 +49,7 @@ namespace MtgEngine
         /// </summary>
         private void DeclareAttackersStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Declare Attackers Step");
+            CurrentStep = Phases.DeclareAttackers;
 
             // Ask the Active Player to declare attackers
             var attackers = ActivePlayer.DeclareAttackers(_players.Except(new[] { ActivePlayer }).ToList());
@@ -78,7 +81,7 @@ namespace MtgEngine
         /// </summary>
         private void DeclareBlockersStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Declare Blockers Step");
+            CurrentStep = Phases.DeclareBlockers;
 
             // Ask the Defending Players, in ApNap order, to declare Blockers
             var defendingPlayers = _players.StartAt(ActivePlayer)
@@ -114,7 +117,7 @@ namespace MtgEngine
         /// </summary>
         private void DamageStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "Damage Step");
+            CurrentStep = Phases.CombatDamage;
 
             // These creatures have been blocked
             var blockedCreatures = ActivePlayer.Battlefield.Creatures.Where(c => c.IsAttacking && c.DefendingPlayer.Battlefield.Creatures.Any(d => d.Blocking == c)).ToList();
@@ -235,7 +238,7 @@ namespace MtgEngine
         /// </summary>
         private void EndOfCombatStep()
         {
-            CurrentStepHasChanged?.Invoke(this, "End of Combat Step");
+            CurrentStep = Phases.EndOfCombat;
 
             // Give Priority to Players
             CheckStateBasedActions();

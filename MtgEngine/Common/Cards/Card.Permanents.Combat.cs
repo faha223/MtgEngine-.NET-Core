@@ -128,6 +128,10 @@ namespace MtgEngine.Common.Cards
             if (!IsACreature)
                 return false;
 
+            // A creature can't block if it's tapped
+            if (IsTapped)
+                return false;
+
             // Can't block non-creatures (Vehicles can only attack/block if they're creatures)
             if (!permanent.IsACreature)
                 return false;

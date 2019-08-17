@@ -522,7 +522,7 @@ namespace MtgEngineTest
         {
             this.currentStep = currentStep;
 
-            if (currentStep == "Untap Step")
+            if (currentStep == Phases.Untap)
                 passTurn = false;
 
             Console.WriteLine();
@@ -568,10 +568,15 @@ namespace MtgEngineTest
             Console.WriteLine();
         }
 
-        public override void PlayerTookDamage(Game game, Player player, int damageDealt)
+        public override void PlayerTookDamage(Game game, Player player, Card source, int damageDealt)
         {
             Console.WriteLine($"{player.Name} took {damageDealt} damage.");
-            Console.WriteLine($"{player.Name}'s life total is now {player.LifeTotal}");
+            Console.WriteLine();
+        }
+
+        public override void PlayerLostLife(Game game, Player player, IResolvable source, int amount)
+        {
+            Console.WriteLine($"{player.Name} lost {amount} life. {player.Name}'s life total is now {player.LifeTotal}.");
             Console.WriteLine();
         }
 
