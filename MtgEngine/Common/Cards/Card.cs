@@ -105,7 +105,7 @@ namespace MtgEngine.Common.Cards
             }
         }
 
-        private CardType[] _types { get; }
+        private CardType[] _types { get; set; }
         public CardType[] Types
         {
             get
