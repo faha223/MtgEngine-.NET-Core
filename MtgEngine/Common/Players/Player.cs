@@ -133,6 +133,8 @@ namespace MtgEngine.Common.Players
 
         public abstract List<Card> MakeChoice(string message, int count, List<Card> options);
 
+        public abstract List<string> MakeChoice(string message, int count, List<string> options);
+
         public abstract List<Card> Sort(string message, List<Card> options);
 
         public abstract int GetValueForX(string cost);
@@ -175,7 +177,7 @@ namespace MtgEngine.Common.Players
 
         public abstract List<BlockerDeclaration> DeclareBlockers(List<Card> AttackingCreatures);
 
-        public abstract ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets);
+        public abstract ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets, string message = null);
 
         public abstract ManaColor ChooseColor();
 

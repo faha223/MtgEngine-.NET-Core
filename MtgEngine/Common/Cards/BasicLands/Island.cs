@@ -9,7 +9,7 @@ namespace MtgEngine.Common.Cards.BasicLands
         public override Card GetCard(Player owner)
         {
             var card = GetBasicLandCard(owner, ManaColor.Blue, new[] { CardType.Land }, new[] { "Island" }, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = CardAttrs;
 
             return card;
         }

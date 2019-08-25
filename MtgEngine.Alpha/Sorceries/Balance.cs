@@ -12,7 +12,7 @@ namespace MtgEngine.Alpha.Sorceries
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Sorcery }, null, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = MtgCard;
 
             card.Cost = ManaCost.Parse(card, "{1}{W}");
 

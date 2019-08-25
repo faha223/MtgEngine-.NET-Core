@@ -63,7 +63,7 @@ namespace MtgEngine.Common.Players.AIPlayers
             return blockers;
         }
 
-        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets)
+        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets, string message = null)
         {
             return possibleTargets.Last();
         }
@@ -79,6 +79,11 @@ namespace MtgEngine.Common.Players.AIPlayers
         }
 
         public override List<Card> MakeChoice(string message, int count, List<Card> options)
+        {
+            return options.Take(count).ToList();
+        }
+
+        public override List<string> MakeChoice(string message, int count, List<string> options)
         {
             return options.Take(count).ToList();
         }

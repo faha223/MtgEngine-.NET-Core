@@ -16,7 +16,7 @@ namespace MtgEngine.TestSet.Creatures
         
             card.Cost = ManaCost.Parse(card, "{2}");
 
-            card.StaticAbilities.Add(StaticAbility.Infect);
+            card.AddStaticAbility(StaticAbility.Infect);
 
             card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Colorless), "{T}: Add {C}."));
 

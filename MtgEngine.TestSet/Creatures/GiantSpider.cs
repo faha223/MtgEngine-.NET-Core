@@ -14,7 +14,7 @@ namespace MtgEngine.TestSet.Creatures
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{3}{G}");
-            card.StaticAbilities.Add(StaticAbility.Reach);
+            card.AddStaticAbility(StaticAbility.Reach);
 
             return card;
         }

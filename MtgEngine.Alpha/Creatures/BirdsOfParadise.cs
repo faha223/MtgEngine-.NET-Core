@@ -12,11 +12,11 @@ namespace MtgEngine.Alpha.Creatures
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Bird" }, false, 0, 1, false, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = MtgCard;
 
             card.Cost = ManaCost.Parse(card, "{G}");
 
-            card.StaticAbilities.Add(StaticAbility.Flying);
+            card.AddStaticAbility(StaticAbility.Flying);
 
             card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.White), "{T}: Add {W}"));
             card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Blue), "{T}: Add {U}"));

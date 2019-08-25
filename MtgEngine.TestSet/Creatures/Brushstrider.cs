@@ -14,7 +14,7 @@ namespace MtgEngine.TestSet.Creatures
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{1}{G}");
-            card.StaticAbilities.Add(StaticAbility.Vigilance);
+            card.AddStaticAbility(StaticAbility.Vigilance);
 
             return card;
         }

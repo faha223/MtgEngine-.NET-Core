@@ -11,12 +11,12 @@ namespace MtgEngine.Alpha.Creatures
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Human", "Soldier" }, false, 1, 1, false, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = MtgCard;
 
             card.Cost = ManaCost.Parse(card, "{W}");
 
             // TODO
-            //card.StaticAbilities.Add(StaticAbility.Banding);
+            //card.AddStaticAbility(StaticAbility.Banding);
 
             return card;
         }

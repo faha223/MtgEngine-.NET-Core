@@ -279,7 +279,7 @@ namespace MtgEngineTest
                 cardsOnTop = scryedCards;
         }
 
-        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets)
+        public override ITarget ChooseTarget(IResolvable source, List<ITarget> possibleTargets, string message = null)
         {
             if (possibleTargets.Count == 1)
                 return possibleTargets[0];
@@ -287,10 +287,17 @@ namespace MtgEngineTest
             int? selection = null;
             while (!selection.HasValue)
             {
-                if (source is Card)
-                    Console.WriteLine((source as Card).Text);
-                else if (source is Ability)
-                    Console.WriteLine((source as Ability).Text);
+                if (string.IsNullOrWhiteSpace(message))
+                {
+                    Console.WriteLine(message);
+                }
+                else
+                {
+                    if (source is Card)
+                        Console.WriteLine((source as Card).Text);
+                    else if (source is Ability)
+                        Console.WriteLine((source as Ability).Text);
+                }
 
                 int i = 0;
                 foreach (var target in possibleTargets)
@@ -651,29 +658,49 @@ namespace MtgEngineTest
 
         public override List<Card> MakeChoice(string message, int count, List<Card> options)
         {
+            Dictionary<string, Card> optionMap = new Dictionary<string, Card>(options.Count);
+            foreach(var card in options)
+            {
+                if (card.IsAPermanent)
+                {
+                    string counters = string.Empty;
+                    if (card.Counters.Count > 0)
+                    {
+                        foreach (var counterType in card.Counters.Distinct())
+                        {
+                            counters += $" ({counterType}: {card.Counters.Count(c => c == counterType)})";
+                        }
+                    }
+                    if (card.IsACreature)
+                        optionMap.Add($"{card.Name} ({card.Power}/{card.Power}){counters}", card);
+                    else
+                        optionMap.Add($"{card.Name}{counters}", card);
+                }
+                else
+                    optionMap.Add(card.Name, card);
+            }
+
+            var choices = MakeChoice(message, count, optionMap.Keys.ToList());
+
+            List<Card> chosenCards = new List<Card>(choices.Count);
+            foreach(var card in choices)
+            {
+                chosenCards.Add(optionMap[card]);
+            }
+
+            return chosenCards;
+        }
+
+        public override List<string> MakeChoice(string message, int count, List<string> options)
+        {
             do
             {
                 Console.WriteLine(message);
                 int i = 0;
-                foreach (var card in options)
+
+                foreach (var option in options)
                 {
-                    if (card.IsAPermanent)
-                    {
-                        string counters = string.Empty;
-                        if(card.Counters.Count > 0)
-                        {
-                            foreach(var counterType in card.Counters.Distinct())
-                            {
-                                counters += $" ({counterType}: {card.Counters.Count(c => c == counterType)})";
-                            }
-                        }
-                        if (card.IsACreature)
-                            Console.WriteLine($"{++i}: {card.Name} ({card.Power}/{card.Power}){counters}");
-                        else
-                            Console.WriteLine($"{++i}: {card.Name}{counters}");
-                    }
-                    else
-                        Console.WriteLine($"{++i}: {card.Name}");
+                    Console.WriteLine($"{++i}: {option}");
                 }
 
                 Console.Write("Choose: ");

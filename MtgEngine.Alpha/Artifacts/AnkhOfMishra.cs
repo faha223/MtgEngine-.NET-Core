@@ -13,7 +13,7 @@ namespace MtgEngine.Alpha.Artifacts
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Artifact }, null, false, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = MtgCard;
 
             card.Cost = ManaCost.Parse(card, "{2}");
             card.AddAbility(new AnkhOfMishraAbility(card));

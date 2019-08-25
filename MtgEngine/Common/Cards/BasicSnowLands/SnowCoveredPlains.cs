@@ -9,7 +9,7 @@ namespace MtgEngine.Common.Cards.BasicSnowLands
         public override Card GetCard(Player owner)
         {
             var card = GetBasicSnowLand(owner, ManaColor.White, new[] { CardType.Land }, new[] { "Plains" });
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = CardAttrs;
 
             return card;
         }

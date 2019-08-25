@@ -14,7 +14,7 @@ namespace MtgEngine.Alpha.Instants
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Instant }, null, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = MtgCard;
 
             card.Cost = ManaCost.Parse(card, "{G}");
 

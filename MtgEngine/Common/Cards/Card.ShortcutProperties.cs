@@ -105,5 +105,23 @@ namespace MtgEngine.Common.Cards
         public bool IsAPermanent => IsAnArtifact || IsACreature || IsAnEnchantment || IsALand || IsAPlaneswalker;
 
         public bool IsASpell => IsAnInstant || IsASorcery;
+
+        public bool IsWhite => ColorIdentity.Contains(ManaColor.White);
+        public bool IsBlue => ColorIdentity.Contains(ManaColor.Blue);
+        public bool IsBlack => ColorIdentity.Contains(ManaColor.Black);
+        public bool IsRed => ColorIdentity.Contains(ManaColor.Red);
+        public bool IsGreen => ColorIdentity.Contains(ManaColor.Green);
+
+        public bool IsColorless {
+            get
+            {
+                var ci = ColorIdentity;
+                if (ci.Length == 0)
+                    return true;
+                if (ci.Length == 1 && ci[0] == ManaColor.Colorless)
+                    return true;
+                return false;
+            }
+        }
     }
 }

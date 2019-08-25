@@ -14,7 +14,7 @@ namespace MtgEngine.TestSet.Creatures
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{3}");
-            card.StaticAbilities.Add(StaticAbility.Indestructible);
+            card.AddStaticAbility(StaticAbility.Indestructible);
 
             return card;
         }

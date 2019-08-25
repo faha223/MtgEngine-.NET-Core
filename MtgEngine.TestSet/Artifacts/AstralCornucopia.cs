@@ -18,8 +18,8 @@ namespace MtgEngine.TestSet
 
             card.Cost = ManaCost.Parse(card, "{X}{X}{X}");
 
-            var mc = card.Cost as ManaCost;
-            mc.ValueforXChosen += (x => card.SetVar("X", x));
+            // This must be a new delegate every time. Otherwise we lose the card reference
+            (card.Cost as ManaCost).ValueforXChosen += (x => card.SetVar("X", x));
 
             card.AddAbility(new AstralCornucopiaManaAbility(card));
 

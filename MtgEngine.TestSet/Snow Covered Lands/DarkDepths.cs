@@ -84,8 +84,8 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
                 var card = new Card(owner, new[] { CardType.Creature, CardType.Token }, new[] { "Avatar" }, false, 20, 20, true, false);
                 card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
-                card.StaticAbilities.Add(StaticAbility.Flying);
-                card.StaticAbilities.Add(StaticAbility.Indestructible);
+                card.AddStaticAbility(StaticAbility.Flying);
+                card.AddStaticAbility(StaticAbility.Indestructible);
 
                 // Override Color Identity to Black
                 card.Modifiers.Add(new ColorModifier(card, nameof(Card.ColorIdentity), ModifierMode.Override, ManaColor.Black));

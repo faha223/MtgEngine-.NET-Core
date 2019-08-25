@@ -4,6 +4,7 @@ using MtgEngine.Common.Modifiers;
 using MtgEngine.Common.Players;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace MtgEngine.Common.Cards
@@ -54,7 +55,7 @@ namespace MtgEngine.Common.Cards
         }
 
         private List<StaticAbility> _staticAbilities { get; } = new List<StaticAbility>();
-        public List<StaticAbility> StaticAbilities
+        public ReadOnlyCollection<StaticAbility> StaticAbilities
         {
             get
             {
@@ -81,8 +82,13 @@ namespace MtgEngine.Common.Cards
                         }
                     }
                 }
-                return abilities;
+                return new ReadOnlyCollection<StaticAbility>(abilities);
             }
+        }
+
+        public void AddStaticAbility(StaticAbility ability)
+        {
+            _staticAbilities.Add(ability);
         }
 
         public Guid InstanceId { get; } = Guid.NewGuid();

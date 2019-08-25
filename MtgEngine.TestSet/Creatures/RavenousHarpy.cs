@@ -14,7 +14,7 @@ namespace MtgEngine.TestSet.Creatures
             card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{2}{B}");
-            card.StaticAbilities.Add(StaticAbility.Flying);
+            card.AddStaticAbility(StaticAbility.Flying);
             card.AddAbility(new RavenousHarpyAbility(card));
 
             return card;

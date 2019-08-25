@@ -9,18 +9,16 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MtgEngine.Alpha.Enchantments
-{ 
-    // TODO: Finish when ProtectionFromBlack has been implemented
+{
+    // TODO: Finish when ProtectionFromBlue has been implemented
 
-    [MtgCard("Black Ward", "LEA", "", "", Text= "Enchant creature\n\nEnchanted creature has protection from black.This effect doesn’t remove Black Ward.")]
-    public class BlackWard : CardSource
+    [MtgCard("Blue Ward", "LEA", "", "", "Enchant Creature\nEnchanted creature has protection from blue. This effect doesn't remove blue ward.")]
+    public class BlueWard : CardSource
     {
-        public Card enchantedCreature;
-
         public override Card GetCard(Player owner)
         {
-            var card = new Card(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false, false, false);
-            card._attrs = MtgCard;
+            var card = new Card(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false);
+            card._attrs = MtgCardAttribute.GetAttribute(GetType());
 
             card.Cost = ManaCost.Parse(card, "{W}");
 
@@ -28,28 +26,28 @@ namespace MtgEngine.Alpha.Enchantments
             {
                 var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.Battlefield.Creatures.Where(_c => _c.CanBeTargetedBy(c)))) as Card;
                 c.SetVar("Target", target);
-                c.AddEffect(new BlackWardEffect(c, target));
+                c.AddEffect(new BlueWardEffect(c, target));
             };
 
             return card;
         }
     }
 
-    public class BlackWardEffect : ContinuousEffect
+    public class BlueWardEffect : ContinuousEffect
     {
         private Card target;
         private Modifier modifier;
 
-        public BlackWardEffect(IResolvable source, Card target) : base(source)
+        public BlueWardEffect(IResolvable source, Card target) : base(source)
         {
             this.target = target;
 
-            modifier = new StaticAbilityModifier(source, nameof(Card.StaticAbilities), ModifierMode.Add, null);// StaticAbility.ProtectionFromBlack);
+            modifier = new StaticAbilityModifier(source, nameof(Card.StaticAbilities), ModifierMode.Add, null);// StaticAbility.ProtectionFromBlue);
         }
 
         public override void ModifyObject(Game game, IResolvable resolvable)
         {
-            if(resolvable == target)
+            if (resolvable == target)
             {
                 var card = resolvable as Card;
                 card.Modifiers.Add(modifier);
@@ -58,7 +56,7 @@ namespace MtgEngine.Alpha.Enchantments
 
         public override void UnmodifyObject(Game game, IResolvable resolvable)
         {
-            if(resolvable is Card)
+            if (resolvable is Card)
             {
                 var card = resolvable as Card;
                 if (card.Modifiers.Contains(modifier))
