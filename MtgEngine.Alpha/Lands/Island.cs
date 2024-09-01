@@ -9,7 +9,7 @@ namespace MtgEngine.Alpha
         public override Card GetCard(Player owner)
         {
             var card = base.GetCard(owner);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = CardAttrs;
 
             return card;
         }

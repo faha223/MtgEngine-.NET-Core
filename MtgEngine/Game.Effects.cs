@@ -1,5 +1,6 @@
 ﻿using MtgEngine.Common;
 using MtgEngine.Common.Cards;
+using MtgEngine.Common.Players;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,15 @@ namespace MtgEngine
             {
                 MoveFromBattlefieldToGraveyard(card);
             }
+        }
+
+        public List<Card> SearchLibraryForCards(Player player, int count, Func<Card, bool> selector)
+        {
+            var acceptableCards = player.Library.Where(c => selector(c)).ToList();
+
+            var selectedCards = player.MakeChoice($"Choose {(count == 1 ? "a" : count.ToString())} card{(count == 1 ? string.Empty : "s")}", count, acceptableCards);
+
+            return selectedCards;
         }
     }
 }

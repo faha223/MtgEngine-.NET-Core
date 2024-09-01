@@ -17,7 +17,7 @@ namespace MtgEngine.Alpha.Enchantments
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Enchantment }, new[] { "Aura" }, false);
-            card._attrs = MtgCard;
+            card._attrs = CardAttrs;
 
             card.Cost = ManaCost.Parse(card, "{3}{U}");
 

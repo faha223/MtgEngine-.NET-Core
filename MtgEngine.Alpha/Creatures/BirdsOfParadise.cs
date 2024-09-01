@@ -12,7 +12,7 @@ namespace MtgEngine.Alpha.Creatures
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Bird" }, false, 0, 1, false, false);
-            card._attrs = MtgCard;
+            card._attrs = CardAttrs;
 
             card.Cost = ManaCost.Parse(card, "{G}");
 

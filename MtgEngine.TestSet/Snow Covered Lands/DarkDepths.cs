@@ -30,7 +30,7 @@ namespace MtgEngine.TestSet.Snow_Covered_Lands
 
         public class DarkDepthsAbility : ActivatedAbility
         {
-            public DarkDepthsAbility(Card source) : base(source, ManaCost.Parse(source, "{3}"), "{3}: Remove an ice counter from Dark Depths")
+            public DarkDepthsAbility(Card source) : base(source, ManaCost.Parse(source, "{3}"), $"{{3}}: Remove an ice counter from {source.Name}")
             {
             }
 

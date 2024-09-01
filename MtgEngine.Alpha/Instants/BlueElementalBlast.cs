@@ -31,7 +31,7 @@ namespace MtgEngine.Alpha.Instants
                 var options = new List<string>(modes);
                 var choice = c.Controller.MakeChoice("Choose One", 1, options);
                 c.SetVar("Mode", choice[0]);
-                if(choice[0] == options[0])
+                if(choice[0] == 1)
                 {
                     // Select target red spell
                     var target = c.Controller.ChooseTarget(c, new List<ITarget>(g.CardsOnStack().Where(c2 => c2.IsRed && c2.CanBeTargetedBy(c))), "Choose target red spell") as Card;

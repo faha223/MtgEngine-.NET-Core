@@ -197,7 +197,7 @@ namespace MtgEngine.Common.Cards
         {
             get
             {
-                var subtypes = new List<string>(_subtypes);
+                var subtypes = new List<string>(_subtypes ?? new string[] { });
                 if (Modifiers.Any(c => c.Property == nameof(Subtypes)))
                 {
                     foreach(StringModifier modifier in Modifiers.Where(c => c.Property == nameof(Subtypes)))

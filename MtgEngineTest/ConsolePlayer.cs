@@ -11,6 +11,7 @@ using MtgEngine.Common.Players;
 using MtgEngine.Common.Players.Actions;
 using MtgEngine.Common.Players.Gameplay;
 using MtgEngine.Common.Utilities;
+using MtgEngineTest.Helpers;
 
 namespace MtgEngineTest
 {
@@ -123,7 +124,7 @@ namespace MtgEngineTest
         private void PrintHand()
         {
             Console.WriteLine("Your Hand:");
-            Hand.ForEach(card => Console.WriteLine(card.Name));
+            Hand.ForEach(card => card.PrintCard());//Console.WriteLine(card.Name));
             Console.WriteLine();
         }
 
@@ -658,7 +659,8 @@ namespace MtgEngineTest
 
         public override List<Card> MakeChoice(string message, int count, List<Card> options)
         {
-            Dictionary<string, Card> optionMap = new Dictionary<string, Card>(options.Count);
+            //Dictionary<string, Card> optionMap = new Dictionary<string, Card>(options.Count);
+            List<string> optionStrings = new List<string>(options.Count);
             foreach(var card in options)
             {
                 if (card.IsAPermanent)
@@ -672,26 +674,26 @@ namespace MtgEngineTest
                         }
                     }
                     if (card.IsACreature)
-                        optionMap.Add($"{card.Name} ({card.Power}/{card.Power}){counters}", card);
+                        optionStrings.Add($"{card.Name} ({card.Power}/{card.Power}){counters}");
                     else
-                        optionMap.Add($"{card.Name}{counters}", card);
+                        optionStrings.Add($"{card.Name}{counters}");
                 }
                 else
-                    optionMap.Add(card.Name, card);
+                    optionStrings.Add(card.Name);
             }
 
-            var choices = MakeChoice(message, count, optionMap.Keys.ToList());
+            var choices = MakeChoice(message, count, optionStrings);
 
             List<Card> chosenCards = new List<Card>(choices.Count);
             foreach(var card in choices)
             {
-                chosenCards.Add(optionMap[card]);
+                chosenCards.Add(options[card - 1]);
             }
 
             return chosenCards;
         }
 
-        public override List<string> MakeChoice(string message, int count, List<string> options)
+        public override List<int> MakeChoice(string message, int count, List<string> options)
         {
             do
             {
@@ -708,7 +710,8 @@ namespace MtgEngineTest
                 var selection = ParseChoice(Console.ReadLine(), count, count, 1, i, true);
                 if (selection != null)
                 {
-                    return options.OrderByIndexList(selection.Select(c => c - 1));
+                    //return options.OrderByIndexList(selection.Select(c => c - 1));
+                    return selection;
                 }
             } while (true);
         }

@@ -16,7 +16,7 @@ namespace MtgEngine.Alpha.Artifacts
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Artifact }, null, false, false, false);
-            card._attrs = MtgCard;
+            card._attrs = CardAttrs;
 
             card.Cost = ManaCost.Parse(card, "{1}");
 

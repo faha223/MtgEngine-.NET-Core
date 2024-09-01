@@ -6,12 +6,6 @@ namespace MtgEngine.Common.Cards
     {
         public abstract Card GetCard(Player owner);
 
-        protected MtgCardAttribute CardAttrs
-        {
-            get
-            {
-                return MtgCardAttribute.GetAttribute(GetType());
-            }
-        }
+        protected MtgCardAttribute CardAttrs => MtgCardAttribute.GetAttribute(GetType());
     }
 }

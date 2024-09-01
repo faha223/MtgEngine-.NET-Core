@@ -83,9 +83,15 @@ namespace MtgEngine.Common.Players.AIPlayers
             return options.Take(count).ToList();
         }
 
-        public override List<string> MakeChoice(string message, int count, List<string> options)
+        public override List<int> MakeChoice(string message, int count, List<string> options)
         {
-            return options.Take(count).ToList();
+            var selection = new List<int>(count);
+            for(int i = 0; i < count; i++)
+            {
+                selection.Add(i);
+            }
+            return selection;
+            //return options.Take(count).ToList();
         }
 
         public override List<Card> Sort(string message, List<Card> options)

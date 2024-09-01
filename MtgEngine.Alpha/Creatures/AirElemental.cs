@@ -11,7 +11,7 @@ namespace MtgEngine.Alpha.Creatures
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Elemental" }, false, 4, 4, false, false);
-            card._attrs = MtgCard;
+            card._attrs = CardAttrs;
 
             card.Cost = ManaCost.Parse(card, "{3}{U}{U}");
             card.AddStaticAbility(StaticAbility.Flying);

@@ -133,7 +133,7 @@ namespace MtgEngine.Common.Players
 
         public abstract List<Card> MakeChoice(string message, int count, List<Card> options);
 
-        public abstract List<string> MakeChoice(string message, int count, List<string> options);
+        public abstract List<int> MakeChoice(string message, int count, List<string> options);
 
         public abstract List<Card> Sort(string message, List<Card> options);
 

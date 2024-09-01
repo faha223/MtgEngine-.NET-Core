@@ -1,4 +1,6 @@
-﻿20x Tundra
+﻿12x Arid Mesa
+4x Mountain
+4x Plains
 20x Palladium Myr
 10x Glorious Anthem
 10x Imprisoned in the Moon

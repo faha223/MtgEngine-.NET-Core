@@ -12,7 +12,7 @@ namespace MtgEngine.Alpha.Lands
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Land }, new[] { "Forest", "Plains" }, false, false, false);
-            card._attrs = MtgCardAttribute.GetAttribute(GetType());
+            card._attrs = CardAttrs;
 
             card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.Green), "{T}: Add {G}"));
             card.AddAbility(new ManaAbility(card, new TapCost(card), new Common.Mana.ManaAmount(1, ManaColor.White), "{T}: Add {W}"));

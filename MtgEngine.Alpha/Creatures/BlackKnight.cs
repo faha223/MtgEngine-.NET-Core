@@ -11,7 +11,7 @@ namespace MtgEngine.Alpha.Creatures
         public override Card GetCard(Player owner)
         {
             var card = new Card(owner, new[] { CardType.Creature }, new[] { "Human", "Knight" }, false, 2, 2, false, false);
-            card._attrs = MtgCard;
+            card._attrs = CardAttrs;
 
             card.Cost = ManaCost.Parse(card, "{B}{B}");
 
